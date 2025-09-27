@@ -26,6 +26,8 @@ export async function GET(req: NextRequest) {
       location: "India",
     });
 
+    //  console.log("SerpAPI Jobs Response:", response);
+
     const jobs: Job[] = Array.isArray(response.jobs_results)
       ? response.jobs_results.map((job: any) => ({
           title: job.title,
@@ -36,6 +38,8 @@ export async function GET(req: NextRequest) {
           apply_options: job.apply_options,
         }))
       : [];
+
+     
 
     return NextResponse.json(jobs);
   } catch (error) {

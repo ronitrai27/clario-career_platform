@@ -12,6 +12,7 @@ import SingleCard from "../../_components/IndustrySingleCard";
 import { Button } from "@/components/ui/button";
 import { useRouter } from "next/navigation";
 import { useQuizData } from "@/context/userQuizProvider";
+import CoursesList from "../../_components/CourseData";
 
 const skills = [
   "Python",
@@ -134,6 +135,8 @@ const CareerBoard = () => {
           <div className="mt-20">
             <CareerTabsDemo />
           </div>
+
+         
         </>
       )}
     </div>

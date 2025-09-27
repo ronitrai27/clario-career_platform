@@ -5,7 +5,10 @@ import { useEffect } from "react";
 import axios from "axios";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useQuizData } from "@/context/userQuizProvider";
-import { LuChevronRight } from "react-icons/lu";
+import { LuActivity, LuChevronRight } from "react-icons/lu";
+import { Button } from "@/components/ui/button";
+import { Heart } from "lucide-react";
+import CareerCourses from "./CourseData";
 
 interface Job {
   title: string;
@@ -21,7 +24,6 @@ export default function CareerTabsDemo() {
   const [jobs, setJobs] = React.useState<Job[]>([]);
   const [loading, setLoading] = React.useState(false);
   const { quizData } = useQuizData();
-
 
   useEffect(() => {
     if (!quizData?.selectedCareer) return;
@@ -44,7 +46,7 @@ export default function CareerTabsDemo() {
   }, [quizData?.selectedCareer]);
 
   return (
-    <div className="max-w-[1000px] bg-white mx-auto p-6">
+    <div className="max-w-[1100px] bg-white rounded-lg mx-auto border p-6">
       <div className="w-full my-4 text-center">
         {activeTab === "jobs" && (
           <>
@@ -90,7 +92,7 @@ export default function CareerTabsDemo() {
         </TabsList>
 
         <TabsContent value="jobs">
-          <div className="p-6 border rounded-lg shadow-sm bg-white">
+          <div className="  bg-white">
             {loading ? (
               <p className="text-muted-foreground">Loading jobs...</p>
             ) : jobs.length === 0 ? (
@@ -98,28 +100,49 @@ export default function CareerTabsDemo() {
                 No jobs found for {quizData?.selectedCareer}
               </p>
             ) : (
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
                 {jobs.map((job, i) => (
                   <div
                     key={i}
-                    className="p-4 bg-blue-50 border rounded-lg hover:shadow-md transition-shadow shadow"
+                    className="p-3 h-[320px] bg-blue-50 border rounded-lg hover:shadow-md transition-shadow shadow flex flex-col"
                   >
-                    <h3 className="font-semibold font-inter tracking-tight">{job.title}</h3>
-                    <p className="text-base font-raleway text-muted-foreground">
-                      <span className="font-semibold text-blue-500">{job.company_name}</span> • {job.location}
+                    <h3 className="font-semibold font-inter tracking-tight text-center text-lg">
+                      {job.title}
+                    </h3>
+                    <p className="text-base font-raleway text-muted-foreground text-center mt-3">
+                      <span className="font-semibold text-blue-500">
+                        {job.company_name}
+                      </span>{" "}
+                      • {job.location}
+                    </p>
+                    <p className="font-inter font-medium my-2 text-left">
+                      Platforms: {job.via}
                     </p>
 
-                    <p className="font-inter line-clamp-2 mt-3 text-muted-foreground text-sm">{job.description}</p>
-                    {job.apply_options[0]?.link && (
-                      <a
-                        href={job.apply_options[0].link}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="text-blue-600 text-sm mt-2 inline-block"
-                      >
-                      Click to Apply <LuChevronRight className="inline-block" />
-                      </a>
-                    )}
+                    <p className="font-inter line-clamp-3 mt-5 text-muted-foreground text-sm">
+                      {job.description}
+                    </p>
+
+                    {/* push this container to bottom */}
+                    <div className="flex items-center justify-center gap-10 mt-auto">
+                      {job.apply_options[0]?.link && (
+                        <Button>
+                          <a
+                            href={job.apply_options[0].link}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="text-white font-inter text-xs inline-block"
+                          >
+                            Click to Apply{" "}
+                          </a>
+                          <LuActivity className="inline-block" />
+                        </Button>
+                      )}
+
+                      <div className="w-10 h-10 rounded-md flex items-center justify-center bg-blue-100">
+                        <Heart className="w-5 h-5 text-blue-500" />
+                      </div>
+                    </div>
                   </div>
                 ))}
               </div>
@@ -128,18 +151,12 @@ export default function CareerTabsDemo() {
         </TabsContent>
 
         <TabsContent value="colleges">
-          <div className="p-6 border rounded-lg shadow-sm bg-white">
-            <p className="text-muted-foreground">
-              College details will appear here.
-            </p>
-          </div>
+          <div className="p-4  bg-white"></div>
         </TabsContent>
 
         <TabsContent value="courses">
-          <div className="p-6 border rounded-lg shadow-sm bg-white">
-            <p className="text-muted-foreground">
-              Course recommendations will appear here.
-            </p>
+          <div className="p-6  bg-white">
+            <CareerCourses />
           </div>
         </TabsContent>
       </Tabs>

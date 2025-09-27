@@ -9,9 +9,9 @@ const SingleCard = () => {
     description:
       "Jobs , courses , colleges and much more to help you prepare for your career",
     accent: "border-indigo-500",
-    gradient: "from-yellow-200 to-amber-300",
+    gradient: "from-blue-200 to-indigo-300",
     textAccent: "text-blue-600",
-    buttonGradient: "from-yellow-300 to-amber-400",
+    buttonGradient: "from-blue-300 to-purple-400",
     image: "/element8.png",
   };
 
@@ -55,11 +55,11 @@ const SingleCard = () => {
             className="absolute w-full h-full object-contain z-10 scale-125"
           />
           <Image
-            src="/staic6.png"
+            src="/static7.png"
             alt="Decorative Element"
             width={300}
             height={300}
-            className=" absolute -left-0 -top-10 "
+            className=" absolute -top-14 "
           />
         </div>
       </div>
