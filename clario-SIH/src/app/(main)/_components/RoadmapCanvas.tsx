@@ -89,7 +89,7 @@ export default function Roadmap({ roadmap }: RoadmapProps) {
   return (
     <div style={{ width: "100%", height: "600px" }}>
       <h2 className="text-xl font-bold mb-2 text-center font-sora mt-2">{roadmap.roadmapTitle}</h2>
-      <p className="text-gray-600 mb-4 text-center font-inter">{roadmap.description}</p>
+      <p className="text-gray-600  text-center font-inter">{roadmap.description}</p>
 
       <ReactFlow
         nodes={nodes}

@@ -39,7 +39,7 @@ const MessagesRightBar = () => {
 
   return (
     <div className="h-full flex flex-col gap-5 w-[30%]">
-      <div className="bg-white w-full p-2 rounded-lg h-[70%] border shadow">
+      <div className="bg-white w-full p-2 rounded-lg h-[70%] overflow-y-scroll border shadow">
         <p className="font-medium text-xl text-center tracking-tight font-inter mb-4">
           Previous Chats
         </p>

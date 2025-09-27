@@ -196,7 +196,7 @@ export async function runAgent(ctx: AgentContext) {
   // 2.5-flash
   while (true) {
     const response = await ai.models.generateContent({
-      model: "gemini-2.0-flash",
+      model: "gemini-2.5-flash",
       contents: history,
       config: {
         systemInstruction: `You are an very helpful and professional AI Career Coach, who loves to solve any quiries, problem or frustation of the user. You help them in deciding their career/ path ways. Resolve their confusion to choose which career , role or path that best suits them by giving accurate and relevant concise reponse.
