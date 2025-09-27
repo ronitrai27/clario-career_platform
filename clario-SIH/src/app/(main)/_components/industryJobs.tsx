@@ -1,9 +1,11 @@
 "use client";
 
 import * as React from "react";
+import { useEffect } from "react";
 import axios from "axios";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useQuizData } from "@/context/userQuizProvider";
+import { LuChevronRight } from "react-icons/lu";
 
 interface Job {
   title: string;
@@ -20,8 +22,8 @@ export default function CareerTabsDemo() {
   const [loading, setLoading] = React.useState(false);
   const { quizData } = useQuizData();
 
-  // Fetch jobs once when component mounts or when selectedCareer changes
-  React.useEffect(() => {
+
+  useEffect(() => {
     if (!quizData?.selectedCareer) return;
 
     const fetchJobs = async () => {
@@ -39,10 +41,43 @@ export default function CareerTabsDemo() {
     };
 
     fetchJobs();
-  }, [quizData?.selectedCareer]); // Only refetch if selectedCareer changes
+  }, [quizData?.selectedCareer]);
 
   return (
     <div className="max-w-[1000px] bg-white mx-auto p-6">
+      <div className="w-full my-4 text-center">
+        {activeTab === "jobs" && (
+          <>
+            <h1 className="text-3xl font-sora font-semibold mb-2">
+              Find Relevant Jobs
+            </h1>
+            <p className="text-muted-foreground font-inter text-lg ">
+              Jobs just made for you, apply anytime.
+            </p>
+          </>
+        )}
+        {activeTab === "colleges" && (
+          <>
+            <h1 className="text-3xl font-sora font-semibold mb-2">
+              Recommended Colleges
+            </h1>
+            <p className="text-muted-foreground font-inter text-lg">
+              Discover the best colleges for your career.
+            </p>
+          </>
+        )}
+        {activeTab === "courses" && (
+          <>
+            <h1 className="text-3xl font-sora font-semibold mb-2">
+              Courses found just for you.
+            </h1>
+            <p className="text-muted-foreground font-inter text-lg">
+              Browse courses to skill up in your field.
+            </p>
+          </>
+        )}
+      </div>
+
       <Tabs
         defaultValue="jobs"
         className="w-full"
@@ -67,12 +102,14 @@ export default function CareerTabsDemo() {
                 {jobs.map((job, i) => (
                   <div
                     key={i}
-                    className="p-4 border rounded-lg hover:shadow-md transition-shadow"
+                    className="p-4 bg-blue-50 border rounded-lg hover:shadow-md transition-shadow shadow"
                   >
-                    <h3 className="font-semibold">{job.title}</h3>
-                    <p className="text-sm text-muted-foreground">
-                      {job.company_name} • {job.location}
+                    <h3 className="font-semibold font-inter tracking-tight">{job.title}</h3>
+                    <p className="text-base font-raleway text-muted-foreground">
+                      <span className="font-semibold text-blue-500">{job.company_name}</span> • {job.location}
                     </p>
+
+                    <p className="font-inter line-clamp-2 mt-3 text-muted-foreground text-sm">{job.description}</p>
                     {job.apply_options[0]?.link && (
                       <a
                         href={job.apply_options[0].link}
@@ -80,7 +117,7 @@ export default function CareerTabsDemo() {
                         rel="noopener noreferrer"
                         className="text-blue-600 text-sm mt-2 inline-block"
                       >
-                        Apply Here
+                      Click to Apply <LuChevronRight className="inline-block" />
                       </a>
                     )}
                   </div>
@@ -92,13 +129,17 @@ export default function CareerTabsDemo() {
 
         <TabsContent value="colleges">
           <div className="p-6 border rounded-lg shadow-sm bg-white">
-            <p className="text-muted-foreground">College details will appear here.</p>
+            <p className="text-muted-foreground">
+              College details will appear here.
+            </p>
           </div>
         </TabsContent>
 
         <TabsContent value="courses">
           <div className="p-6 border rounded-lg shadow-sm bg-white">
-            <p className="text-muted-foreground">Course recommendations will appear here.</p>
+            <p className="text-muted-foreground">
+              Course recommendations will appear here.
+            </p>
           </div>
         </TabsContent>
       </Tabs>

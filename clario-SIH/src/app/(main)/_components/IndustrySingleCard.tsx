@@ -5,14 +5,14 @@ import Image from "next/image";
 const SingleCard = () => {
   const card = {
     id: 2,
-    title: "Connect With Skilled Mentors",
+    title: "Get Industry Insights",
     description:
-      "Learn from industry experts who will guide you through your professional journey.",
+      "Jobs , courses , colleges and much more to help you prepare for your career",
     accent: "border-indigo-500",
     gradient: "from-yellow-200 to-amber-300",
     textAccent: "text-blue-600",
     buttonGradient: "from-yellow-300 to-amber-400",
-    image: "/static1.png",
+    image: "/element8.png",
   };
 
   return (
@@ -33,15 +33,7 @@ const SingleCard = () => {
 
             {/* Call-to-action buttons */}
             <div className="flex items-center gap-8">
-              <Button
-                className={`bg-gradient-to-r ${card.buttonGradient} text-white rounded-lg font-medium transition-all duration-200 group cursor-pointer`}
-              >
-                Book Now
-                <Book
-                  size={18}
-                  className="group-hover:translate-x-1 transition-transform"
-                />
-              </Button>
+             
               <Button className="cursor-pointer" variant="outline">
                 Learn More <LucideArrowRight size={18} />
               </Button>
