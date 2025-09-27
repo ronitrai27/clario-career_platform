@@ -1,0 +1,12 @@
+Static links -  const link = `${window.location.origin}/invite/${user.invite_link}` (onboardingCard.tsx), in email verified page 
+2 localstorage - onbaording and loginProvider ! , different for mentor
+
+
+// to protect the user and mentor portal by role
+if (user.user_metadata.role !== "mentor") {
+  router.push("/unauthorized");
+}
+
+
+## Cached -
+recomeneded 6 mentors in home , user quiz career/skill suggestion.
