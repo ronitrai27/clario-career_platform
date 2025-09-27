@@ -14,7 +14,6 @@ import {
 } from "@/lib/functions/dbActions";
 import { useEffect, useState } from "react";
 import { DBMentor } from "@/lib/types/allTypes";
-// import { useMemo } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import Image from "next/image";
 // import Rating from "@mui/material/Rating";
@@ -155,7 +154,7 @@ export default function HomePage() {
               </div>
             ) : (
               <div className="mt-5 max-w-[800px]  mx-auto flex justify-between items-center">
-                <h1 className="text-4xl font-semibold font-inter tracking-tight">
+                <h1 className="text-4xl font-semibold font-inter tracking-tight max-w-[380px] truncate">
                   Welcome, {user?.userName}
                 </h1>
                 <ActionsButtons />

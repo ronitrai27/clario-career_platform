@@ -87,13 +87,13 @@ const MessageNamesList: React.FC = () => {
           id: p.id,
           name: p.userName,
           avatar: p.avatar,
-          type: "peer" as const, // explicitly typed
+          type: "peer" as const, 
         })) || []),
         ...(mentors?.map((m) => ({
           id: m.id,
           name: m.full_name,
           avatar: m.avatar,
-          type: "mentor" as const, // explicitly typed
+          type: "mentor" as const, 
         })) || []),
       ];
 
@@ -104,7 +104,11 @@ const MessageNamesList: React.FC = () => {
     fetchMessageNames();
   }, [user?.id]);
 
-  if (userLoading || loading) return <div>Loading users...</div>;
+  if (userLoading || loading) return (
+    <div className="flex items-center justify-center h-full">
+     <p className="font-inter text-lg">Loading...</p>
+    </div>
+  )
   if (users.length === 0)
     return (
       <div className="flex flex-col items-center justify-center -mt-20 h-full text-gray-500">
