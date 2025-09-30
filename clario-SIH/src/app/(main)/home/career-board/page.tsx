@@ -30,13 +30,13 @@ const CareerBoard = () => {
     <div className="bg-gray-50 w-full h-full p-4">
       <SingleCard />
 
-      {user?.isQuizDone == false ? (
+      {user?.isQuizDone == false || quizData?.selectedCareer == null ? (
         <div className="mt-20 flex flex-col items-center justify-center gap-6 text-center">
           <h2 className="text-4xl font-semibold font-sora">
             Complete Your Quiz First!
           </h2>
           <p className="text-gray-800 max-w-lg   font-inter">
-            You need to complete the quiz to unlock Industry Insights. Take the
+            You need to complete the quiz and select your career to unlock Industry Insights. Take the
             quiz now to access valuable data and insights tailored for you.
           </p>
           <Button
