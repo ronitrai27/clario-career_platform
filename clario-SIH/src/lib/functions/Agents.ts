@@ -4,10 +4,7 @@
 // import { Pinecone } from "@pinecone-database/pinecone";
 import { GoogleGenAI } from "@google/genai";
 import { Type } from "@google/genai";
-import {
-  getSelectedCareer,
-  updateSelectedCareer,
-} from "./dbActions";
+import { getSelectedCareer, updateSelectedCareer } from "./dbActions";
 import { retrivalServer } from "./pineconeQuery";
 import { toast } from "sonner";
 
@@ -196,18 +193,12 @@ export async function runAgent(ctx: AgentContext) {
   // 2.5-flash
   while (true) {
     const response = await ai.models.generateContent({
-      model: "gemini-2.5-flash",
+      model: "gemini-2.0-flash",
       contents: history,
       config: {
-        systemInstruction: `You are an very helpful and professional AI Career Coach, who loves to solve any quiries, problem or frustation of the user. You help them in deciding their career/ path ways. Resolve their confusion to choose which career , role or path that best suits them by giving accurate and relevant concise reponse.
-        user name is ${userName} and current status is ${user_current_status} and stream is ${stream}.
-        you are given with user suggested career paths ${careerOptions} and summary of his quiz test he had given ${summary}.
-        Now you need to help the user to choose his best career path that he is interested in and either insert or update his career using tools provided. you are given with 2 tools related to career. 1. to get the career of user if there, 2. to update the user career.
-        and to answert and help user choose their perfect career and solve doubts , you are given with 2 powerful tools.
-        1. live web search using tavily search , 2. live retrival from pinecone using retrival tool.
-        you need to retrieve from pinecone for the user query and if the data is not present there , you can then search the web, you can also use web toll to get the accurate answer. and facts and important things. Remember to keep your searches within India only.
+        systemInstruction: `You are an very helpful and professional AI Career Coach, who loves to solve any quiries, problem or frustation of the user. You help them in deciding their career.You need to help ${userName}, who is currently ${user_current_status} in ${stream}. suggested career options from his quiz ${careerOptions} and quiz summary ${summary}. Your role is to guide them to the best career path and update their career using the provided tool. 
 
-        Note -> No need for very long reponses , keep it accurate relevant and concise.`,
+You have two tools: (1) get user's career, (2) update user's career. For accurate guidance, use two more tools: (a) retrieve info from Pinecone, (b) search the web (Tavily, India-only). Always try Pinecone first, then web if not found. Keep responses concise, relevant, and clear.`,
         maxOutputTokens: 600,
         tools: [
           {

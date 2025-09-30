@@ -19,30 +19,163 @@ interface Job {
   apply_options: { title: string; link: string }[];
 }
 
+// demo data just-------------
+const demoJobs: Job[] = [
+  {
+    title: "Frontend Developer",
+    company_name: "Vrsa solution PVT Ltd",
+    location: "Bengaluru, India",
+    via: "LinkedIn",
+    description:
+      "Work on modern web applications using React, Tailwind, and Next.js.",
+    apply_options: [
+      {
+        title: "Apply on Company Site",
+        link: "https://technova.com/jobs/frontend",
+      },
+      {
+        title: "Apply via LinkedIn",
+        link: "https://linkedin.com/jobs/frontend",
+      },
+    ],
+  },
+  {
+    title: "Backend Engineer",
+    company_name: "CodeSphere Solutions",
+    location: "Hyderabad, India",
+    via: "Naukri",
+    description: "Develop scalable APIs with Node.js, Express, and PostgreSQL.",
+    apply_options: [
+      { title: "Apply on Naukri", link: "https://naukri.com/jobs/backend" },
+    ],
+  },
+  {
+    title: "Full Stack Developer",
+    company_name: "CloudEdge Systems",
+    location: "Remote, India",
+    via: "Indeed",
+    description: "End-to-end development with React, Node.js, and AWS.",
+    apply_options: [
+      { title: "Apply on Indeed", link: "https://indeed.com/fullstack" },
+    ],
+  },
+  {
+    title: "Data Analyst",
+    company_name: "Insight Analytics",
+    location: "Pune, India",
+    via: "Glassdoor",
+    description:
+      "Analyze business data and create dashboards using Python & PowerBI.",
+    apply_options: [
+      {
+        title: "Apply on Glassdoor",
+        link: "https://glassdoor.com/data-analyst",
+      },
+    ],
+  },
+  {
+    title: "Machine Learning Engineer",
+    company_name: "AI Innovators",
+    location: "Gurgaon, India",
+    via: "LinkedIn",
+    description: "Build ML models for NLP and Computer Vision tasks.",
+    apply_options: [
+      { title: "Apply via LinkedIn", link: "https://linkedin.com/ml-engineer" },
+    ],
+  },
+  {
+    title: "UI/UX Designer",
+    company_name: "DesignHive Studio",
+    location: "Mumbai, India",
+    via: "Company Website",
+    description:
+      "Create engaging designs using Figma, Adobe XD, and prototyping tools.",
+    apply_options: [
+      {
+        title: "Apply on Company Site",
+        link: "https://designhive.com/careers/uiux",
+      },
+    ],
+  },
+  {
+    title: "DevOps Engineer",
+    company_name: "CloudOps Pvt Ltd",
+    location: "Chennai, India",
+    via: "LinkedIn",
+    description:
+      "Manage CI/CD pipelines and cloud infrastructure on AWS & GCP.",
+    apply_options: [
+      { title: "Apply on LinkedIn", link: "https://linkedin.com/jobs/devops" },
+    ],
+  },
+  {
+    title: "Mobile App Developer",
+    company_name: "AppWorks Technologies",
+    location: "Noida, India",
+    via: "Indeed",
+    description: "Build cross-platform apps using React Native and Flutter.",
+    apply_options: [
+      { title: "Apply on Indeed", link: "https://indeed.com/mobile-dev" },
+    ],
+  },
+  {
+    title: "Cybersecurity Analyst",
+    company_name: "SecureNet India",
+    location: "Kolkata, India",
+    via: "Naukri",
+    description:
+      "Monitor and secure enterprise IT infrastructure against threats.",
+    apply_options: [
+      { title: "Apply on Naukri", link: "https://naukri.com/cybersecurity" },
+    ],
+  },
+  {
+    title: "AI Research Intern",
+    company_name: "DeepThink Labs",
+    location: "Remote, India",
+    via: "Company Website",
+    description:
+      "Assist in cutting-edge AI research projects on LLMs and Generative AI.",
+    apply_options: [
+      {
+        title: "Apply on Company Site",
+        link: "https://deepthink.ai/internships",
+      },
+    ],
+  },
+];
+
 export default function CareerTabsDemo() {
   const [activeTab, setActiveTab] = React.useState("jobs");
   const [jobs, setJobs] = React.useState<Job[]>([]);
   const [loading, setLoading] = React.useState(false);
   const { quizData } = useQuizData();
 
+  // useEffect(() => {
+  //   if (!quizData?.selectedCareer) return;
+
+  //   const fetchJobs = async () => {
+  //     try {
+  //       setLoading(true);
+  //       const res = await axios.get<Job[]>(
+  //         `/api/jobs?q=${encodeURIComponent(quizData.selectedCareer)}`
+  //       );
+  //       setJobs(res.data);
+  //     } catch (error) {
+  //       console.error("Error fetching jobs:", error);
+  //     } finally {
+  //       setLoading(false);
+  //     }
+  //   };
+
+  //   fetchJobs();
+  // }, [quizData?.selectedCareer]);
+
+  // DEMO DATA-------------------------
   useEffect(() => {
-    if (!quizData?.selectedCareer) return;
-
-    const fetchJobs = async () => {
-      try {
-        setLoading(true);
-        const res = await axios.get<Job[]>(
-          `/api/jobs?q=${encodeURIComponent(quizData.selectedCareer)}`
-        );
-        setJobs(res.data);
-      } catch (error) {
-        console.error("Error fetching jobs:", error);
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchJobs();
+    if (quizData?.selectedCareer) {
+      setJobs(demoJobs);
+    }
   }, [quizData?.selectedCareer]);
 
   return (

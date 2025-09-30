@@ -57,9 +57,9 @@ const SingleCard = () => {
           <Image
             src="/static7.png"
             alt="Decorative Element"
-            width={300}
-            height={300}
-            className=" absolute -top-14 "
+            width={800}
+            height={800}
+            className=" absolute w-full h-full -top-2 "
           />
         </div>
       </div>
