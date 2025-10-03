@@ -2,6 +2,8 @@
 
 import { useEffect, useState } from "react";
 import { useQuizData } from "@/context/userQuizProvider";
+import { Button } from "@/components/ui/button";
+import { ExternalLink } from "lucide-react";
 
 type Course = {
   title: string;
@@ -9,6 +11,7 @@ type Course = {
   source?: string;
   redirect_link?: string;
   displayed_link?: string;
+  favicon?: string;
   snippet?: string;
 };
 
@@ -18,7 +21,9 @@ const demoCourses: Course[] = [
     link: "https://coursera.org/web-dev",
     source: "Coursera",
     displayed_link: "coursera.org",
+    favicon: "https://serpapi.com/searches/68d83966d1a72bf32a4c37bc/images/36cfec19a0a7c5787c1a138b581fcef39ccbc9414b414c8aa182b07086fc936e.png",
     snippet: "Learn HTML, CSS, and JavaScript to build responsive websites.",
+  redirect_link: "https://www.coursera.org/learn/html-css-javascript-for-web-developers",
   },
   {
     title: "Full-Stack Developer Bootcamp",
@@ -82,80 +87,87 @@ export default function CareerCourses() {
   const [courses, setCourses] = useState<Course[]>([]);
   const [loading, setLoading] = useState(false);
 
-  // useEffect(() => {
-  //   if (!quizData?.selectedCareer) return;
-
-  //   const fetchCourses = async () => {
-  //     try {
-  //       setLoading(true);
-  //       const res = await fetch(`/api/courses?q=${quizData.selectedCareer}`);
-  //       const data: Course[] = await res.json();
-  //       setCourses(data || []);
-  //     } catch (err) {
-  //       console.error("❌ Error fetching courses:", err);
-  //     } finally {
-  //       setLoading(false);
-  //     }
-  //   };
-
-  //   fetchCourses();
-  // }, [quizData?.selectedCareer]);
-
   useEffect(() => {
-    if (quizData?.selectedCareer) {
-      setCourses(demoCourses);
-    }
+    if (!quizData?.selectedCareer) return;
+
+    const fetchCourses = async () => {
+      try {
+        setLoading(true);
+        const res = await fetch(`/api/courses?q=${quizData.selectedCareer}`);
+        const data: Course[] = await res.json();
+        setCourses(data || []);
+      } catch (err) {
+        console.error("❌ Error fetching courses:", err);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchCourses();
   }, [quizData?.selectedCareer]);
+
+  // ----------------------FAKE DATA FOR DEMO----------------------
+  // useEffect(() => {
+  //   if (quizData?.selectedCareer) {
+  //     setCourses(demoCourses);
+  //   }
+  // }, [quizData?.selectedCareer]);
 
   if (loading) return <p className="text-center mt-6">Loading...</p>;
   if (!courses.length)
     return <p className="text-center mt-6">No courses found.</p>;
 
   return (
-    <div className="max-w-6xl mx-auto mt-6 px-4">
+    <div className="max-w-7xl mx-auto  px-4">
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
         {courses.map((course, idx) => (
           <div
             key={idx}
-            className="border rounded-lg p-4 shadow-sm hover:shadow-md transition bg-white"
+            className="border rounded-lg p-4 shadow-sm hover:shadow-md transition bg-white h-[300px] flex flex-col"
           >
             <a
               href={course.link}
               target="_blank"
               rel="noopener noreferrer"
-              className="text-lg font-semibold text-blue-600 hover:underline"
+              className="text-lg font-semibold text-black font-inter text-center hover:underline"
             >
               {course.title}
             </a>
 
             {course.snippet && (
-              <p className="text-sm text-gray-600 mt-2 line-clamp-4">
+              <p className="text-base line-clamp-3 font-sora text-muted-foreground  mt-2 ">
                 {course.snippet}
               </p>
             )}
 
+         <div className="flex items-center justify-between gap-10 px-4 mt-4">
+             {course.favicon && (
+              <img
+                src={course.favicon}
+                alt={course.title}
+                className="w-8 h-8 mt-2"
+              />
+            )}
+
             {course.source && (
-              <p className="text-xs text-gray-400 mt-2">
-                Source: {course.source}
+              <p className="text-sm tracking-tight font-raleway text-blue-600  mt-2">
+                 {course.source}
               </p>
             )}
+         </div>
 
-            {course.displayed_link && (
-              <p className="text-xs text-gray-400 mt-1 break-all">
-                {course.displayed_link}
-              </p>
-            )}
-
-            {course.redirect_link && (
+           <Button className="font-inter text-sm mt-auto w-full" variant="outline" >
+             {course.redirect_link && (
               <a
                 href={course.redirect_link}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="text-xs text-blue-500 mt-1 block hover:underline break-all"
+                className=""
               >
-                Redirect Link
+                Redirect Link <ExternalLink className="inline-block ml-2 -mt-1 h-4 w-4" />
               </a>
             )}
+           </Button>
           </div>
         ))}
       </div>

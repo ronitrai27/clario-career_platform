@@ -8,12 +8,10 @@ import { getSelectedCareer, updateSelectedCareer } from "./dbActions";
 import { retrivalServer } from "./pineconeQuery";
 import { toast } from "sonner";
 
-// import * as dotenv from "dotenv";
-// dotenv.config();
-
+// const ai = new GoogleGenAI({ apiKey: process.env.NEXT_PUBLIC_GEMINI_API_KEY!});
 const ai = new GoogleGenAI({
-  apiKey: "AIzaSyDY4XR8q9MT8E2j4a96i6FLSgbEDHZPk9k",
-});
+  apiKey: "AIzaSyDzhB5Uc25-HX-7dd62CyDDyIP_AYxwjfk"
+})
 
 type AgentContext = {
   question: string;

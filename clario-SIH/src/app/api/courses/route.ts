@@ -8,6 +8,7 @@ interface Course {
   source?: string;
   redirect_link?: string;
   displayed_link?: string;
+  favicon?: string;
   snippet?: string;
   [key: string]: any;
 }
@@ -20,7 +21,7 @@ export async function GET(req: NextRequest) {
 
   try {
     const response: any = await getJson({
-      api_key: process.env.SERPAPI_KEY,
+      // api_key: process.env.SERPAPI_KEY,
       q: query,
       hl: "en",
       gl: "us",
@@ -37,6 +38,7 @@ export async function GET(req: NextRequest) {
           source: course.source,
           redirect_link: course.redirect_link,
           displayed_link: course.displayed_link,
+          favicon: course.favicon,
           snippet: course.snippet,
         }))
       : [];

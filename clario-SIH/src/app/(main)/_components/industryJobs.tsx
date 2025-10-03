@@ -13,9 +13,23 @@ import {
   LuChevronRight,
 } from "react-icons/lu";
 import { Button } from "@/components/ui/button";
-import { Heart, ExternalLink, PinIcon } from "lucide-react";
+import {
+  Heart,
+  ExternalLink,
+  PinIcon,
+  Search,
+  Building2,
+  LucideActivity,
+} from "lucide-react";
 import CareerCourses from "./CourseData";
 import { Separator } from "@/components/ui/separator";
+import { Input } from "@/components/ui/input";
+
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover";
 
 interface Job {
   title: string;
@@ -161,6 +175,10 @@ export default function CareerTabsDemo() {
   const [visibleJobs, setVisibleJobs] = useState(6);
   const [loadingMore, setLoadingMore] = useState(false);
 
+  // colleges---------------------------->
+  const [nearbyActive, setNearbyActive] = useState(false);
+  const [collegeType, setCollegeType] = useState<string | null>(null);
+
   // useEffect(() => {
   //   if (!quizData?.selectedCareer) return;
 
@@ -189,7 +207,7 @@ export default function CareerTabsDemo() {
   }, [quizData?.selectedCareer]);
 
   return (
-    <div className="max-w-[1120px] bg-white rounded-lg mx-auto border p-6">
+    <div className="max-w-[1120px] bg-white rounded-lg mx-auto border p-6 mb-20">
       <div className="w-full my-4 text-center">
         {activeTab === "jobs" && (
           <>
@@ -250,6 +268,68 @@ export default function CareerTabsDemo() {
             >
               Liked Jobs <Heart className="ml-2" />
             </Button>
+          </div>
+        )}
+
+        {activeTab === "courses" && (
+          <div className="mb-8 flex items-center justify-between px-8">
+            <h2 className="font-inter text-xl font-medium tracking-tight">
+              Courses found for{" "}
+              <span className="text-blue-500">{quizData?.selectedCareer}</span>
+              <LuBriefcase className="inline-block ml-3 text-blue-500" />
+            </h2>
+          </div>
+        )}
+
+        {activeTab === "colleges" && (
+          <div className="mb-8 flex items-center gap-10  px-8">
+            <div className="relative w-full max-w-[340px] flex justify-between items-center border border-blue-300 rounded-md px-4 bg-blue-50">
+              <Input
+                type="text"
+                placeholder="Search Colleges by Location..."
+                className="font-inter text-sm bg-transparent border-none shadow-none focus:outline-none focus:ring-0 focus-visible:border-0 focus-visible:ring-0 focus-visible:ring-offset-0"
+              />
+
+              <Search className=" text-blue-600" />
+            </div>
+            <Button
+              onClick={() => setNearbyActive(!nearbyActive)}
+              className={`font-inter text-sm cursor-pointer flex items-center hover:bg-blue-100 hover:border-blue-500 hover:text-blue-600
+    ${nearbyActive ? "bg-blue-100 border-blue-500 text-blue-600" : ""}`}
+              variant={nearbyActive ? "default" : "outline"}
+            >
+              Nearby <Building2 className="ml-2" />
+            </Button>
+
+            <Popover>
+              <PopoverTrigger asChild>
+                <Button
+                  className="font-inter text-sm cursor-pointer flex items-center"
+                  variant="outline"
+                >
+                  {collegeType ? collegeType : "Type"}{" "}
+                  <LucideActivity className="ml-2" />
+                </Button>
+              </PopoverTrigger>
+              <PopoverContent className="w-48">
+                <div className="flex flex-col gap-2 font-inter">
+                  <Button
+                    variant={collegeType === "Private" ? "default" : "outline"}
+                    onClick={() => setCollegeType("Private")}
+                  >
+                    Private College
+                  </Button>
+                  <Button
+                    variant={
+                      collegeType === "Government" ? "default" : "outline"
+                    }
+                    onClick={() => setCollegeType("Government")}
+                  >
+                    Government College
+                  </Button>
+                </div>
+              </PopoverContent>
+            </Popover>
           </div>
         )}
 
