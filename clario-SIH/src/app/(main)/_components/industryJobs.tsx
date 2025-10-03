@@ -1,14 +1,21 @@
 "use client";
 
 import * as React from "react";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import axios from "axios";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useQuizData } from "@/context/userQuizProvider";
-import { LuActivity, LuChevronRight } from "react-icons/lu";
+import {
+  LuActivity,
+  LuBriefcase,
+  LuBuilding,
+  LuBuilding2,
+  LuChevronRight,
+} from "react-icons/lu";
 import { Button } from "@/components/ui/button";
-import { Heart } from "lucide-react";
+import { Heart, ExternalLink, PinIcon } from "lucide-react";
 import CareerCourses from "./CourseData";
+import { Separator } from "@/components/ui/separator";
 
 interface Job {
   title: string;
@@ -146,10 +153,13 @@ const demoJobs: Job[] = [
 ];
 
 export default function CareerTabsDemo() {
-  const [activeTab, setActiveTab] = React.useState("jobs");
-  const [jobs, setJobs] = React.useState<Job[]>([]);
-  const [loading, setLoading] = React.useState(false);
+  const [activeTab, setActiveTab] = useState("jobs");
+  const [jobs, setJobs] = useState<Job[]>([]);
+  const [loading, setLoading] = useState(false);
   const { quizData } = useQuizData();
+
+  const [visibleJobs, setVisibleJobs] = useState(6);
+  const [loadingMore, setLoadingMore] = useState(false);
 
   // useEffect(() => {
   //   if (!quizData?.selectedCareer) return;
@@ -179,22 +189,22 @@ export default function CareerTabsDemo() {
   }, [quizData?.selectedCareer]);
 
   return (
-    <div className="max-w-[1100px] bg-white rounded-lg mx-auto border p-6">
+    <div className="max-w-[1120px] bg-white rounded-lg mx-auto border p-6">
       <div className="w-full my-4 text-center">
         {activeTab === "jobs" && (
           <>
             <h1 className="text-3xl font-sora font-semibold mb-2">
-              Find Relevant Jobs
+              Recommended Jobs for you
             </h1>
             <p className="text-muted-foreground font-inter text-lg ">
-              Jobs just made for you, apply anytime.
+              Explore job opportunities tailored to your career choice.
             </p>
           </>
         )}
         {activeTab === "colleges" && (
           <>
             <h1 className="text-3xl font-sora font-semibold mb-2">
-              Recommended Colleges
+              Recommended Colleges for you
             </h1>
             <p className="text-muted-foreground font-inter text-lg">
               Discover the best colleges for your career.
@@ -224,32 +234,60 @@ export default function CareerTabsDemo() {
           <TabsTrigger value="courses">Courses</TabsTrigger>
         </TabsList>
 
+        <Separator className="mb-5" />
+        {/* Jobs */}
+        {activeTab === "jobs" && (
+          <div className="mb-8 flex items-center justify-between px-8">
+            <h2 className="font-inter text-xl font-medium tracking-tight">
+              Search results for{" "}
+              <span className="text-blue-500">{quizData?.selectedCareer}</span>
+              <LuBriefcase className="inline-block ml-3 text-blue-500" />
+            </h2>
+
+            <Button
+              className="cursor-pointer font-inter text-sm"
+              variant="outline"
+            >
+              Liked Jobs <Heart className="ml-2" />
+            </Button>
+          </div>
+        )}
+
         <TabsContent value="jobs">
           <div className="  bg-white">
             {loading ? (
-              <p className="text-muted-foreground">Loading jobs...</p>
+              <p className="text-muted-foreground flex items-center justify-center text-center font-inter text-xl">
+                Loading jobs...
+              </p>
             ) : jobs.length === 0 ? (
               <p className="text-muted-foreground">
                 No jobs found for {quizData?.selectedCareer}
               </p>
             ) : (
               <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-                {jobs.map((job, i) => (
+                {jobs.slice(0, visibleJobs).map((job, i) => (
                   <div
                     key={i}
-                    className="p-3 h-[320px] bg-blue-50 border rounded-lg hover:shadow-md transition-shadow shadow flex flex-col"
+                    className="p-3 h-[320px] bg-white border border-t-8 border-t-blue-500 rounded-lg hover:shadow-md transition-shadow shadow flex flex-col"
                   >
                     <h3 className="font-semibold font-inter tracking-tight text-center text-lg">
                       {job.title}
                     </h3>
-                    <p className="text-base font-raleway text-muted-foreground text-center mt-3">
+                    <p className="text-base font-raleway text-muted-foreground text-left mt-3">
+                      <LuBuilding2 className="inline-block mr-2 text-xl -mt-1 text-blue-600" />
                       <span className="font-semibold text-blue-500">
                         {job.company_name}
-                      </span>{" "}
-                      • {job.location}
+                      </span>
                     </p>
-                    <p className="font-inter font-medium my-2 text-left">
-                      Platforms: {job.via}
+                    <p className="my-2 font-inter tracking-tight text-left text-sm">
+                      <PinIcon
+                        className="inline-block mr-2  -mt-1 text-blue-600"
+                        size={20}
+                      />
+                      {job?.location}
+                    </p>
+                    <p className="font-inter font-medium my-2 text-left tracking-tight">
+                      Platform: {job.via}
                     </p>
 
                     <p className="font-inter line-clamp-3 mt-5 text-muted-foreground text-sm">
@@ -264,20 +302,40 @@ export default function CareerTabsDemo() {
                             href={job.apply_options[0].link}
                             target="_blank"
                             rel="noopener noreferrer"
-                            className="text-white font-inter text-xs inline-block"
+                            className="text-white font-inter text-xs inline-block cursor-pointer"
                           >
                             Click to Apply{" "}
                           </a>
-                          <LuActivity className="inline-block" />
+                          <ExternalLink className="inline-block ml-5 cursor-pointer" />
                         </Button>
                       )}
 
-                      <div className="w-10 h-10 rounded-md flex items-center justify-center bg-blue-100">
-                        <Heart className="w-5 h-5 text-blue-500" />
+                      <div className="w-9 h-9 rounded-md flex items-center justify-center bg-blue-100 cursor-pointer">
+                        <Heart className="w-4 h-4 text-blue-500" />
                       </div>
                     </div>
                   </div>
                 ))}
+              </div>
+            )}
+
+            {/* Load More Button */}
+            {visibleJobs < jobs.length && (
+              <div className="flex justify-center mt-10">
+                <Button
+                  disabled={loadingMore}
+                  onClick={() => {
+                    setLoadingMore(true);
+                    setTimeout(() => {
+                      setVisibleJobs(jobs.length);
+                      setLoadingMore(false);
+                    }, 2000);
+                  }}
+                  className="font-inter text-sm"
+                  variant="outline"
+                >
+                  {loadingMore ? "Loading..." : "Load More"}
+                </Button>
               </div>
             )}
           </div>

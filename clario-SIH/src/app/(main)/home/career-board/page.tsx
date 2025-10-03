@@ -48,9 +48,9 @@ const CareerBoard = () => {
         </div>
       ) : (
         <>
-          <div className="flex gap-4 w-full mt-10">
+          <div className="flex gap-4 px-4 w-full mt-10">
             {/* 1. Selected Career */}
-            <Card className="flex-1 p-4">
+            <Card className="flex-1 p-3">
               <CardHeader className="flex items-center gap-2">
                 <Cpu className="w-6 h-6 text-blue-500" />
                 <CardTitle className="text-lg font-inter">
@@ -68,7 +68,7 @@ const CareerBoard = () => {
             </Card>
 
             {/* 2. Industry Growth */}
-            <Card className="flex-1 p-4">
+            <Card className="flex-1 p-3">
               <CardHeader className="flex items-center gap-2">
                 <TrendingUp className="w-6 h-6 text-green-500" />
                 <CardTitle className="text-lg font-inter">
@@ -89,7 +89,7 @@ const CareerBoard = () => {
             </Card>
 
             {/* 3. Demand Level */}
-            <Card className="flex-1 p-4">
+            <Card className="flex-1 p-3">
               <CardHeader className="flex items-center gap-2">
                 <Users className="w-6 h-6 text-yellow-500" />
                 <CardTitle className="text-lg font-inter">
