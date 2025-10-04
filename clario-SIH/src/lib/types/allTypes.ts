@@ -77,7 +77,7 @@ export type College = {
   best_suit_for: string[];
   fees: string;
   placement: string;
-  inserted_at: string; 
+  // inserted_at: string; 
   type: string;
 };
 

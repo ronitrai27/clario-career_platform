@@ -358,3 +358,35 @@ export async function updateSelectedCareer(
 
   return data?.selectedCareer || null;
 }
+
+export async function paginatedColleges(
+  page: number = 1,
+  limit: number = 6,
+  locationQuery?: string | null,
+  collegeType?: string | null
+): Promise<College[]> {
+  const supabase = createClient();
+  const from = (page - 1) * limit;
+  const to = from + limit - 1;
+
+  let query = supabase.from("colleges").select("*");
+
+  if (collegeType) {
+    query = query.eq("type", collegeType.toLowerCase());
+  }
+
+  if (locationQuery && locationQuery.trim() !== "") {
+    query = query.ilike("location", `%${locationQuery.trim()}%`);
+  }
+
+  const { data, error } = await query
+    .order("id", { ascending: true })
+    .range(from, to);
+
+  if (error) {
+    console.error("Error fetching colleges:", error);
+    return [];
+  }
+
+  return data as College[];
+}

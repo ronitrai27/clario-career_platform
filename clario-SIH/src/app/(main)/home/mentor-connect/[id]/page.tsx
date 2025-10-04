@@ -146,7 +146,7 @@ export default function MentorConnectPage() {
     setSessionType(null);
     setNotes("");
     setDate(new Date());
-    alert("✅ Session requested successfully!");
+    toast.success("Session booked successfully!");
   }
 
   if (loading)
@@ -221,9 +221,9 @@ export default function MentorConnectPage() {
       </div>
 
       {/* ----------------------------- */}
-      <div className="mt-10 flex h-full px-8">
+      <div className="mt-10 flex h-full px-8 gap-5">
         {/* LEFT SIDE */}
-        <div className="w-[64%] h-full">
+        <div className="w-[68%] h-full">
           <h2 className="font-inter underline underline-offset-4 text-lg font-semibold">
             About Me
           </h2>
@@ -238,10 +238,12 @@ export default function MentorConnectPage() {
             {mentor?.expertise?.join(", ") || "No expertise added"}
           </p>
 
-          <h2 className="text-center my-8 text-lg font-semibold font-sora">
+         <div className="bg-gradient-to-br from-yellow-400 to-amber-100 h-48 rounded-lg p-4 mt-14">
+           <h2 className="text-center mt-4 mb-2 text-lg font-semibold font-sora">
             Book Session
           </h2>
-          <div className="flex gap-8 mt-4 justify-center">
+          <p className="text-center text-base font-inter ">Select the duration of your session. 20 coins for 30 min and 30 coins for 45 min</p>
+          <div className="flex gap-8 mt-10 justify-center">
             <Button
               onClick={() => {
                 setSessionType("30");
@@ -250,7 +252,7 @@ export default function MentorConnectPage() {
               className="cursor-pointer"
               variant="outline"
             >
-              <LuTimer className="mr-2" /> 30 MIN (20 coins)
+              <LuTimer className="mr-2" /> 30 Min Session
             </Button>
             <Button
               onClick={() => {
@@ -260,13 +262,14 @@ export default function MentorConnectPage() {
               className="cursor-pointer"
               variant="outline"
             >
-              <LuTimer className="mr-2" /> 45 MIN (35 coins)
+              <LuTimer className="mr-2" /> 45 Min Session
             </Button>
           </div>
+         </div>
         </div>
         <Separator orientation="vertical" className="" />
         {/* RIGHT SIDE */}
-        <div className="w-[36%] h-full mt-5">
+        <div className="w-[32%] h-full mt-5 ">
           <div className="flex flex-col  bg-yellow-50 p-3 rounded-md shadow justify-center mx-auto w-[200px]">
             <h2 className="font-inter text-2xl font-semibold">Rating</h2>
             <div className="flex items-center gap-4">
@@ -277,8 +280,8 @@ export default function MentorConnectPage() {
           <h2 className="text-xl font-medium text-center my-10 font-sora">
             Other Mentors
           </h2>
-          <div className="flex justify-center mt-5">
-            <div className="flex flex-col gap-4 w-full justify-center px-12 mb-20">
+          <div className="flex  mt-5">
+            <div className="flex flex-col gap-4 w-[340px] px-5 mb-20">
               {recomentors.slice(0, 3).map((mentor) => (
                 <div
                   key={mentor.id}
@@ -412,11 +415,11 @@ export default function MentorConnectPage() {
               <Button
                 variant="outline"
                 onClick={() => setOpen(false)}
-                className="w-24"
+                className="w-24 cursor-pointer"
               >
                 Cancel <LuX className="ml-2" />
               </Button>
-              <Button onClick={handleSubmit} className="w-36">
+              <Button onClick={handleSubmit} className="w-36 cursor-pointer">
                 Book Session <LuScreenShare className="ml-2" />
               </Button>
             </div>

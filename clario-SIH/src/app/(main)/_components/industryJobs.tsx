@@ -23,13 +23,8 @@ import {
 } from "lucide-react";
 import CareerCourses from "./CourseData";
 import { Separator } from "@/components/ui/separator";
-import { Input } from "@/components/ui/input";
-
-import {
-  Popover,
-  PopoverContent,
-  PopoverTrigger,
-} from "@/components/ui/popover";
+import CollegesList from "./CollegesDataUi";
+import Image from "next/image";
 
 interface Job {
   title: string;
@@ -281,57 +276,6 @@ export default function CareerTabsDemo() {
           </div>
         )}
 
-        {activeTab === "colleges" && (
-          <div className="mb-8 flex items-center gap-10  px-8">
-            <div className="relative w-full max-w-[340px] flex justify-between items-center border border-blue-300 rounded-md px-4 bg-blue-50">
-              <Input
-                type="text"
-                placeholder="Search Colleges by Location..."
-                className="font-inter text-sm bg-transparent border-none shadow-none focus:outline-none focus:ring-0 focus-visible:border-0 focus-visible:ring-0 focus-visible:ring-offset-0"
-              />
-
-              <Search className=" text-blue-600" />
-            </div>
-            <Button
-              onClick={() => setNearbyActive(!nearbyActive)}
-              className={`font-inter text-sm cursor-pointer flex items-center hover:bg-blue-100 hover:border-blue-500 hover:text-blue-600
-    ${nearbyActive ? "bg-blue-100 border-blue-500 text-blue-600" : ""}`}
-              variant={nearbyActive ? "default" : "outline"}
-            >
-              Nearby <Building2 className="ml-2" />
-            </Button>
-
-            <Popover>
-              <PopoverTrigger asChild>
-                <Button
-                  className="font-inter text-sm cursor-pointer flex items-center"
-                  variant="outline"
-                >
-                  {collegeType ? collegeType : "Type"}{" "}
-                  <LucideActivity className="ml-2" />
-                </Button>
-              </PopoverTrigger>
-              <PopoverContent className="w-48">
-                <div className="flex flex-col gap-2 font-inter">
-                  <Button
-                    variant={collegeType === "Private" ? "default" : "outline"}
-                    onClick={() => setCollegeType("Private")}
-                  >
-                    Private College
-                  </Button>
-                  <Button
-                    variant={
-                      collegeType === "Government" ? "default" : "outline"
-                    }
-                    onClick={() => setCollegeType("Government")}
-                  >
-                    Government College
-                  </Button>
-                </div>
-              </PopoverContent>
-            </Popover>
-          </div>
-        )}
 
         <TabsContent value="jobs">
           <div className="  bg-white">
@@ -348,11 +292,16 @@ export default function CareerTabsDemo() {
                 {jobs.slice(0, visibleJobs).map((job, i) => (
                   <div
                     key={i}
-                    className="p-3 h-[320px] bg-white border border-t-8 border-t-blue-500 rounded-lg hover:shadow-md transition-shadow shadow flex flex-col"
+                    className="p-3 h-[338px] bg-white border border-t-8 border-t-blue-500 rounded-lg hover:shadow-md transition-shadow shadow flex flex-col relative overflow-hidden"
                   >
-                    <h3 className="font-semibold font-inter tracking-tight text-center text-lg">
-                      {job.title}
-                    </h3>
+                    <div className="flex items-center justify-between">
+                      <h3 className="font-semibold font-inter tracking-tight text-center text-lg line-clamp-2">
+                        {job.title}
+                      </h3>
+                      <div className="w-9 h-9 rounded-md flex items-center justify-center bg-blue-100 cursor-pointer">
+                        <Heart className="w-4 h-4 text-blue-500" />
+                      </div>
+                    </div>
                     <p className="text-base font-raleway text-muted-foreground text-left mt-3">
                       <LuBuilding2 className="inline-block mr-2 text-xl -mt-1 text-blue-600" />
                       <span className="font-semibold text-blue-500">
@@ -373,26 +322,32 @@ export default function CareerTabsDemo() {
                     <p className="font-inter line-clamp-3 mt-5 text-muted-foreground text-sm">
                       {job.description}
                     </p>
+                    <Image
+                      src="/jobs.png"
+                      width={200}
+                      height={200}
+                      alt="jobs"
+                      className="absolute opacity-5  -right-5  top-12 w-32 h-32"
+                    />
 
                     {/* push this container to bottom */}
-                    <div className="flex items-center justify-center gap-10 mt-auto">
+                    <div className="flex items-center justify-center gap-10 mt-auto w-full">
                       {job.apply_options[0]?.link && (
-                        <Button>
+                        <Button
+                          className="cursor-pointer w-full bg-blue-50 border-blue-200"
+                          variant="outline"
+                        >
                           <a
                             href={job.apply_options[0].link}
                             target="_blank"
                             rel="noopener noreferrer"
-                            className="text-white font-inter text-xs inline-block cursor-pointer"
+                            className="text-black  font-inter text-xs inline-block cursor-pointer"
                           >
                             Click to Apply{" "}
                           </a>
                           <ExternalLink className="inline-block ml-5 cursor-pointer" />
                         </Button>
                       )}
-
-                      <div className="w-9 h-9 rounded-md flex items-center justify-center bg-blue-100 cursor-pointer">
-                        <Heart className="w-4 h-4 text-blue-500" />
-                      </div>
                     </div>
                   </div>
                 ))}
@@ -422,7 +377,9 @@ export default function CareerTabsDemo() {
         </TabsContent>
 
         <TabsContent value="colleges">
-          <div className="p-4  bg-white"></div>
+          <div className="p-4  bg-white">
+            <CollegesList />
+          </div>
         </TabsContent>
 
         <TabsContent value="courses">
