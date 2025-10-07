@@ -24,7 +24,7 @@ export default function ActionBox() {
       <Link href="/home/ai-tools/career-coach/">
         <div className="relative overflow-hidden rounded-md shadow-lg px-3 py-2 text-black hover:scale-105 transition bg-gradient-to-br from-white via-white to-blue-100 cursor-pointer  border-l-8 border-blue-500">
           <div className="flex  items-center gap-4">
-            <div className="p-2 bg-blue-500/15 rounded-full backdrop-blur-sm">
+            <div className="p-2 bg-blue-100 rounded-full backdrop-blur-sm">
               <GraduationCap className="w-7 h-7 text-blue-500" />
             </div>
             <h3 className="text-lg font-medium font-inter tracking-tight">

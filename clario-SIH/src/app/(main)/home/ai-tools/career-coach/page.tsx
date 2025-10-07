@@ -4,7 +4,13 @@ import { useUserData } from "@/context/UserDataProvider";
 import { useRouter } from "next/navigation";
 import React, { useEffect, useRef, useState } from "react";
 import { Separator } from "@/components/ui/separator";
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogFooter,
+} from "@/components/ui/dialog";
 import {
   LuAArrowUp,
   LuArrowUpRight,
@@ -18,6 +24,7 @@ import {
 import {
   Divide,
   Loader2,
+  LucideActivity,
   LucideGlobe,
   LucideHistory,
   LucideSendHorizontal,
@@ -35,8 +42,7 @@ import { ScrollArea } from "@/components/ui/scroll-area";
 import ReactMarkdown from "react-markdown";
 import { BsStars } from "react-icons/bs";
 import AILoadingState from "@/components/kokonutui/ai-loading";
-import { Typewriter } from "react-simple-typewriter";
-import { redis } from "@/lib/redis";
+import axios from "axios";
 
 type Message = {
   role: "user" | "ai";
@@ -55,21 +61,21 @@ const CareerCoach = () => {
 
   const [quizSummary, setQuizSummary] = useState<string>("");
   const [quizStream, setQuizStream] = useState<string>("");
-  const[showQuizDialog, setShowQuizDialog] = useState(false);
+  const [showQuizDialog, setShowQuizDialog] = useState(false);
 
   // AI PART
   const [messages, setMessages] = useState<Message[]>([]);
   const [input, setInput] = useState("");
   const [aiLoading, setAiLoading] = useState(false);
 
+  // follow-up state
+  const [followUpQuestions, setFollowUpQuestions] = useState<string[]>([]);
+
   const scrollRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     scrollRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [messages]);
-
-  // const userCareerFocuses =
-  //   focus === "career/ path guidance" || focus === "choose career paths";
 
   useEffect(() => {
     if (!user?.id) return;
@@ -111,9 +117,9 @@ const CareerCoach = () => {
       toast.error("Please enter a message to send.");
       return;
     }
-    if(user?.isQuizDone == false) {
+    if (user?.isQuizDone == false) {
       setShowQuizDialog(true);
-       return;
+      return;
     }
 
     if (aiLoading) return;
@@ -141,10 +147,10 @@ const CareerCoach = () => {
       if (user?.current_status !== "10th student") {
         ctx.stream = quizStream;
       }
-      console.log("Context passing to AI:", ctx);
+      // console.log("Context passing to AI:", ctx);
 
       const aiReply = await runAgent(ctx);
-      console.log("AI Reply:---------->", aiReply);
+      // console.log("AI Reply:---------->", aiReply);
 
       const aiMessage: Message = {
         role: "ai",
@@ -152,6 +158,23 @@ const CareerCoach = () => {
       };
 
       setMessages((prev) => [...prev, aiMessage]);
+      // Fetch follow-up questions
+      (async () => {
+        try {
+          const { data } = await axios.post("/api/ai/follow-up", {
+            conversationString: `User: ${userInput}\nAI: ${aiMessage.text}`,
+          });
+
+          const followUps: string[] = Array.isArray(data.followUps)
+            ? data.followUps.slice(0, 4)
+            : [];
+
+          setFollowUpQuestions(followUps);
+        } catch (err) {
+          console.error("Follow-up questions error:", err);
+          setFollowUpQuestions([]); // fallback to empty
+        }
+      })();
     } catch (err) {
       console.error(err);
       setMessages((prev) => [
@@ -226,7 +249,7 @@ const CareerCoach = () => {
                         <div
                           key={idx}
                           className="h-11 flex items-center justify-center rounded-md shadow p-1 
-              bg-white text-black border hover:shadow-md hover:bg-slate-900 
+              bg-white text-black border hover:shadow-md hover:bg-slate-100 
               transition text-center"
                         >
                           <p className="text-xs font-inter font-light tracking-tight line-clamp-2">
@@ -301,19 +324,43 @@ const CareerCoach = () => {
                         <ReactMarkdown>{msg.text}</ReactMarkdown>
                       </div>
                     ) : (
-                      // AI message
-                      <div
-                        key={idx}
-                        className="max-w-[75%] px-3 py-3 rounded-md text-sm font-inter tracking-normal leading-relaxed bg-blue-100 text-black flex  gap-2"
-                      >
-                        <BsStars
-                          className="text-blue-600 mt-1 shrink-0"
-                          size={30}
-                        />
-                        <div>
-                          <ReactMarkdown>{msg.text}</ReactMarkdown>
+                      // AI message and dollow up questions
+                      <>
+                        <div
+                          key={idx}
+                          className="max-w-[75%] px-3 py-3 rounded-md text-sm font-inter tracking-normal leading-relaxed bg-blue-100 text-black flex  gap-2"
+                        >
+                          <BsStars
+                            className="text-blue-600 mt-1 shrink-0"
+                            size={30}
+                          />
+                          <div>
+                            <ReactMarkdown>{msg.text}</ReactMarkdown>
+                          </div>
                         </div>
-                      </div>
+
+                        {followUpQuestions.length > 0 && (
+                          <div className=" bg-gray-200 max-w-[700px] p-3 rounded-md shadow">
+                            <p className="font-inter text-sm text-blue-600">
+                              <LucideActivity className="w-4 h-4 inline" />{" "}
+                              Follow Up
+                            </p>
+                            <div className="mt-2 grid grid-cols-2 gap-4">
+                              {followUpQuestions.map((q, i) => (
+                                <button
+                                  key={i}
+                                  className="bg-white hover:bg-blue-50 border hover:border-blue-300 cursor-pointer px-3 py-1 rounded-md transition text-xs font-inter"
+                                  onClick={() => {
+                                    setInput(q);
+                                  }}
+                                >
+                                  {q}
+                                </button>
+                              ))}
+                            </div>
+                          </div>
+                        )}
+                      </>
                     )
                   )}
                   {aiLoading && (
@@ -443,7 +490,7 @@ const CareerCoach = () => {
         </div>
       </div>
 
-       {/* Quiz Required Dialog */}
+      {/* Quiz Required Dialog */}
       <Dialog open={showQuizDialog} onOpenChange={setShowQuizDialog}>
         <DialogContent>
           <DialogHeader>

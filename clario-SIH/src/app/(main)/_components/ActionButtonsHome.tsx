@@ -13,6 +13,13 @@ import {
   DialogTrigger,
   DialogClose,
 } from "@/components/ui/dialog";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
+
 import Image from "next/image";
 import { LuX } from "react-icons/lu";
 import { useRouter } from "next/navigation";
@@ -77,14 +84,25 @@ export default function ActionsButtons() {
 
       <div className="">
         {quizData?.selectedCareer ? (
-          <p className="font-sora text-base text-black bg-white py-2 px-4 shadow-sm rounded-md">
-            <span className="font-medium font-inter ">Career : </span>{" "}
-            {quizData.selectedCareer}
-          </p>
+          <TooltipProvider>
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <p className="font-sora text-base text-black bg-white py-2 px-4 shadow-sm rounded-md cursor-default">
+                  <span className="font-medium font-inter">Career:</span>{" "}
+                  {quizData.selectedCareer}
+                </p>
+              </TooltipTrigger>
+              <TooltipContent side="bottom" className="font-inter text-sm max-w-[200px]">
+                Your current career: <b>{quizData.selectedCareer}</b>.
+                You can manually edit it anytime in your profile.
+              </TooltipContent>
+            </Tooltip>
+          </TooltipProvider>
         ) : (
           <Button
             variant="outline"
-            className="rounded-md shadow-md cursor-pointer font-inter text-base text-black hover:-translate-y-1 duration-200" onClick={()=>router.push("/home/ai-tools/career-coach")}
+            className="rounded-md shadow-md cursor-pointer font-inter text-base text-black hover:-translate-y-1 duration-200"
+            onClick={() => router.push("/home/ai-tools/career-coach")}
           >
             Plan Your Career
           </Button>

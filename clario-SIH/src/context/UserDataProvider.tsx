@@ -22,6 +22,7 @@ interface DBUser {
   isQuizDone: boolean;
   latitude: number;
   longitude: number;
+  isPro: boolean;
 }
 // mentors ---
 interface DBMentor {
