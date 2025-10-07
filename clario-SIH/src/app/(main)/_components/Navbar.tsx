@@ -135,9 +135,10 @@ export default function Navbar() {
                   alt="User Avatar"
                   width={36}
                   height={36}
-                  className="rounded-full border -mt-3"
+                  className="rounded-full border -mt-3 cursor-pointer"
+                  onClick={() => router.push("/home/profile")}
                 />
-                <div className="flex flex-col justify-end">
+                <div className="flex flex-col justify-end cursor-pointer" onClick={() => router.push("/home/profile")}>
                   <p className="font-inter font-medium text-base">
                     {user?.userName}
                   </p>

@@ -9,10 +9,9 @@ export async function canSendMessage(userId: string) {
   const count = await redis.get(key);
 
   if (count && Number(count) >= DAILY_LIMIT) {
-    return false; // user reached daily limit
+    return false; 
   }
 
-  // increment count and set TTL for 24h if first time
   await redis.incr(key);
   if (!count) {
     await redis.expire(key, 60 * 60 * 24);

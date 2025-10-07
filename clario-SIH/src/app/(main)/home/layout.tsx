@@ -11,8 +11,9 @@ import GetUserLocation from "@/app/(main)/_components/GeoLocation";
 export default function Layout({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
   const hideNavbar =
-    pathname.startsWith("/home/mentor-connect/") &&
-    pathname !== "/home/mentor-connect";
+    (pathname.startsWith("/home/mentor-connect/") &&
+      pathname !== "/home/mentor-connect") ||
+    pathname === "/home/profile";
 
   return (
     <div className="w-screen overflow-hidden">
