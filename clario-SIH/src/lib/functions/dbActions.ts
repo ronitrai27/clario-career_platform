@@ -390,3 +390,70 @@ export async function paginatedColleges(
 
   return data as College[];
 }
+
+// ---------------------------------------CACHED VERSION MENTORS PAGINATED
+// export async function getAllMentorsPaginated(
+//   page: number = 1,
+//   limit: number = 6
+// ): Promise<PaginatedMentors> {
+//   const supabase = createClient();
+//   const cacheKey = `mentors:page:${page}:limit:${limit}`;
+//   const cachedData = await redis.get(cacheKey);
+
+//   if (cachedData) {
+//     try {
+//       let parsed: PaginatedMentors;
+
+//       // Check if cachedData is already an object (e.g., Redis client auto-parsed)
+//       if (typeof cachedData === "object" && cachedData !== null) {
+//         parsed = cachedData as PaginatedMentors;
+//       } else if (typeof cachedData === "string") {
+//         // Parse if it's a string
+//         parsed = JSON.parse(cachedData) as PaginatedMentors;
+//       } else {
+//         throw new Error(
+//           "Cached data is neither an object nor a valid JSON string"
+//         );
+//       }
+
+//       // Validate the parsed data structure
+//       if (
+//         parsed &&
+//         Array.isArray(parsed.mentors) &&
+//         typeof parsed.hasMore === "boolean" &&
+//         typeof parsed.total === "number"
+//       ) {
+//         console.log(`--- ✅HIT from Redis for mentors-connect ${cacheKey} ---`);
+//         return parsed;
+//       }
+//       console.warn(`Invalid cache data structure for key: ${cacheKey}`);
+//     } catch (err) {
+//       console.warn(`Invalid cache data for key: ${cacheKey}`, err);
+//     }
+//   }
+//   console.log(`--- Cache miss for mentors-connect ${cacheKey} ---`);
+
+//   const start = (page - 1) * limit;
+//   const end = start + limit - 1;
+
+//   const { data, error, count } = await supabase
+//     .from("mentors")
+//     .select("*", { count: "exact" })
+//     .order("created_at", { ascending: false })
+//     .range(start, end);
+
+//   if (error) {
+//     console.error("Mentors fetch error:", error);
+//     return { mentors: [], hasMore: false, total: 0 };
+//   }
+
+//   const hasMore = count !== null ? end + 1 < count : false;
+//   const total = count || 0;
+
+//   const result: PaginatedMentors = { mentors: data || [], hasMore, total };
+
+//   await redis.set(cacheKey, JSON.stringify(result), { ex: 600 });
+//   console.log(`--- Cached mentors for ${cacheKey} ---`);
+
+//   return result;
+// }
