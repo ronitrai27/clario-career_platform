@@ -9,9 +9,6 @@ import { retrivalServer } from "./pineconeQuery";
 import { toast } from "sonner";
 
 const ai = new GoogleGenAI({ apiKey: process.env.NEXT_PUBLIC_GEMINI_API_KEY!});
-// const ai = new GoogleGenAI({
-//   apiKey: "AIzaSyDzhB5Uc25-HX-7dd62CyDDyIP_AYxwjfk"
-// })
 
 type AgentContext = {
   question: string;
