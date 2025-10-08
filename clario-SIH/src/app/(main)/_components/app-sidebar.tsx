@@ -256,7 +256,7 @@ export function AppSidebar() {
                   height={46}
                   className="rounded-full"
                 />
-                <div className="flex flex-col">
+                <div className="flex flex-col ">
                   <p className="text-base font-inter tracking-tight text-black">
                     {user?.userName}
                   </p>
@@ -304,6 +304,7 @@ export function AppSidebar() {
 
                 <Button
                   variant="ghost"
+                  onClick={() => router.push("/home/profile")}
                   className="justify-between w-full font-roboto hover:bg-gray-50 rounded-none cursor-pointer"
                 >
                   <div className="flex gap-2 items-center">

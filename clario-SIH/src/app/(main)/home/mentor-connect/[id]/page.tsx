@@ -239,11 +239,11 @@ export default function MentorConnectPage() {
           </p>
 
          <div className="bg-gradient-to-br from-yellow-400 to-amber-100 h-48 rounded-lg p-4 mt-14">
-           <h2 className="text-center mt-4 mb-2 text-lg font-semibold font-sora">
+           <h2 className="text-center mt-2 mb-2 text-xl font-semibold font-sora">
             Book Session
           </h2>
-          <p className="text-center text-base font-inter ">Select the duration of your session. 20 coins for 30 min and 30 coins for 45 min</p>
-          <div className="flex gap-8 mt-10 justify-center">
+          <p className="text-center text-base font-inter tracking-tight">Book a session with {mentor?.full_name} and get guidance on your career choices. Make 1:1 Video call and discuss your concerns</p>
+          <div className="flex gap-8 mt-6 justify-center">
             <Button
               onClick={() => {
                 setSessionType("30");
@@ -271,7 +271,7 @@ export default function MentorConnectPage() {
         {/* RIGHT SIDE */}
         <div className="w-[32%] h-full mt-5 ">
           <div className="flex flex-col  bg-yellow-50 p-3 rounded-md shadow justify-center mx-auto w-[200px]">
-            <h2 className="font-inter text-2xl font-semibold">Rating</h2>
+            <h2 className="font-inter text-xl font-semibold">Rating</h2>
             <div className="flex items-center gap-4">
               <Star className="text-amber-500" />
               <h2 className="text-2xl font-sora">{mentor?.rating}</h2>

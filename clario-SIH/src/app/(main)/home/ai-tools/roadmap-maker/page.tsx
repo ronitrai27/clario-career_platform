@@ -12,7 +12,13 @@ import {
 } from "react-icons/lu";
 import { getUserQuizData } from "@/lib/functions/dbActions";
 import { createClient } from "@/lib/supabase/client";
-import { Loader2, LucideGlobe, LucideSendHorizontal } from "lucide-react";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import {
+  Activity,
+  Loader2,
+  LucideGlobe,
+  LucideSendHorizontal,
+} from "lucide-react";
 import { Textarea } from "@/components/ui/textarea";
 import Roadmap from "@/app/(main)/_components/RoadmapCanvas";
 import axios from "axios";
@@ -37,6 +43,8 @@ const RoadmapMaker = () => {
   const [careerSkillOptions, setCareerSkillOptions] = useState<string[]>([]);
   const [quizDataLoading, setQuizDataLoading] = useState(false);
   const supabase = createClient();
+
+  const [showSuggestions, setShowSuggestions] = useState(false);
 
   const [field, setField] = useState("");
   const [loadingRoadmap, setLoadingRoadmap] = useState(false);
@@ -142,45 +150,80 @@ const RoadmapMaker = () => {
             Level up your career with AI-powered roadmaps. Personalised guidance
             for your path.
           </p>
-          {!quizDataLoading && (
-            <div className="mt-6 grid grid-cols-1 px-6 mx-auto max-w-[260px] justify-items-center bg-slate-800 w-full p-2 rounded-md cursor-pointer hover:scale-105 duration-200">
-              <p className="text-white text-sm font-inter">
-                History <LuHistory className="inline ml-2" />
-              </p>
-            </div>
-          )}
-          {quizDataLoading && (
-            <div className="mt-8 grid grid-cols-1 gap-3 w-full ">
-              {Array.from({ length: 5 }).map((_, idx) => (
-                <div
-                  key={idx}
-                  className="h-12 w-full  rounded-xl bg-gray-200 animate-pulse"
-                />
-              ))}
-            </div>
-          )}
+          <Tabs
+            defaultValue="suggestions"
+            className="w-full flex flex-col items-center mt-6"
+          >
+            {/* Tabs header */}
+            <TabsList className="grid grid-cols-2 w-full  bg-gray-100 rounded-md">
+              <TabsTrigger
+                value="history"
+                className="flex items-center justify-center gap-2 data-[state=active]:bg-slate-800 data-[state=active]:text-white text-sm font-inter py-2 rounded-md transition-all"
+              >
+                <LuHistory size={18} />
+                History
+              </TabsTrigger>
 
-          {user?.isQuizDone ? (
-            <div className="mt-4 grid grid-cols-1 gap-3  mx-auto px-6 w-full">
-              {quizDataLoading ? (
-                <></>
+              <TabsTrigger
+                value="suggestions"
+                className="flex items-center justify-center gap-2 data-[state=active]:bg-slate-800 data-[state=active]:text-white text-sm font-inter py-2 rounded-md transition-all"
+              >
+                <Activity size={18} />
+                Suggestions
+              </TabsTrigger>
+            </TabsList>
+
+            {/* History tab */}
+            <TabsContent value="history" className="w-full max-w-[400px]">
+              {!quizDataLoading ? (
+                <div className="mt-4 bg-white border border-gray-200 rounded-md p-4 shadow-sm text-center">
+                  <p className="text-gray-700 font-inter text-sm">
+                    📜 Your past quiz attempts and generated roadmaps will
+                    appear here.
+                  </p>
+                </div>
               ) : (
-                careerSkillOptions.map((option, idx) => (
-                  <div
-                    key={idx}
-                    onClick={() => setField(option)}
-                    className="rounded-md w-full max-w-[260px] mx-auto shadow p-2 bg-gray-50 border border-blue-400 hover:scale-105 gover:bg-blue-100 duration-200 cursor-pointer  justify-items-center text-center"
-                  >
-                    <p className="text-xs font-inter font-medium text-black tracking-tight">
-                      {option}
-                    </p>
-                  </div>
-                ))
+                <div className="mt-6 grid grid-cols-1 gap-3 w-full">
+                  {Array.from({ length: 5 }).map((_, idx) => (
+                    <div
+                      key={idx}
+                      className="h-12 w-full rounded-xl bg-gray-200 animate-pulse"
+                    />
+                  ))}
+                </div>
               )}
-            </div>
-          ) : (
-            <div></div>
-          )}
+            </TabsContent>
+
+            {/* Suggestions tab */}
+            <TabsContent value="suggestions" className="w-full max-w-[400px]">
+              {quizDataLoading && (
+                <div className="mt-8 grid grid-cols-1 gap-3 w-full">
+                  {Array.from({ length: 5 }).map((_, idx) => (
+                    <div
+                      key={idx}
+                      className="h-12 w-full rounded-xl bg-gray-200 animate-pulse"
+                    />
+                  ))}
+                </div>
+              )}
+
+              {!quizDataLoading && user?.isQuizDone && (
+                <div className="mt-4 grid grid-cols-1 gap-3 mx-auto px-6 w-full">
+                  {careerSkillOptions.map((option, idx) => (
+                    <div
+                      key={idx}
+                      onClick={() => setField(option)}
+                      className="rounded-md w-full max-w-[260px] mx-auto shadow p-2 bg-gray-50 border border-blue-400 hover:scale-105 hover:bg-blue-100 duration-200 cursor-pointer text-center"
+                    >
+                      <p className="text-xs font-inter font-medium text-black tracking-tight">
+                        {option}
+                      </p>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </TabsContent>
+          </Tabs>
 
           <div className="absolute bottom-4 left-1/2 transform -translate-x-1/2 w-full max-w-[480px] mx-auto">
             <div className="bg-slate-800 rounded-md pb-2 pt-3 px-2">
@@ -220,12 +263,12 @@ const RoadmapMaker = () => {
         </div>
         {/* RIGHT SIDE */}
         <div className="w-[68%] h-full bg-white border border-slate-300 rounded-md">
-          {loadingRoadmap ? (
+          {!loadingRoadmap ? (
             <div className="flex items-center justify-center h-full">
-              <div className="bg-gray-100 rounded-xl shadow-md p-6 max-w-[580px] mx-auto w-full">
+              <div className="bg-blue-50 border border-gray-300 rounded-xl shadow-md p-6 max-w-[580px] mx-auto w-full">
                 {/* Header */}
                 <div className="flex items-center gap-3 mb-6">
-                  <h2 className="text-2xl font-medium text-black font-sora">
+                  <h2 className="text-2xl font-medium text-black font-inter tracking-wide">
                     Hang tight,{" "}
                     <span className="font-semibold text-blue-600">Clario</span>{" "}
                     is designing your personalised roadmap
@@ -258,14 +301,14 @@ const RoadmapMaker = () => {
                           transition={{ duration: 0.4 }}
                           className="relative flex items-center bg-white p-2 rounded-md w-full"
                         >
-                          {/* Step dot */}
-                          <div
-                            className={`absolute -left-[26px] w-5 h-5 rounded-full border-2 ${
-                              isActive
-                                ? "border-blue-500 bg-blue-100"
-                                : "border-gray-300 bg-white"
-                            }`}
-                          />
+                          {/* Step indicator */}
+                          <div className="absolute -left-[26px] flex items-center justify-center w-5 h-5">
+                            {isActive ? (
+                              <div className="w-4 h-4 border-2 border-blue-500 border-t-transparent rounded-full animate-spin" />
+                            ) : (
+                              <div className="w-4 h-4 rounded-full border-2 border-gray-300 bg-white" />
+                            )}
+                          </div>
 
                           {/* Step text */}
                           <span

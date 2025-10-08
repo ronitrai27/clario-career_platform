@@ -180,12 +180,12 @@ export default function MentorConnect() {
 
         <div className="max-w-[1000px] w-full mx-auto flex items-center justify-between  px-4 py-2 my-6">
           {/* Search Bar */}
-          <div className="flex items-center w-[560px] bg-white border border-gray-200 rounded-full px-3 py-1">
+          <div className="flex items-center w-[560px] bg-white border border-blue-200 rounded-full px-3 py-1">
             <Input
               placeholder="Search mentors"
               className="bg-transparent border-none shadow-none focus-visible:ring-0 focus-visible:ring-offset-0 text-sm"
             />
-            <LuSearch className="text-lg text-gray-600 ml-2" />
+            <LuSearch className="text-lg text-blue-600 ml-2" />
           </div>
 
           {/* Filter */}
@@ -195,7 +195,7 @@ export default function MentorConnect() {
           </div>
 
           {/* View Toggle */}
-          <div className="flex items-center gap-2">
+          {/* <div className="flex items-center gap-2">
             <Button
               variant={viewMode === "grid" ? "default" : "outline"}
               size="icon"
@@ -210,10 +210,10 @@ export default function MentorConnect() {
             >
               <List className="text-lg" />
             </Button>
-          </div>
+          </div> */}
 
           {/* History */}
-          <div className="flex items-center gap-2 cursor-pointer hover:text-blue-600 transition-colors bg-blue-50 border border-blue-500 py-2 px-4 rounded-md">
+          <div className="flex items-center gap-2 -ml-10 cursor-pointer hover:text-blue-600 transition-colors bg-blue-50 border border-blue-500 py-2 px-4 rounded-md">
             <LuHistory className="text-lg" />
             <p className="text-sm font-medium">History</p>
           </div>
