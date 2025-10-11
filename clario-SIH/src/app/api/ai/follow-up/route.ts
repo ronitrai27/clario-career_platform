@@ -55,6 +55,7 @@ export async function POST(req: Request) {
       : [];
 
     return NextResponse.json({ followUps });
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
   } catch (err: any) {
     console.error("Follow-up API error:", err);
     return NextResponse.json({ followUps: [] }, { status: 500 });
