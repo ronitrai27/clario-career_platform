@@ -8,7 +8,7 @@ import { z } from "zod";
 const followUpSchema = z.object({
   followUps: z.array(z.string()).optional(),
 });
-
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 const parser = StructuredOutputParser.fromZodSchema(followUpSchema as any);
 
 // --- Prompt Template ---
