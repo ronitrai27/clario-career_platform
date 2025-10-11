@@ -120,7 +120,7 @@ export default function CollegesList() {
             key={college.id}
             className="border rounded-lg p-4 border-b-4 border-b-blue-500 shadow-sm hover:shadow-md bg-white relative overflow-hidden flex flex-col h-[290px]"
           >
-            <div className="w-40 h-20 rounded-full absolute -top-7 -left-5 bg-blue-500 opacity-15 blur-xl"></div>
+            {/* <div className="w-40 h-20 rounded-full absolute -top-7 -left-5 bg-blue-500 opacity-15 blur-xl"></div> */}
             <h2 className="font-semibold text-lg font-inter tracking-tight line-clamp-2  capitalize">
               {college.college_name}
             </h2>

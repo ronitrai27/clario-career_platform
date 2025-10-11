@@ -10,7 +10,9 @@ import {
   LuBriefcase,
   LuBuilding,
   LuBuilding2,
+  LuChartColumnDecreasing,
   LuChevronRight,
+  LuTreePine,
 } from "react-icons/lu";
 import { Button } from "@/components/ui/button";
 import {
@@ -25,6 +27,7 @@ import CareerCourses from "./CourseData";
 import { Separator } from "@/components/ui/separator";
 import CollegesList from "./CollegesDataUi";
 import Image from "next/image";
+import { CallTracker } from "assert";
 
 interface Job {
   title: string;
@@ -257,6 +260,10 @@ export default function CareerTabsDemo() {
               <LuBriefcase className="inline-block ml-3 text-blue-500" />
             </h2>
 
+            <div className="flex -mr-[320px] items-center gap-1 font-inter text-sm font-light bg-white ">
+              <LuChartColumnDecreasing className="w-7 h-7 text-gray-400 " />
+              Track Jobs Easily
+            </div>
             <Button
               className="cursor-pointer font-inter text-sm"
               variant="outline"
@@ -276,7 +283,6 @@ export default function CareerTabsDemo() {
           </div>
         )}
 
-
         <TabsContent value="jobs">
           <div className="  bg-white">
             {loading ? (
@@ -292,7 +298,7 @@ export default function CareerTabsDemo() {
                 {jobs.slice(0, visibleJobs).map((job, i) => (
                   <div
                     key={i}
-                    className="p-3 h-[338px] bg-white border border-t-8 border-t-blue-500 rounded-lg hover:shadow-md transition-shadow shadow flex flex-col relative overflow-hidden"
+                    className="p-3 h-[338px] bg-white border rounded-md hover:shadow-md transition-shadow shadow-sm flex flex-col relative overflow-hidden"
                   >
                     <div className="flex items-center justify-between">
                       <h3 className="font-semibold font-inter tracking-tight text-center text-lg line-clamp-2">
@@ -303,14 +309,14 @@ export default function CareerTabsDemo() {
                       </div>
                     </div>
                     <p className="text-base font-raleway text-muted-foreground text-left mt-3">
-                      <LuBuilding2 className="inline-block mr-2 text-xl -mt-1 text-blue-600" />
-                      <span className="font-semibold text-blue-500">
+                      <LuBuilding2 className="inline-block mr-2 text-base -mt-1 text-blue-600" />
+                      <span className=" text-blue-500 font-inter">
                         {job.company_name}
                       </span>
                     </p>
                     <p className="my-2 font-inter tracking-tight text-left text-sm">
                       <PinIcon
-                        className="inline-block mr-2  -mt-1 text-blue-600"
+                        className="inline-block mr-2  -mt-1 "
                         size={20}
                       />
                       {job?.location}
@@ -331,23 +337,22 @@ export default function CareerTabsDemo() {
                     />
 
                     {/* push this container to bottom */}
-                    <div className="flex items-center justify-center gap-10 mt-auto w-full">
-                      {job.apply_options[0]?.link && (
-                        <Button
-                          className="cursor-pointer w-full bg-blue-50 border-blue-200"
-                          variant="outline"
+                    <div className="flex items-center justify-between gap-10 mt-auto w-full">
+                      <Button
+                        className="cursor-pointer w-3/4 bg-blue-50 border-blue-200"
+                        variant="outline"
+                      >
+                        <a
+                          href={job.apply_options[0].link}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="text-black  font-inter text-xs inline-block cursor-pointer"
                         >
-                          <a
-                            href={job.apply_options[0].link}
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            className="text-black  font-inter text-xs inline-block cursor-pointer"
-                          >
-                            Click to Apply{" "}
-                          </a>
-                          <ExternalLink className="inline-block ml-5 cursor-pointer" />
-                        </Button>
-                      )}
+                          Click to Apply{" "}
+                        </a>
+                        <ExternalLink className="inline-block ml-5 cursor-pointer" />
+                      </Button>
+                      <Button className="w-fit" variant="outline"> <LuChartColumnDecreasing className="w-7 h-7 text-gray-800 " /></Button>
                     </div>
                   </div>
                 ))}
