@@ -198,10 +198,10 @@ const RoadmapMaker = () => {
             <TabsContent value="suggestions" className="w-full max-w-[400px]">
               {quizDataLoading && (
                 <div className="mt-8 grid grid-cols-1 gap-3 w-full">
-                  {Array.from({ length: 5 }).map((_, idx) => (
+                  {Array.from({ length: 4 }).map((_, idx) => (
                     <div
                       key={idx}
-                      className="h-12 w-full rounded-xl bg-gray-200 animate-pulse"
+                      className="h-11 w-full rounded-xl bg-gray-200 animate-pulse"
                     />
                   ))}
                 </div>
@@ -213,7 +213,7 @@ const RoadmapMaker = () => {
                     <div
                       key={idx}
                       onClick={() => setField(option)}
-                      className="rounded-md w-full max-w-[260px] mx-auto shadow p-2 bg-gray-50 border border-blue-400 hover:scale-105 hover:bg-blue-100 duration-200 cursor-pointer text-center"
+                      className="rounded-md w-full max-w-[260px] mx-auto shadow p-2 bg-white border border-gray-100 hover:scale-105 hover:bg-blue-100 duration-200 cursor-pointer text-center"
                     >
                       <p className="text-xs font-inter font-medium text-black tracking-tight">
                         {option}

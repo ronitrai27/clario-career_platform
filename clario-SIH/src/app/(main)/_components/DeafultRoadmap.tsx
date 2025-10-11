@@ -19,21 +19,19 @@ const DefaultRoadmap: React.FC<DefaultRoadmapProps> = ({ setField, fetchRoadmap 
   };
 
   return (
-    <div className="bg-gradient-to-br from-white via-blue-50 to-purple-200 h-full p-4 relative overflow-hidden flex flex-col justify-center">
+    <div className="bg-white h-full p-4 relative overflow-hidden flex flex-col justify-center">
       <h2 className="capitalize text-4xl text-balance font-extrabold tracking-wide font-inter text-center -mt-4">
         welcome to your personalised learning roadmap
       </h2>
 
       <p className="text-muted-foreground text-center font-sora text-lg mt-6 px-6">
-        Lorem ipsum dolor sit amet consectetur, adipisicing elit. Maiores animi
-        placeat numquam provident repellendus quis enim deserunt delectus! Rem,
-        esse!
+       Follow the Right Step towards your Dream Job. Easy download and share options available!
       </p>
 
       {/* Clickable Box */}
       <div
         onClick={handleClick}
-        className="mt-14 bg-white border border-gray-200 p-5 max-w-sm mx-auto rounded-xl shadow-sm relative hover:shadow-md transition cursor-pointer z-50"
+        className="mt-14 bg-gradient-to-br from-blue-50 to-indigo-200 border p-5 max-w-sm mx-auto rounded-xl shadow-sm relative hover:shadow-md transition cursor-pointer z-50"
       >
         <h2 className="text-2xl font-semibold font-sora text-center text-gray-900">
           Let’s Start Your Journey

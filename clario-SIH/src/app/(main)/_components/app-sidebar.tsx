@@ -211,6 +211,9 @@ export function AppSidebar() {
                   <SidebarMenuSubItem className="font-inter font-medium text-gray-200 cursor-pointer text-base hover:text-white hover:translate-x-2 duration-200">
                     Resume Analyser
                   </SidebarMenuSubItem>
+                  <SidebarMenuSubItem className="font-inter font-medium text-gray-200 cursor-pointer text-base hover:text-white hover:translate-x-2 duration-200">
+                    <Link href="/home/ai-tools/roadmap-maker">AI Job Tracker </Link>
+                  </SidebarMenuSubItem>
                 </SidebarMenuSub>
               </CollapsibleContent>
             </Collapsible>
@@ -218,7 +221,7 @@ export function AppSidebar() {
         </SidebarGroup>
       </SidebarContent>
       <SidebarFooter className="px-1 overflow-hidden">
-        <div className="mb-4 bg-gradient-to-br from-white via-blue-200 to-blue-400 w-[96%] mx-auto h-[120px] rounded-lg px-2 py-3">
+        <div className="mb-4 mt-1 bg-gradient-to-br from-white via-blue-200 to-blue-400 w-[96%] mx-auto h-[120px] rounded-lg px-2 py-3">
           <div className="flex items-center gap-3">
             <LuWallet className="text-2xl text-blue-600" />
 

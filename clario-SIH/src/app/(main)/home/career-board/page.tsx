@@ -136,7 +136,6 @@ const CareerBoard = () => {
             <CareerTabsDemo />
           </div>
 
-         
         </>
       )}
     </div>
