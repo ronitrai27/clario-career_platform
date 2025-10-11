@@ -263,7 +263,7 @@ const RoadmapMaker = () => {
         </div>
         {/* RIGHT SIDE */}
         <div className="w-[68%] h-full bg-white border border-slate-300 rounded-md">
-          {!loadingRoadmap ? (
+          {loadingRoadmap ? (
             <div className="flex items-center justify-center h-full">
               <div className="bg-blue-50 border border-gray-300 rounded-xl shadow-md p-6 max-w-[580px] mx-auto w-full">
                 {/* Header */}

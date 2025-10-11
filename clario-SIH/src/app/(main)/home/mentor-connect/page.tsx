@@ -2,7 +2,9 @@
 "use client";
 
 import {
+  LuAccessibility,
   LuBook,
+  LuBookMarked,
   LuFilter,
   LuHistory,
   LuLinkedin,
@@ -24,11 +26,12 @@ import { Button } from "@/components/ui/button";
 import Image from "next/image";
 import Link from "next/link";
 import { Input } from "@/components/ui/input";
-import { Grid2X2, List, Star } from "lucide-react";
+import { Award, Grid2X2, List, Ribbon, Star } from "lucide-react";
 import { Separator } from "@/components/ui/separator";
 import { Video } from "@imagekit/next";
 import { useUserData } from "@/context/UserDataProvider";
 import { useRouter } from "next/navigation";
+import styled from "styled-components";
 
 const fallbackAvatars = [
   "/a1.png",
@@ -44,7 +47,7 @@ interface MentorVideo {
 }
 
 export default function MentorConnect() {
-  const {user} = useUserData();
+  const { user } = useUserData();
   const [mentorData, setMentorData] = useState<DBMentor[]>([]);
   const [page, setPage] = useState(1);
   const [hasMore, setHasMore] = useState(true);
@@ -57,7 +60,7 @@ export default function MentorConnect() {
   const router = useRouter();
 
   useEffect(() => {
-    if(!user) return
+    if (!user) return;
     const fetchVideos = async () => {
       const res = await getRandomMentorVideos();
       setVideos(res);
@@ -178,44 +181,49 @@ export default function MentorConnect() {
           </div>
         )}
 
-        <div className="max-w-[1000px] w-full mx-auto flex items-center justify-between  px-4 py-2 my-6">
-          {/* Search Bar */}
-          <div className="flex items-center w-[560px] bg-white border border-blue-200 rounded-full px-3 py-1">
-            <Input
-              placeholder="Search mentors"
-              className="bg-transparent border-none shadow-none focus-visible:ring-0 focus-visible:ring-offset-0 text-sm"
-            />
-            <LuSearch className="text-lg text-blue-600 ml-2" />
+        <div className="flex items-center justify-center gap-6 my-7">
+          <h2 className=" text-2xl font-semibold font-sora text-center">
+            Discover More By Category
+          </h2>
+          <div className="flex items-center gap-1 font-inter text-sm bg-white p-2 shadow rounded-lg">
+            <Award className="w-7 h-7 text-blue-500 " />
+            Top Rated Mentors
           </div>
+        </div>
 
-          {/* Filter */}
-          <div className="flex items-center gap-2 cursor-pointer hover:text-blue-600 transition-colors bg-blue-50 py-2 px-4 rounded-md border border-blue-500">
-            <LuFilter className="text-lg" />
-            <p className="text-sm font-medium">Filter</p>
-          </div>
-
-          {/* View Toggle */}
-          {/* <div className="flex items-center gap-2">
-            <Button
-              variant={viewMode === "grid" ? "default" : "outline"}
-              size="icon"
-              onClick={() => setViewMode("grid")}
-            >
-              <Grid2X2 className="text-lg" />
+        <div className=" w-full mx-auto flex items-center justify-between  px-4 py-2 my-6">
+          <p className="font-inter text-base ">
+            <span className="font-semibold">45</span> Mentors Found
+          </p>
+          <div className="flex items-center gap-5">
+            {/* Search Bar */}
+            <div className="flex items-center w-[320px] bg-white border border-gray-200 rounded-lg px-3 ">
+              <LuSearch className="text-lg text-gray-600 ml-2" />
+              <Input
+                placeholder="Search mentors"
+                className="bg-transparent border-none shadow-none focus-visible:ring-0 focus-visible:ring-offset-0 text-sm"
+              />
+            </div>
+            {/* Available Filters */}
+            <div className="flex items-center gap-4 font-inter text-sm py-2 px-3 bg-white shadow rounded-md">
+              <StyledWrapper>
+                <label className="switch">
+                  <input type="checkbox" />
+                  <span className="slider" />
+                </label>
+              </StyledWrapper>
+              Available
+            </div>
+            {/* Bookings */}
+            <Button className="font-inter text-sm " variant="outline">
+              <LuHistory className="mr-2" />
+              My Bookings
             </Button>
-            <Button
-              variant={viewMode === "list" ? "default" : "outline"}
-              size="icon"
-              onClick={() => setViewMode("list")}
-            >
-              <List className="text-lg" />
+            {/* Filters */}
+             <Button className="font-inter text-sm " variant="outline">
+              <LuFilter className="mr-2" />
+              Filters
             </Button>
-          </div> */}
-
-          {/* History */}
-          <div className="flex items-center gap-2 -ml-10 cursor-pointer hover:text-blue-600 transition-colors bg-blue-50 border border-blue-500 py-2 px-4 rounded-md">
-            <LuHistory className="text-lg" />
-            <p className="text-sm font-medium">History</p>
           </div>
         </div>
 
@@ -227,7 +235,7 @@ export default function MentorConnect() {
             return (
               <div
                 key={mentor.id}
-                className={`border-l-4 ${borderColor} rounded-xl shadow-sm bg-white hover:shadow-md transition-shadow duration-200 overflow-hidden h-[240px]`}
+                className={`border-l-4 ${borderColor} rounded-md shadow-sm bg-white hover:shadow-md transition-shadow duration-200 overflow-hidden h-[240px]`}
               >
                 <div className="flex h-full">
                   {/* Left Section */}
@@ -248,8 +256,14 @@ export default function MentorConnect() {
                     </div>
 
                     <div className="fmt-4 w-full">
-                    
-                      <Button size="sm" variant="outline" className="w-full cursor-pointer" onClick={()=> router.push(`/home/mentor-connect/${mentor.id}`)}>
+                      <Button
+                        size="sm"
+                        variant="outline"
+                        className="w-full cursor-pointer"
+                        onClick={() =>
+                          router.push(`/home/mentor-connect/${mentor.id}`)
+                        }
+                      >
                         Connect <LuScreenShare className="ml-2" />
                       </Button>
                     </div>
@@ -340,3 +354,61 @@ export default function MentorConnect() {
     </div>
   );
 }
+const StyledWrapper = styled.div`
+  .switch {
+    --secondary-container: #d3d3d3;
+    --primary: #ffffff;
+    font-size: 10px;
+    position: relative;
+    display: inline-block;
+    width: 3.7em;
+    height: 1.8em;
+  }
+
+  .switch input {
+    display: none;
+    opacity: 0;
+    width: 0;
+    height: 0;
+  }
+
+  .slider {
+    position: absolute;
+    cursor: pointer;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: var(--secondary-container); /* grey track */
+    transition: background-color 0.2s;
+    border-radius: 30px;
+  }
+
+  .slider:before {
+    position: absolute;
+    content: "";
+    height: 1.4em;
+    width: 1.4em;
+    border-radius: 20px;
+    left: 0.2em;
+    bottom: 0.2em;
+    background-color: var(--primary); /* white knob */
+    transition: transform 0.4s, background-color 0.4s;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+  }
+
+  input:checked + .slider::before {
+    background-color: var(--primary);
+  }
+
+  input:checked + .slider {
+    background-color: #84da89; /* green track when active */
+  }
+  input:focus + .slider {
+    box-shadow: 0 0 1px var(--secondary-container);
+  }
+
+  input:checked + .slider:before {
+    transform: translateX(1.9em);
+  }
+`;
