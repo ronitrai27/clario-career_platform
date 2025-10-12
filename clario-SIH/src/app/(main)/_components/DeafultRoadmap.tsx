@@ -1,15 +1,24 @@
 "use client";
+import { Button } from "@/components/ui/button";
+import { useUserData } from "@/context/UserDataProvider";
 import { useQuizData } from "@/context/userQuizProvider";
 import Image from "next/image";
+import { useRouter } from "next/navigation";
 import React from "react";
+import { LuActivity } from "react-icons/lu";
 
 interface DefaultRoadmapProps {
   setField: (val: string) => void;
   fetchRoadmap: () => void;
 }
 
-const DefaultRoadmap: React.FC<DefaultRoadmapProps> = ({ setField, fetchRoadmap }) => {
+const DefaultRoadmap: React.FC<DefaultRoadmapProps> = ({
+  setField,
+  fetchRoadmap,
+}) => {
+  const { user } = useUserData();
   const { quizData } = useQuizData();
+  const router = useRouter();
 
   const handleClick = () => {
     if (quizData?.selectedCareer) {
@@ -20,12 +29,15 @@ const DefaultRoadmap: React.FC<DefaultRoadmapProps> = ({ setField, fetchRoadmap 
 
   return (
     <div className="bg-white h-full p-4 relative overflow-hidden flex flex-col justify-center">
-      <h2 className="capitalize text-4xl text-balance font-extrabold tracking-wide font-inter text-center -mt-4">
+      {user?.isQuizDone ? (
+        <>
+        <h2 className="capitalize text-4xl text-balance font-extrabold tracking-wide font-inter text-center -mt-4">
         welcome to your personalised learning roadmap
       </h2>
 
       <p className="text-muted-foreground text-center font-sora text-lg mt-6 px-6">
-       Follow the Right Step towards your Dream Job. Easy download and share options available!
+        Follow the Right Step towards your Dream Job. Easy download and share
+        options available!
       </p>
 
       {/* Clickable Box */}
@@ -59,7 +71,14 @@ const DefaultRoadmap: React.FC<DefaultRoadmapProps> = ({ setField, fetchRoadmap 
         width={350}
         height={350}
         className="mx-auto mt-6 absolute -right-16 -bottom-24 opacity-30"
-      />
+      /></>
+      ): (
+        <div className="flex flex-col items-center justify-center">
+          <h1 className="font-sora capitalize text-3xl font-semibold">Complete your quiz first</h1>
+          <p className="font-inter text-lg px-20 text-center mt-2">Complete quiz to get personlaised interest and roadmap aligned with our goals.</p>
+          <Button className="mt-5 font-inter text-sm" onClick={()=>router.push("/start-quiz")}>Start Quiz <LuActivity className="ml-2" /></Button>
+        </div>
+      )}
     </div>
   );
 };

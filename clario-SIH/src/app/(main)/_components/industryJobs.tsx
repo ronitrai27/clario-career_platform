@@ -245,9 +245,24 @@ export default function CareerTabsDemo() {
         onValueChange={(val) => setActiveTab(val)}
       >
         <TabsList className="grid w-full grid-cols-3 max-w-[700px] mx-auto mb-6 font-inter">
-          <TabsTrigger value="jobs">Jobs</TabsTrigger>
-          <TabsTrigger value="colleges">Colleges</TabsTrigger>
-          <TabsTrigger value="courses">Courses</TabsTrigger>
+          <TabsTrigger
+            value="jobs"
+            className="data-[state=active]:bg-slate-800 data-[state=active]:text-white"
+          >
+            Jobs
+          </TabsTrigger>
+          <TabsTrigger
+            value="colleges"
+            className="data-[state=active]:bg-slate-800 data-[state=active]:text-white"
+          >
+            Colleges
+          </TabsTrigger>
+          <TabsTrigger
+            value="courses"
+            className="data-[state=active]:bg-slate-800 data-[state=active]:text-white"
+          >
+            Courses
+          </TabsTrigger>
         </TabsList>
 
         <Separator className="mb-5" />
@@ -352,7 +367,10 @@ export default function CareerTabsDemo() {
                         </a>
                         <ExternalLink className="inline-block ml-5 cursor-pointer" />
                       </Button>
-                      <Button className="w-fit" variant="outline"> <LuChartColumnDecreasing className="w-7 h-7 text-gray-800 " /></Button>
+                      <Button className="w-fit" variant="outline">
+                        {" "}
+                        <LuChartColumnDecreasing className="w-7 h-7 text-gray-800 " />
+                      </Button>
                     </div>
                   </div>
                 ))}

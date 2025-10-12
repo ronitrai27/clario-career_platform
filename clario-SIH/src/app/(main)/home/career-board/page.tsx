@@ -57,11 +57,11 @@ const CareerBoard = () => {
                   Selected Career
                 </CardTitle>
               </CardHeader>
-              <CardContent>
+              <CardContent className="flex flex-col h-full">
                 <p className="text-2xl font-inter font-semibold">
                  {quizData?.selectedCareer}
                 </p>
-                <p className="text-base mt-1 text-muted-foreground font-inter">
+                <p className="text-base mt-auto text-muted-foreground font-inter">
                   Your selected career
                 </p>
               </CardContent>
@@ -75,15 +75,15 @@ const CareerBoard = () => {
                   Industry Growth
                 </CardTitle>
               </CardHeader>
-              <CardContent>
+              <CardContent className="flex flex-col h-full">
                 <p className="text-2xl font-inter font-semibold">12.5%</p>
                 <Progress
                   value={4.5}
                   max={10}
                   className="mt-2 h-2 rounded-full"
                 />
-                <p className="text-base mt-1 text-muted-foreground font-inter">
-                  Your selected career
+                <p className="text-base mt-auto text-muted-foreground font-inter">
+                  Industry Growth Rate
                 </p>
               </CardContent>
             </Card>
@@ -96,31 +96,31 @@ const CareerBoard = () => {
                   Demand Level
                 </CardTitle>
               </CardHeader>
-              <CardContent>
+              <CardContent className="flex flex-col h-full">
                 <p className="text-2xl font-inter font-semibold">High</p>
                 <Progress
                   value={100}
                   max={100}
                   className="mt-2 h-2 rounded-full"
                 />
-                <p className="text-base mt-1 text-muted-foreground font-inter">
-                  Your selected career
+                <p className="text-base mt-auto text-muted-foreground font-inter">
+                   Job Market Demand
                 </p>
               </CardContent>
             </Card>
 
             {/* 4. Skills Required */}
-            <Card className="flex-1 p-3 border border-gray-200 rounded-md">
+            <Card className="flex-1 p-3 border border-gray-800 rounded-md bg-gradient-to-br from-gray-600 to-gray-800">
               <CardHeader className="flex items-center gap-2">
                 <ListChecks className="w-5 h-5 text-purple-500" />
-                <CardTitle className="text-lg font-inter">Top Skills</CardTitle>
+                <CardTitle className="text-lg font-inter text-white">Top Skills</CardTitle>
               </CardHeader>
-              <CardContent>
-                <div className="grid grid-cols-2 sm:grid-cols-2 gap-2 mt-2">
+              <CardContent className="p-0">
+                <div className="grid grid-cols-2 space-y-2 mt-2">
                   {skills.map((skill) => (
                     <div
                       key={skill}
-                      className=" whitespace-nowrap bg-blue-50 p-1 rounded-md text-sm font-inter tracking-tight  "
+                      className=" whitespace-nowrap text-white p-1 rounded-md text-sm font-sora tracking-tight  "
                     >
                       {skill}
                     </div>
