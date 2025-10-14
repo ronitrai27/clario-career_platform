@@ -209,7 +209,7 @@ export function AppSidebar() {
                   </SidebarMenuSubItem>
 
                   <SidebarMenuSubItem className="font-inter font-medium text-gray-200 cursor-pointer text-base hover:text-white hover:translate-x-2 duration-200">
-                    Resume Analyser
+                    AI Resume Maker 
                   </SidebarMenuSubItem>
                   <SidebarMenuSubItem className="font-inter font-medium text-gray-200 cursor-pointer text-base hover:text-white hover:translate-x-2 duration-200">
                     <Link href="/home/job-tracker">AI Job Tracker </Link>

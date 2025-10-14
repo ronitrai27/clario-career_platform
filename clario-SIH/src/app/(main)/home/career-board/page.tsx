@@ -26,17 +26,18 @@ const CareerBoard = () => {
   const { user, loading } = useUserData();
   const router = useRouter();
   const { quizData } = useQuizData();
+
   return (
     <div className="bg-gray-50 w-full h-full p-4">
       <SingleCard />
 
-      {user?.isQuizDone == false || quizData?.selectedCareer == null ? (
+      {user?.isQuizDone === false ? (
         <div className="mt-20 flex flex-col items-center justify-center gap-6 text-center">
           <h2 className="text-4xl font-semibold font-sora">
             Complete Your Quiz First!
           </h2>
-          <p className="text-gray-800 max-w-lg   font-inter">
-            You need to complete the quiz and select your career to unlock Industry Insights. Take the
+          <p className="text-gray-800 max-w-lg font-inter">
+            You need to complete the quiz to unlock Industry Insights. Take the
             quiz now to access valuable data and insights tailored for you.
           </p>
           <Button
@@ -44,6 +45,22 @@ const CareerBoard = () => {
             onClick={() => router.push("/start-quiz")}
           >
             Start Quiz
+          </Button>
+        </div>
+      ) : !quizData?.selectedCareer ? (
+        <div className="mt-20 flex flex-col items-center justify-center gap-6 text-center">
+          <h2 className="text-4xl font-semibold font-sora">
+            You Haven’t Selected a Career Yet!
+          </h2>
+          <p className="text-gray-800 max-w-lg font-inter">
+            Kindly select a career to unlock Industry Insights, jobs, and more
+            personalized data for your growth.
+          </p>
+          <Button
+            className="rounded-md shadow-md cursor-pointer font-inter text-base mt-10 bg-gradient-to-b from-blue-300 to-blue-500 text-white hover:-translate-y-1 duration-200"
+            onClick={() => router.push("/home/ai-tools/career-coach")}
+          >
+            Select Career
           </Button>
         </div>
       ) : (
@@ -59,7 +76,7 @@ const CareerBoard = () => {
               </CardHeader>
               <CardContent className="flex flex-col h-full">
                 <p className="text-2xl font-inter font-semibold">
-                 {quizData?.selectedCareer}
+                  {quizData?.selectedCareer}
                 </p>
                 <p className="text-base mt-auto text-muted-foreground font-inter">
                   Your selected career
@@ -104,7 +121,7 @@ const CareerBoard = () => {
                   className="mt-2 h-2 rounded-full"
                 />
                 <p className="text-base mt-auto text-muted-foreground font-inter">
-                   Job Market Demand
+                  Job Market Demand
                 </p>
               </CardContent>
             </Card>
@@ -113,7 +130,9 @@ const CareerBoard = () => {
             <Card className="flex-1 p-3 border border-gray-800 rounded-md bg-gradient-to-br from-gray-600 to-gray-800">
               <CardHeader className="flex items-center gap-2">
                 <ListChecks className="w-5 h-5 text-purple-500" />
-                <CardTitle className="text-lg font-inter text-white">Top Skills</CardTitle>
+                <CardTitle className="text-lg font-inter text-white">
+                  Top Skills
+                </CardTitle>
               </CardHeader>
               <CardContent className="p-0">
                 <div className="grid grid-cols-2 space-y-2 mt-2">
@@ -135,7 +154,6 @@ const CareerBoard = () => {
           <div className="mt-20">
             <CareerTabsDemo />
           </div>
-
         </>
       )}
     </div>

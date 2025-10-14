@@ -265,39 +265,74 @@ export async function getAllMentorProfiles(): Promise<MentorProfile[]> {
   return data as MentorProfile[];
 }
 
+// export async function getSuggestedCollegeData(
+//   userDegrees: string[],
+//   userState: string
+// ): Promise<College[]> {
+//   const supabase = createClient();
+
+//   const normalizedDegrees = userDegrees.map((d) => d.toLowerCase().trim());
+//   const normalizedState = userState.toLowerCase().trim();
+
+//   console.log("Normalized degrees:", normalizedDegrees);
+//   console.log("User state:", normalizedState);
+
+//   const { data, error } = await supabase
+//     .from("colleges")
+//     .select("*")
+//     .overlaps("best_suit_for", normalizedDegrees)
+//     .ilike("location", `%${normalizedState}%`) // filter by state in location
+//     .limit(10);
+
+//   if (error) {
+//     console.error("Error fetching suggested colleges:", error);
+//     return [];
+//   }
+
+//   if (!data || data.length === 0) {
+//     console.warn("No colleges found for state:", normalizedState);
+//     return [];
+//   }
+
+//   console.log("✅ Colleges fetched for state:", normalizedState);
+//   return data as College[];
+// }
+
 export async function getSuggestedCollegeData(
   userDegrees: string[],
   userState: string
 ): Promise<College[]> {
   const supabase = createClient();
 
-  const normalizedDegrees = userDegrees.map((d) => d.toLowerCase().trim());
+  const normalizedDegrees = userDegrees.map((degree) => {
+    return degree.toLowerCase().trim().split(" ")[0]; 
+  });
+
   const normalizedState = userState.toLowerCase().trim();
 
-  console.log("Normalized degrees:", normalizedDegrees);
-  console.log("User state:", normalizedState);
+  console.log("🎓 Normalized degrees:", normalizedDegrees);
+  console.log("📍 User state:", normalizedState);
 
   const { data, error } = await supabase
     .from("colleges")
     .select("*")
     .overlaps("best_suit_for", normalizedDegrees)
-    .ilike("location", `%${normalizedState}%`) // filter by state in location
+    .ilike("location", `%${normalizedState}%`)
     .limit(10);
 
   if (error) {
-    console.error("Error fetching suggested colleges:", error);
+    console.error("❌ Error fetching suggested colleges:", error);
     return [];
   }
 
   if (!data || data.length === 0) {
-    console.warn("No colleges found for state:", normalizedState);
+    console.warn("⚠️ No colleges found for state:", normalizedState);
     return [];
   }
 
   console.log("✅ Colleges fetched for state:", normalizedState);
   return data as College[];
 }
-
 // 1. GET selectedCareer
 export async function getSelectedCareer(userId: any): Promise<string | null> {
   const supabase = createClient();
@@ -431,6 +466,7 @@ export async function paginatedColleges(
 //       console.warn(`Invalid cache data for key: ${cacheKey}`, err);
 //     }
 //   }
+
 //   console.log(`--- Cache miss for mentors-connect ${cacheKey} ---`);
 
 //   const start = (page - 1) * limit;
