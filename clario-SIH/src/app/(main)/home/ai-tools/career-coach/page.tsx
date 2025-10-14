@@ -274,8 +274,7 @@ const CareerCoach = () => {
                       </div>
                     </div>
                     <p className="mt-4 max-w-[250px] mx-auto text-center font-inter text-gray-200 text-sm">
-                      Talk naturally with your AI companion and get instant
-                      responses anytime.
+                      Test your knowledge. AI Voice Assistant made for Interview Preparations.
                     </p>
                   </div>
                   {/* 2 */}
@@ -460,8 +459,7 @@ const CareerCoach = () => {
                 AI Voice Assistant
               </h2>
               <p className="text-center text-sm font-light tracking-tight font-inter mt-3 px-2">
-                Need someone to help you? instead of just typing, you can
-                actually clear doubts by using AI Voice Assistant
+                AI Voice Assistant made for Interview Preparations. Try it out now
               </p>
 
               <div className="w-full flex items-center justify-center mt-5">
