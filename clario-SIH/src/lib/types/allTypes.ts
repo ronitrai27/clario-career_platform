@@ -87,9 +87,24 @@ export type MentorSession = {
   student_id: string;
   session_type: "30 min session" | "45 min session";
   status: "pending" | "accepted" | "rejected" | "completed";
-  requested_at: string;   // ISO date string (timestamp with time zone)
+  requested_at: string;   
   scheduled_at?: string | null;
   completed_at?: string | null;
   notes?: string | null;
   vc_link?: string | null;
 };
+
+export type JobTracker = {
+  id: number;
+  created_at: string; 
+  userId: any; 
+  stage: string;
+  job_title: string;
+  company: string;
+  applied_date: string; 
+  type: string;
+  description: string;
+  note: string;
+};
+// stage: "saved" | "applied" | "interviewing" | "negotiating" | "hired" | "rejected";
+// type: "full-time" | "internship" | "contract" | "freelance" | "part-time";

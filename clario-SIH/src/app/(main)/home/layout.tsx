@@ -16,10 +16,10 @@ export default function Layout({ children }: { children: React.ReactNode }) {
     pathname === "/home/profile";
 
   return (
-    <div className="w-screen overflow-hidden">
+    <div className="w-screen ">
       <SidebarProvider>
         <AppSidebar />
-        <main className="flex-1">
+        <main className="flex-1 flex flex-col">
           <QuizDataProvider>
             {!hideNavbar && <Navbar />}
             {children}

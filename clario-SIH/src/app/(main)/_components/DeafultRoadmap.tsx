@@ -61,7 +61,7 @@ const DefaultRoadmap: React.FC<DefaultRoadmapProps> = ({
             ) : (
               <>
                 <h2 className="text-xl font-semibold font-sora text-center text-gray-900">
-                  You haven7&apos;t selected a career yet
+                  You haven&apos;t selected a career yet
                 </h2>
 
                 <p className="text-center mt-1 text-gray-600 text-base">

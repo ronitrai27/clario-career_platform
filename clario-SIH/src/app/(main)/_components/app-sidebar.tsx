@@ -197,7 +197,7 @@ export function AppSidebar() {
                   <LuChevronDown className="text-xl group-hover:text-black " />
                 </SidebarMenuButton>
               </CollapsibleTrigger>
-              <CollapsibleContent>
+              <CollapsibleContent className="p-0">
                 <SidebarMenuSub className="pl-2 mt-3 space-y-2">
                   <SidebarMenuSubItem className="font-inter font-medium text-gray-200 cursor-pointer text-base hover:text-white hover:translate-x-2 duration-200">
                     <Link href="/home/ai-tools/career-coach">
@@ -209,10 +209,15 @@ export function AppSidebar() {
                   </SidebarMenuSubItem>
 
                   <SidebarMenuSubItem className="font-inter font-medium text-gray-200 cursor-pointer text-base hover:text-white hover:translate-x-2 duration-200">
-                    AI Resume Maker 
-                  </SidebarMenuSubItem>
-                  <SidebarMenuSubItem className="font-inter font-medium text-gray-200 cursor-pointer text-base hover:text-white hover:translate-x-2 duration-200">
                     <Link href="/home/job-tracker">AI Job Tracker </Link>
+                  </SidebarMenuSubItem>
+
+                    <SidebarMenuSubItem className="font-inter font-medium text-gray-200 cursor-pointer text-base hover:text-white hover:translate-x-2 duration-200 flex items-center whitespace-nowrap">
+                    AI Resume Maker  <span className="font-inter text-xs text-pink-500 ml-3">Pro</span>
+                  </SidebarMenuSubItem>
+
+                    <SidebarMenuSubItem className="font-inter font-medium text-gray-200 cursor-pointer text-base hover:text-white hover:translate-x-2 duration-200 whitespace-nowrap">
+                    AI Interview Prep  <span className="font-inter text-xs text-pink-500 ml-3">Pro</span>
                   </SidebarMenuSubItem>
                 </SidebarMenuSub>
               </CollapsibleContent>
