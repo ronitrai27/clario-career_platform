@@ -13,7 +13,8 @@ export default function Layout({ children }: { children: React.ReactNode }) {
   const hideNavbar =
     (pathname.startsWith("/home/mentor-connect/") &&
       pathname !== "/home/mentor-connect") ||
-    pathname === "/home/profile";
+    pathname === "/home/profile"||
+    pathname === "/home/interview-prep/start";
 
   return (
     <div className="w-screen ">
