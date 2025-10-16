@@ -74,9 +74,9 @@ const JobTracker = () => {
             </p>
           </div>
           {/* Right side all columns */}
-          <div className="flex h-auto min-w-max gap-2">
+          <div className="flex h-auto min-w-max gap-4">
             {/* Saved */}
-            <div className="flex flex-col w-[250px] bg-white rounded-md shadow-sm">
+            <div className="flex flex-col w-[260px] bg-white rounded-md shadow-sm">
               <div className="text-center py-3 font-semibold border rounded shadow bg-gray-100">
                 <h1 className="font-sora text-base flex items-center justify-center gap-5">
                   Saved <LuChevronDown className="w-4 h-4 ml-2" />
@@ -86,7 +86,7 @@ const JobTracker = () => {
             </div>
 
             {/* Applied */}
-            <div className="flex flex-col w-[250px] bg-white rounded-md shadow-sm">
+            <div className="flex flex-col w-[260px] bg-white rounded-md shadow-sm">
               <div className="text-center py-3 font-semibold border rounded shadow bg-blue-100">
                 <h1 className="font-sora text-base flex items-center justify-center gap-5">
                   Applied <LuChevronDown className="w-4 h-4 ml-2" />
@@ -96,7 +96,7 @@ const JobTracker = () => {
             </div>
 
             {/* Interviewing */}
-            <div className="flex flex-col w-[250px] bg-white rounded-md shadow-sm">
+            <div className="flex flex-col w-[260px] bg-white rounded-md shadow-sm">
               <div className="text-center py-3 font-semibold border rounded shadow bg-green-100">
                 <h1 className="font-sora text-base flex items-center justify-center gap-5">
                   Interviewing <LuChevronDown className="w-4 h-4 ml-2" />
@@ -107,7 +107,7 @@ const JobTracker = () => {
             {/* <Separator orientation="vertical" className="bg-gray-300" /> */}
 
             {/* Negotiating */}
-            <div className="flex flex-col w-[250px] bg-white rounded-md shadow-sm">
+            <div className="flex flex-col w-[260px] bg-white rounded-md shadow-sm">
               <div className="text-center py-3 font-semibold border rounded shadow bg-yellow-100">
                 <h1 className="font-sora text-base flex items-center justify-center gap-5">
                   Negotiating <LuChevronDown className="w-4 h-4 ml-2" />
@@ -118,7 +118,7 @@ const JobTracker = () => {
             {/* <Separator orientation="vertical" className="bg-gray-300" /> */}
 
             {/* Hired */}
-            <div className="flex flex-col w-[250px] bg-white rounded-md shadow-sm">
+            <div className="flex flex-col w-[260px] bg-white rounded-md shadow-sm">
               <div className="text-center py-3 font-semibold border rounded shadow bg-emerald-100">
                 <h1 className="font-sora text-base flex items-center justify-center gap-5">
                   Hired <LuChevronDown className="w-4 h-4 ml-2" />
@@ -129,7 +129,7 @@ const JobTracker = () => {
             {/* <Separator orientation="vertical" className="bg-gray-300" /> */}
 
             {/* Rejected */}
-            <div className="flex flex-col w-[250px] bg-white rounded-md shadow-sm">
+            <div className="flex flex-col w-[260px] bg-white rounded-md shadow-sm">
               <div className="text-center py-3 font-semibold border rounded shadow bg-red-100">
                 <h1 className="font-sora text-base flex items-center justify-center gap-5">
                   Rejected <LuChevronDown className="w-4 h-4 ml-2" />
