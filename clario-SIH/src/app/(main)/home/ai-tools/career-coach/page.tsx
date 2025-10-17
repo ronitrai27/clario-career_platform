@@ -375,7 +375,7 @@ const CareerCoach = () => {
           )}
 
           <div className="absolute bottom-4 left-1/2 transform -translate-x-1/2 w-full max-w-[480px] mx-auto">
-            <div className="bg-gray-800 rounded-md pb-2 pt-1 px-2">
+            <div className="bg-gray-200 rounded-md pb-2 pt-1 px-2">
               <div className="flex items-center justify-between px-6 mb-2">
                 {messages.length > 0 ? (
                   <Button
@@ -390,24 +390,24 @@ const CareerCoach = () => {
                   <Button
                     variant="ghost"
                     size="sm"
-                    className="font-inter text-sm text-blue-300"
+                    className="font-inter text-sm text-black"
                     onClick={() => setShowSuggestion(!showSuggestion)}
                   >
                     {showSuggestion ? (
                       <>
                         Hide Suggestions{" "}
-                        <LuChevronDown className="text-blue-300 inline ml-1" />
+                        <LuChevronDown className="text-black inline ml-1" />
                       </>
                     ) : (
                       <>
                         Show Suggestions{" "}
-                        <LuChevronUp className="text-blue-300 inline ml-1" />
+                        <LuChevronUp className="text-black inline ml-1" />
                       </>
                     )}
                   </Button>
                 )}
 
-                <p className="text-gray-400 font-sora text-sm">5 searchs -</p>
+                <p className="text-gray-600 font-sora text-sm">5 searchs -</p>
               </div>
               <div className="relative">
                 <Textarea

@@ -94,7 +94,7 @@ export type MentorSession = {
   vc_link?: string | null;
 };
 
-export type JobTracker = {
+export type JobTrackerCard = {
   id: number;
   created_at: string; 
   userId: any; 
