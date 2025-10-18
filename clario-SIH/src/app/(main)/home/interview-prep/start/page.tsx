@@ -20,6 +20,7 @@ import { Button } from "@/components/ui/button";
 import { X } from "lucide-react";
 import { toast } from "sonner";
 import Vapi from '@vapi-ai/web';
+import AI_Voice from "@/components/kokonutui/ai-voice";
 // const vapi = new Vapi('YOUR_PUBLIC_API_KEY');
 
 const InterviewStart = () => {
@@ -146,9 +147,13 @@ const InterviewStart = () => {
               </div>
             )}
 
-            <div className="w-[150px] h-[150px] bg-blue-50 absolute top-5 right-5 rounded-lg border-2 border-blue-400 flex items-center justify-center ">
-              <div className="  bg-white border rounded-full w-12 h-12 flex items-center justify-center">
+            <div className="w-[180px] h-[180px] bg-blue-50 absolute top-3 right-3 rounded-lg border-2 border-blue-400 flex flex-col items-center justify-center overflow-hidden">
+              <div className="  bg-white border rounded-full w-16 h-16 flex items-center justify-center shrink-0 -mb-5">
                 <h1 className="font-extrabold font-inter text-2xl">AI</h1>
+              </div>
+              <div className="mt-10 flex flex-col space-y-1">
+                <AI_Voice />
+                <p className="text-center font-inter text-sm">Listening</p>
               </div>
             </div>
           </div>

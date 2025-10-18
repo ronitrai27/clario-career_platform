@@ -1,14 +1,5 @@
 "use client";
 
-/**
- * @author: @dorian_baffier
- * @description: Shimmer Text
- * @version: 1.0.0
- * @date: 2025-06-26
- * @license: MIT
- * @website: https://kokonutui.com
- * @github: https://github.com/kokonut-labs/kokonutui
- */
 
 import { cn } from "@/lib/utils";
 import { motion } from "motion/react";
@@ -32,7 +23,7 @@ export default function ShimmerText({
             >
                 <motion.h1
                     className={cn(
-                        "text-3xl font-bold bg-gradient-to-r from-neutral-950 via-neutral-400 to-neutral-950 dark:from-white dark:via-neutral-600 dark:to-white bg-[length:200%_100%] bg-clip-text text-transparent",
+                        "text-3xl font-bold font-sora bg-gradient-to-r from-neutral-950 via-neutral-400 to-neutral-950 dark:from-white dark:via-neutral-600 dark:to-white bg-[length:200%_100%] bg-clip-text text-transparent",
                         className
                     )}
                     animate={{

@@ -3,7 +3,7 @@ import { Button } from "@/components/ui/button";
 import { useSidebar } from "@/components/ui/sidebar";
 import { Separator } from "@/components/ui/separator";
 import { JobTrackerCard } from "@/lib/types/allTypes";
-import { Filter, Icon, Info } from "lucide-react";
+import { Filter, Icon, Info, InfoIcon, LucideCheckCircle } from "lucide-react";
 import Image from "next/image";
 import React, { useEffect, useState } from "react";
 import {
@@ -45,6 +45,8 @@ import { DndContext, closestCenter, DragEndEvent } from "@dnd-kit/core";
 import axios from "axios";
 import ShimmerText from "@/components/kokonutui/shimmer-text";
 import { motion, AnimatePresence } from "framer-motion";
+import { useRouter } from "next/navigation";
+import { AnimatedCircularProgressBar } from "@/components/ui/animated-circular-progress-bar";
 
 const stages = [
   {
@@ -96,6 +98,7 @@ const messages = [
 const JobTracker = () => {
   const supabase = createClient();
   const { user } = useUserData();
+  const router = useRouter();
   const { open: sidebarOpen, isMobile } = useSidebar();
   const [jobs, setJobs] = useState<JobTrackerCard[]>([]);
   const [open, setOpen] = useState(false);
@@ -178,24 +181,65 @@ const JobTracker = () => {
 
   // -------------ANIMATION IN DIALOG------------------
   const [activeIndex, setActiveIndex] = useState(0);
+  const [showInstructions, setShowInstructions] = useState(false);
+  const [countdown, setCountdown] = useState(10);
 
+  // --- Phase 1: Messages ---
   useEffect(() => {
     if (!prepOpen) return;
+
     setActiveIndex(0);
+    setShowInstructions(false);
 
     const interval = setInterval(() => {
       setActiveIndex((prev) => {
-        if (prev === messages.length - 1) {
-          clearInterval(interval);
-          console.log("✅ Prep animation complete");
-          return prev;
+        const nextIndex = (prev + 1) % messages.length;
+
+        if (nextIndex === 0 && prev === messages.length - 1) {
+          toast.success("Interview prep is ready!");
+          setShowInstructions(true);
         }
-        return prev + 1;
+
+        return nextIndex;
       });
     }, 2000);
 
     return () => clearInterval(interval);
   }, [prepOpen]);
+
+  // --- Phase 2: Countdown Timer ---
+  useEffect(() => {
+    if (!showInstructions) return;
+    setCountdown(10);
+
+    const timer = setInterval(() => {
+      setCountdown((prev) => {
+        if (prev <= 1) {
+          clearInterval(timer);
+          console.log("⏩ Redirecting to interview...");
+          router.push("/home/interview-prep/start");
+          return 0;
+        }
+        return prev - 1;
+      });
+    }, 1000);
+
+    return () => clearInterval(timer);
+  }, [showInstructions, router]);
+  // ------Last animation MAGICUI----------------
+  const [value, setValue] = useState(0);
+  useEffect(() => {
+    const handleIncrement = (prev: number) => {
+      if (prev === 100) {
+        return 0;
+      }
+      return prev + 10;
+    };
+    setValue(handleIncrement);
+    const interval = setInterval(() => setValue(handleIncrement), 2000);
+    return () => clearInterval(interval);
+  }, []);
+
   // --------------------------------QNA GENERATION--------------------
   const handleInterviewQna = async (job: any) => {
     console.log("Job Title:", job.job_title);
@@ -510,25 +554,131 @@ const JobTracker = () => {
         <DialogContent className="sm:max-w-[750px] h-[500px] p-0 border-0 shadow-2xl rounded-lg overflow-hidden bg-transparent">
           <div className="flex h-full w-full">
             {/* LEFT SIDE */}
-            <div className="bg-gradient-to-br from-white to-blue-100 h-full w-[300px] shrink-0 relative">
-              <Image
-                src="/prep2.png"
-                alt="element1"
-                width={900}
-                height={900}
-                className=" h-full w-full -bottom-10 object-cover absolute z-20"
-              />
-              <Image
-                src="/staic6.png"
-                alt="element1"
-                width={900}
-                height={900}
-                className=" h-full w-full shrink-0 absolute -top-20 z-0"
-              />
+            <div
+              className={`${
+                showInstructions
+                  ? "bg-gradient-to-br from-white to-blue-500"
+                  : "bg-gradient-to-br from-white to-yellow-500"
+              } h-full w-[300px] shrink-0 relative`}
+            >
+              {!showInstructions ? (
+                <Image
+                  src="/prep2.png"
+                  alt="element1"
+                  width={900}
+                  height={900}
+                  className=" h-full w-full -bottom-10 object-cover absolute z-20"
+                />
+              ) : (
+                <Image
+                  src="/element5.png"
+                  alt="element1"
+                  width={900}
+                  height={900}
+                  className=" h-full w-full  object-cover absolute z-20"
+                />
+              )}
+              {!showInstructions ? (
+                <Image
+                  src="/staic6.png"
+                  alt="element1"
+                  width={900}
+                  height={900}
+                  className=" h-full w-full shrink-0 absolute -top-20 z-0"
+                />
+              ) : (
+                <Image
+                  src="/static7.png"
+                  alt="element1"
+                  width={900}
+                  height={900}
+                  className=" h-full w-full shrink-0 absolute -top-10 z-0"
+                />
+              )}
             </div>
             {/* RIGHT SIDE */}
-            <div className="bg-white/70 w-full">
-            <ShimmerText text="Preparing To Launch" />
+            <div className="bg-white/90 w-full flex flex-col h-full">
+              {!showInstructions ? (
+                <>
+                  <ShimmerText text="Preparing To Launch" />
+                  {/* Animated list */}
+                  <div className="flex flex-col space-y-4 ml-10 ">
+                    {messages.map((msg, index) => (
+                      <motion.div
+                        key={index}
+                        className="flex items-center space-x-3 font-inter text-base"
+                        initial={{ opacity: 0.5 }}
+                        animate={{
+                          opacity: activeIndex === index ? 1 : 0.5,
+                          scale: activeIndex === index ? 1.05 : 1,
+                        }}
+                        transition={{ duration: 0.5 }}
+                      >
+                        <LucideCheckCircle
+                          className={`w-6 h-6 ${
+                            activeIndex === index
+                              ? "text-blue-600 animate-pulse"
+                              : "text-black"
+                          }`}
+                        />
+                        <span
+                          className={`font-inter tracking-wide ${
+                            activeIndex === index
+                              ? "text-blue-600 font-semibold"
+                              : "text-black font-medium"
+                          }`}
+                        >
+                          {msg}
+                        </span>
+                      </motion.div>
+                    ))}
+
+                    {/* Optional connecting line */}
+                    <div className="border-l-2 border-gray-300 h-full absolute left-3 top-3"></div>
+                  </div>
+                  {/* Bottom note */}
+                  <div className="mt-auto mb-4 p-2 ">
+                    <motion.div
+                      className="text-center bg-white border border-blue-500 p-2 rounded-lg text-black"
+                      // animate={{ opacity: [0.6, 1, 0.6] }}
+                      transition={{ repeat: Infinity, duration: 2 }}
+                    >
+                      Please wait while the system is setting up your interview
+                      environment...
+                    </motion.div>
+                  </div>
+                </>
+              ) : (
+                <div className="p-2 flex flex-col h-full">
+                  <ShimmerText text="Starting Interview" />
+
+                  <div className="w-full mx-auto flex items-center justify-center">
+                    <AnimatedCircularProgressBar
+                      // value={value}
+                      gaugePrimaryColor="#3B82F6"
+                      gaugeSecondaryColor="rgba(255, 255, 255, 0.3)"
+                    />
+                  </div>
+                  <div className="text-sm mt-auto mb-5 font-inter space-y-3 tracking-tight bg-white p-3 rounded-lg border border-blue-500">
+                    <p className="flex items-center gap-2">
+                      <InfoIcon className="w-4 h-4 mr-2" /> Ensure proper
+                      lighting and network in your room.
+                    </p>
+                    <p className="flex items-center gap-2">
+                      <InfoIcon className="w-4 h-4 mr-2" /> Check your internet
+                      connection for stability.
+                    </p>
+                    <p className="flex items-center gap-2">
+                      <InfoIcon className="w-4 h-4 mr-2" /> Don't switch tabs or
+                      refresh during the interview.
+                    </p>
+                    <p className="flex items-center gap-2">
+                      <InfoIcon className="w-4 h-4 mr-2" /> Relax and be
+                      yourself — you've got this!
+                    </p>
+                  </div>
+                </div>
+              )}
             </div>
           </div>
         </DialogContent>
