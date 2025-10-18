@@ -19,6 +19,8 @@ import {
 import { Button } from "@/components/ui/button";
 import { X } from "lucide-react";
 import { toast } from "sonner";
+import Vapi from '@vapi-ai/web';
+// const vapi = new Vapi('YOUR_PUBLIC_API_KEY');
 
 const InterviewStart = () => {
   const { user } = useUserData();

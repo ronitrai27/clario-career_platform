@@ -1,6 +1,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 "use client";
 import { Button } from "@/components/ui/button";
+import { useSidebar } from "@/components/ui/sidebar";
 import { useUserData } from "@/context/UserDataProvider";
 import { createClient } from "@/lib/supabase/client";
 import { useRouter } from "next/navigation";
@@ -20,6 +21,7 @@ import Image from "next/image";
 import {
   LuActivity,
   LuBookOpenCheck,
+  LuChevronDown,
   LuChevronRight,
   LuCircleFadingPlus,
   LuFilter,
@@ -43,6 +45,7 @@ import {
   Building2,
   CheckCircle,
   Ghost,
+  LucideInfo,
   Map,
   PlusCircle,
   Sparkles,
@@ -61,6 +64,7 @@ import { Separator } from "@/components/ui/separator";
 import { BsSuitcase, BsSuitcase2 } from "react-icons/bs";
 import SuggestedCollegeScroll from "../_components/SuggestedCollegeScroll";
 import MessageNamesList from "./test/showchats/page";
+import confetti from "canvas-confetti";
 
 const fallbackAvatars = [
   "/a1.png",
@@ -75,11 +79,14 @@ export default function HomePage() {
   const supabase = createClient();
   const router = useRouter();
   const { user, loading, ensureUserInDB } = useUserData();
+   const { open: sidebarOpen, isMobile } = useSidebar();
   const [mentors, setMentors] = useState<DBMentor[]>([]);
   const [mentorLoading, setMentorLoading] = useState<boolean>(false);
   const [discoverUsers, setDiscoverUsers] = useState<DBUser[]>([]);
   const [discoverLoading, setDiscoverLoading] = useState(false);
   const [open, setOpen] = useState(false);
+
+  const [step, setStep] = useState(1);
 
   useEffect(() => {
     ensureUserInDB();
@@ -111,12 +118,38 @@ export default function HomePage() {
       .finally(() => setDiscoverLoading(false));
   }, [user]);
 
+  // -----------CONFETTI---------------------
+  const handleClick = () => {
+    const duration = 4 * 1000;
+    const animationEnd = Date.now() + duration;
+    const defaults = { startVelocity: 30, spread: 360, ticks: 60, zIndex: 0 };
+    const randomInRange = (min: number, max: number) =>
+      Math.random() * (max - min) + min;
+    const interval = window.setInterval(() => {
+      const timeLeft = animationEnd - Date.now();
+      if (timeLeft <= 0) {
+        return clearInterval(interval);
+      }
+      const particleCount = 50 * (timeLeft / duration);
+      confetti({
+        ...defaults,
+        particleCount,
+        origin: { x: randomInRange(0.1, 0.3), y: Math.random() - 0.2 },
+      });
+      confetti({
+        ...defaults,
+        particleCount,
+        origin: { x: randomInRange(0.7, 0.9), y: Math.random() - 0.2 },
+      });
+    }, 250);
+  };
   // HANDLE SHOW DIALOG ON QUIZ COMPLETE-----------------------
 
   useEffect(() => {
     const quizDone = localStorage.getItem("quizDone");
     if (quizDone === "true") {
       setOpen(true);
+      handleClick();
     }
   }, []);
 
@@ -148,13 +181,13 @@ export default function HomePage() {
           <div className="w-[75%] px-2">
             <SlidingCards />
             {loading ? (
-              <div className="mt-3 max-w-[800px] mx-auto flex justify-between items-center">
+              <div className={`mt-3 ${sidebarOpen ? "max-w-[810px]" : "max-w-[1100px]"} max-w-[800px] mx-auto flex justify-between items-center`}>
                 <Skeleton className="h-[40px] w-[300px] rounded-full" />
                 <Skeleton className="h-[40px] w-[300px] rounded-full" />
               </div>
             ) : (
-              <div className="mt-5 max-w-[800px]  mx-auto flex justify-between items-center">
-                <h1 className="text-4xl font-semibold font-inter tracking-tight max-w-[380px] truncate">
+               <div className={`mt-5 ${sidebarOpen ? "max-w-[810px]" : "w-[1100px]"} max-w-[800px] mx-auto flex justify-between items-center`}>
+                <h1 className="text-4xl font-semibold font-sora tracking-tight max-w-[380px] truncate">
                   Welcome, {user?.userName}
                 </h1>
                 <ActionsButtons />
@@ -162,10 +195,11 @@ export default function HomePage() {
             )}
 
             {/* ACTION BOX */}
+          
             <ActionBox />
 
             {/* MENTORS !! */}
-            <div className="max-w-[880px] mx-auto mt-6 bg-white  border border-gray-200 p-2 rounded-xl  overflow-hidden">
+            <div className={`${sidebarOpen ? "max-w-[880px]" : "w-[1020px]"} mx-auto mt-6 bg-white  border border-gray-200 p-2 rounded-xl  overflow-hidden`}>
               <div className="flex items-center justify-between pr-8">
                 <h2 className="text-[26px] pt-4 tracking-tight font-medium font-inter mb-3 pl-2">
                   Recommended Mentors{" "}
@@ -175,6 +209,7 @@ export default function HomePage() {
                 <div>
                   <Button
                     variant="outline"
+                    onClick={()=>router.push('/home/mentor-connect')}
                     className="cursor-pointer text-sm tracking-tight font-inter"
                   >
                     View More{" "}
@@ -237,7 +272,7 @@ export default function HomePage() {
                             {m.full_name}
                           </CardTitle>
                         </CardHeader>
-                        <CardContent className="-mt-5 w-full mx-auto pb-3">
+                        <CardContent className="-mt-5 w-full mx-auto pb-3 flex flex-col h-full">
                           <p className="font-inter bg-gradient-to-r from-blue-500 to-indigo-400 text-transparent bg-clip-text tracking-tight text-center capitalize text-base">
                             {m.current_position}
                           </p>
@@ -246,8 +281,13 @@ export default function HomePage() {
                             {m.expertise?.join(", ")}
                           </p>
 
-                          <div className="flex justify-center mt-5">
-                            <Button className="rounded-md text-xs font-inter bg-blue-500 text-white hover:bg-blue-600 cursor-pointer" onClick={()=>router.push(`/home/mentor-connect/${m.id}`)}>
+                          <div className="flex justify-center mt-auto">
+                            <Button
+                              className="rounded-md text-xs font-inter bg-blue-500 text-white hover:bg-blue-600 cursor-pointer"
+                              onClick={() =>
+                                router.push(`/home/mentor-connect/${m.id}`)
+                              }
+                            >
                               Book Session <LuScreenShare />
                             </Button>
                           </div>
@@ -382,7 +422,7 @@ export default function HomePage() {
                 </TabsList>
                 <div className="flex-1 mt-4 overflow-y-auto">
                   <TabsContent value="messages" className="h-full">
-                   <MessageNamesList/>
+                    <MessageNamesList />
                   </TabsContent>
                   <TabsContent value="discover" className="h-full">
                     {discoverUsers.length === 0 ? (
@@ -452,7 +492,7 @@ export default function HomePage() {
                   <Building2 className="inline ml-2 text-blue-500" />
                 </h2>
                 <p className="font-inter text-lg italic text-gray-600">
-                  Discover top colleges nearby you 
+                  Discover top colleges nearby you
                 </p>
               </div>
               <div>
@@ -473,75 +513,183 @@ export default function HomePage() {
 
       {/* Dialog to show after quiz ends*/}
       <Dialog open={open} onOpenChange={setOpen}>
-        <DialogContent className="sm:max-w-md border-0 shadow-2xl">
-          <DialogHeader className="text-center space-y-2 pb-1">
-            <div className="mx-auto w-12 h-12 bg-gradient-to-br from-blue-400 to-blue-600 rounded-full flex items-center justify-center mb-1">
-              <CheckCircle className="w-6 h-6 text-white" />
+        <DialogContent className="sm:max-w-[780px] h-[520px] p-0 border-0 shadow-2xl rounded-lg overflow-hidden">
+          <div className="flex h-full w-full">
+            {/* LEFT SIDE */}
+            <div className="bg-gradient-to-br from-red-100 via-red-200 to-rose-400 h-full w-[460px] relative">
+              <Image
+                src="/element1.png"
+                alt="element1"
+                width={900}
+                height={900}
+                className=" h-full w-full object-cover absolute z-20"
+              />
+              <Image
+                src="/static5.png"
+                alt="element1"
+                width={900}
+                height={900}
+                className=" h-full w-full shrink-0 absolute -top-20 z-0"
+              />
             </div>
-            {/* <DialogTitle className="text-xl font-bold text-gray-900 leading-tight">Quiz Complete!</DialogTitle> */}
-            <p className="text-gray-600 text-base leading-relaxed text-center font-inter">
-              Congratulations on completing your personalized assessment. Now We
-              will help you decide your future Career.
-            </p>
-          </DialogHeader>
+            {/* RIGHT SIDE */}
+            <div>
+              {step == 1 ? (
+                <div className="space-y-2 p-4">
+                  <div className="mx-auto w-12 h-12 bg-gradient-to-br from-blue-400 to-blue-600 rounded-full flex items-center justify-center mb-1">
+                    <CheckCircle className="w-6 h-6 text-white" />
+                  </div>
+                  <p className="font-sora text-center my-2 text-2xl font-semibold">
+                    Quiz Complete!
+                  </p>
+                  <p className="text-gray-600 text-base leading-relaxed text-center font-inter">
+                    Congratulations on completing your personalized assessment.
+                    Now We will help you decide your future Career.
+                  </p>
 
-          <div className="space-y-3 py-4">
-            <h3 className="font-semibold text-gray-800 font-inter text-base mb-3">
-              What&apos;s next for you:
-            </h3>
+                  <div className="space-y-3 py-2">
+                    <h3 className="font-semibold text-gray-800 font-inter text-base mb-3">
+                      What&apos;s next for you:
+                    </h3>
 
-            <div className="space-y-3">
-              <div className="flex items-start gap-2 p-2.5 rounded-lg bg-gradient-to-r from-blue-50 to-indigo-50 border border-blue-100">
-                <div className="w-7 h-7 bg-blue-500 rounded-lg flex items-center justify-center flex-shrink-0 mt-0.5">
-                  <Sparkles className="w-3.5 h-3.5 text-white" />
-                </div>
-                <div>
-                  <p className="font-medium text-gray-900 text-sm">
-                    Personalized Career Suggestions
-                  </p>
-                  <p className="text-gray-600 text-xs mt-0.5 font-inter">
-                    Discover roles tailored to your skills and interests
-                  </p>
-                </div>
-              </div>
+                    <div className="space-y-3">
+                      <div className="flex items-start gap-2 p-2.5 rounded-lg bg-gradient-to-r from-blue-50 to-indigo-50 border border-blue-100">
+                        <div className="w-7 h-7 bg-blue-500 rounded-lg flex items-center justify-center flex-shrink-0 mt-0.5">
+                          <Sparkles className="w-3.5 h-3.5 text-white" />
+                        </div>
+                        <div>
+                          <p className="font-medium text-gray-900 text-sm">
+                            Personalized Career Suggestions
+                          </p>
+                          <p className="text-gray-600 text-xs mt-0.5 font-inter">
+                            Discover roles tailored to your skills and interests
+                          </p>
+                        </div>
+                      </div>
 
-              <div className="flex items-start gap-2 p-2.5 rounded-lg bg-gradient-to-r from-purple-50 to-violet-50 border border-purple-100">
-                <div className="w-7 h-7 bg-purple-500 rounded-lg flex items-center justify-center flex-shrink-0 mt-0.5">
-                  <Map className="w-3.5 h-3.5 text-white" />
-                </div>
-                <div>
-                  <p className="font-medium text-gray-900 text-sm">
-                    AI-Powered Roadmap
-                  </p>
-                  <p className="text-gray-600 text-xs mt-0.5 font-inter">
-                    Get a step-by-step plan to reach your goals
-                  </p>
-                </div>
-              </div>
+                      <div className="flex items-start gap-2 p-2.5 rounded-lg bg-gradient-to-r from-purple-50 to-violet-50 border border-purple-100">
+                        <div className="w-7 h-7 bg-purple-500 rounded-lg flex items-center justify-center flex-shrink-0 mt-0.5">
+                          <Map className="w-3.5 h-3.5 text-white" />
+                        </div>
+                        <div>
+                          <p className="font-medium text-gray-900 text-sm">
+                            AI-Powered Roadmap
+                          </p>
+                          <p className="text-gray-600 text-xs mt-0.5 font-inter">
+                            Get a step-by-step plan to reach your goals
+                          </p>
+                        </div>
+                      </div>
 
-              <div className="flex items-start gap-2 p-2.5 rounded-lg bg-gradient-to-r from-emerald-50 to-teal-50 border border-emerald-100">
-                <div className="w-7 h-7 bg-emerald-500 rounded-lg flex items-center justify-center flex-shrink-0 mt-0.5">
-                  <Users className="w-3.5 h-3.5 text-white" />
+                      <div className="flex items-start gap-2 p-2.5 rounded-lg bg-gradient-to-r from-emerald-50 to-teal-50 border border-emerald-100">
+                        <div className="w-7 h-7 bg-emerald-500 rounded-lg flex items-center justify-center flex-shrink-0 mt-0.5">
+                          <Users className="w-3.5 h-3.5 text-white" />
+                        </div>
+                        <div>
+                          <p className="font-medium text-gray-900 text-sm">
+                            AI Interview Preparation
+                          </p>
+                          <p className="text-gray-600 text-xs mt-0.5 font-inter">
+                            Get expert advice on how to prepare for interviews
+                          </p>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div className="">
+                    <Button
+                      // onClick={handleClose}
+                      onClick={()=>setStep(2)}
+                      className="w-full h-9 font-inter text-sm bg-gradient-to-r from-blue-400 to-blue-600 hover:from-blue-700 hover:to-blue-800 text-white font-semibold rounded-lg shadow-lg hover:shadow-xl transition-all duration-200 cursor-pointer"
+                    >
+                    Continue
+                      <LuChevronRight className="ml-2" />
+                    </Button>
+                  </div>
                 </div>
-                <div>
-                  <p className="font-medium text-gray-900 text-sm">
-                    Personal Career Coach
+              ) : (
+                <div className="space-y-2 p-4">
+                  <div className="mx-auto w-12 h-12 bg-gradient-to-br from-blue-400 to-blue-600 rounded-full flex items-center justify-center mb-1">
+                    <LucideInfo className="w-6 h-6 text-white" />
+                  </div>
+                  <p className="font-sora text-center my-2 text-2xl font-semibold">
+                    Next Step !
                   </p>
-                  <p className="text-gray-600 text-xs mt-0.5 font-inter">
-                    Expert guidance throughout your journey
+                  <p className="text-gray-600 text-base leading-relaxed text-center font-inter">
+                    Now its time to decide your Career Path. AI powered career adviser will guide you through the process.
                   </p>
+
+                  <div className="space-y-3 py-2">
+                    <h3 className="font-semibold text-gray-800 font-inter text-base mb-3">
+                      What You Need To Do:
+                    </h3>
+
+                    <div className="space-y-3">
+                      <div className="flex items-start gap-2 p-2.5 rounded-lg bg-gradient-to-r from-blue-50 to-indigo-50 border border-blue-100">
+                        <div className="w-7 h-7 bg-blue-500 rounded-lg flex items-center justify-center flex-shrink-0 mt-0.5">
+                         <p className="text-white font-extrabold">1</p>
+                        </div>
+                        <div>
+                          <p className="font-medium text-gray-900 text-sm">
+                            Say Hello
+                          </p>
+                          <p className="text-gray-600 text-xs mt-0.5 font-inter">
+                            Greet your AI Career Adviser.
+                          </p>
+                        </div>
+                      </div>
+
+                      <div className="flex items-start gap-2 p-2.5 rounded-lg bg-gradient-to-r from-purple-50 to-violet-50 border border-purple-100">
+                        <div className="w-7 h-7 bg-purple-500 rounded-lg flex items-center justify-center flex-shrink-0 mt-0.5">
+                         <p className="text-white font-extrabold">2</p>
+                        </div>
+                        <div>
+                          <p className="font-medium text-gray-900 text-sm">
+                            Ask Bout Your Career
+                          </p>
+                          <p className="text-gray-600 text-xs mt-0.5 font-inter">
+                            Ask your confusion and career options according to your interests.
+                          </p>
+                        </div>
+                      </div>
+
+                      <div className="flex items-start gap-2 p-2.5 rounded-lg bg-gradient-to-r from-emerald-50 to-teal-50 border border-emerald-100">
+                        <div className="w-7 h-7 bg-emerald-500 rounded-lg flex items-center justify-center flex-shrink-0 mt-0.5">
+                         <p className="text-white font-extrabold">3</p>
+                        </div>
+                        <div>
+                          <p className="font-medium text-gray-900 text-sm">
+                            Select your career
+                          </p>
+                          <p className="text-gray-600 text-xs mt-0.5 font-inter">
+                            After getting career options, tell your AI Career Adviser about desired career that suits you the best.
+                          </p>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div className="flex items-center justify-evenly mt-4">
+                    <Button
+                      onClick={handleClose}
+                      className=" h-9 font-inter text-xs bg-gradient-to-r from-blue-400 to-blue-600 hover:from-blue-700 hover:to-blue-800 text-white rounded-lg shadow-lg hover:shadow-xl transition-all duration-200 cursor-pointer"
+                    >
+                    Talk to AI Adviser
+                      <LuChevronRight className="ml-2" />
+                    </Button>
+                     <Button
+                      onClick={handleClose}
+                      variant="outline"
+                      className=" h-9 font-inter text-xs bg-gray-50 rounded-lg shadow-lg hover:shadow-xl transition-all duration-200 cursor-pointer"
+                    >
+                   Set up Later
+                      <LuChevronRight className="ml-2" />
+                    </Button>
+                  </div>
                 </div>
-              </div>
+              )}
             </div>
-          </div>
-
-          <div className="pt-3">
-            <Button
-              onClick={handleClose}
-              className="w-full h-10 bg-gradient-to-r from-blue-400 to-blue-600 hover:from-blue-700 hover:to-blue-800 text-white font-semibold rounded-lg shadow-lg hover:shadow-xl transition-all duration-200 cursor-pointer"
-            >
-              Start My Career Journey <LuChevronRight className="ml-2" />
-            </Button>
           </div>
         </DialogContent>
       </Dialog>

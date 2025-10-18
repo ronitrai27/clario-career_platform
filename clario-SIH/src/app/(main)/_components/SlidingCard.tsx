@@ -7,9 +7,11 @@ import {
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import Image from "next/image";
+import { useSidebar } from "@/components/ui/sidebar";
 
 const SlidingCards = () => {
   const [currentSlide, setCurrentSlide] = useState(0);
+  const { open: sidebarOpen, isMobile } = useSidebar();
 
   const cards = [
     {
@@ -92,7 +94,7 @@ const SlidingCards = () => {
                   <h2 className="text-[27px] font-semibold text-black mb-4 leading-tight font-sora">
                     {card.title}
                   </h2>
-                  <p className="text-base text-muted-foreground font-raleway mb-8 leading-snug">
+                  <p className="text-base text-gray-800 font-inter mb-8 leading-snug">
                     {card.description}
                   </p>
 
@@ -106,9 +108,6 @@ const SlidingCards = () => {
                         size={18}
                         className="group-hover:translate-x-1 transition-transform"
                       />
-                    </Button>
-                    <Button className="cursor-pointer" variant="outline">
-                      Lean More <LucideArrowRight size={18} />
                     </Button>
                   </div>
                 </div>

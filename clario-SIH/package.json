@@ -9,6 +9,9 @@
     "lint": "eslint"
   },
   "dependencies": {
+    "@dnd-kit/core": "^6.3.1",
+    "@dnd-kit/modifiers": "^9.0.0",
+    "@dnd-kit/sortable": "^10.0.0",
     "@emotion/react": "^11.14.0",
     "@emotion/styled": "^11.14.1",
     "@google/genai": "^1.20.0",
@@ -45,9 +48,12 @@
     "@splinetool/react-spline": "^4.1.0",
     "@supabase/ssr": "^0.7.0",
     "@supabase/supabase-js": "^2.56.0",
+    "@types/canvas-confetti": "^1.9.0",
     "@upstash/redis": "^1.35.3",
+    "@vapi-ai/web": "^2.4.0",
     "@xyflow/react": "^12.8.4",
     "axios": "^1.11.0",
+    "canvas-confetti": "^1.9.3",
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
     "cmdk": "^1.1.1",

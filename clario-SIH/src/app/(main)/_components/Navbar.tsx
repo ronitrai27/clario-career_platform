@@ -80,7 +80,7 @@ export default function Navbar() {
   }
 
   return (
-    <div className="bg-gray-50 pt-3 pb-1 px-4 pr-8 flex items-center gap-10 justify-between ">
+    <div className="bg-gray-50 pt-3 pb-1  px-4 pr-8 flex items-center gap-10 justify-between ">
       <div>
         <SidebarTrigger />
       </div>

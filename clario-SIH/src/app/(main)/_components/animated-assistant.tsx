@@ -56,7 +56,7 @@ export default function AnimatedAssistant() {
       <div className="flex items-center gap-4 relative">
         <div
           onClick={open}
-          className="relative bg-white w-11 h-11 rounded-full flex items-center justify-center shadow-md cursor-pointer"
+          className="relative bg-gradient-to-br from-blue-300/30 to-white w-11 h-11 rounded-full flex items-center justify-center shadow-md cursor-pointer"
         >
           <BsStars className="text-[20px] text-black z-10" />
           {showWave && (
@@ -68,7 +68,7 @@ export default function AnimatedAssistant() {
           )}
         </div>
 
-        <p className="font-poppins text-base text-black">
+        <p className="font-sora text-base text-black">
           <Typewriter
             words={[displayText]}
             loop={1}
