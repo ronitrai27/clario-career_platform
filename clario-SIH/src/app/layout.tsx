@@ -3,6 +3,7 @@ import { Sora, Inter, Raleway } from "next/font/google";
 import "./globals.css";
 import { Toaster } from "@/components/ui/sonner";
 import { UserDataProvider } from "@/context/UserDataProvider";
+import { InterviewProvider } from "@/context/InterviewContext";
 
 const sora = Sora({
   subsets: ["latin"],

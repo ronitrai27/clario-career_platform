@@ -7,13 +7,14 @@ import Navbar from "@/app/(main)/_components/Navbar";
 import { QuizDataProvider } from "@/context/userQuizProvider";
 import { usePathname } from "next/navigation";
 import GetUserLocation from "@/app/(main)/_components/GeoLocation";
+import { InterviewProvider } from "@/context/InterviewContext";
 
 export default function Layout({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
   const hideNavbar =
     (pathname.startsWith("/home/mentor-connect/") &&
       pathname !== "/home/mentor-connect") ||
-    pathname === "/home/profile"||
+    pathname === "/home/profile" ||
     pathname === "/home/interview-prep/start";
 
   return (
@@ -22,8 +23,10 @@ export default function Layout({ children }: { children: React.ReactNode }) {
         <AppSidebar />
         <main className="flex-1 flex flex-col">
           <QuizDataProvider>
-            {!hideNavbar && <Navbar />}
-            {children}
+            <InterviewProvider>
+              {!hideNavbar && <Navbar />}
+              {children}
+            </InterviewProvider>
           </QuizDataProvider>
         </main>
         <Toaster />

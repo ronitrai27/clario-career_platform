@@ -19,9 +19,22 @@ import {
 import { Button } from "@/components/ui/button";
 import { X } from "lucide-react";
 import { toast } from "sonner";
-import Vapi from '@vapi-ai/web';
+import Vapi from "@vapi-ai/web";
 import AI_Voice from "@/components/kokonutui/ai-voice";
-// const vapi = new Vapi('YOUR_PUBLIC_API_KEY');
+import { useInterview } from "@/context/InterviewContext";
+
+const VAPI_PUBLIC_KEY = process.env.NEXT_PUBLIC_VAPI_PUBLIC_KEY;
+
+if (!VAPI_PUBLIC_KEY) {
+  throw new Error(
+    "NEXT_PUBLIC_VAPI_PUBLIC_KEY is required. Please set it in your .env.local file."
+  );
+}
+
+interface Message {
+  type: "user" | "assistant";
+  content: string;
+}
 
 const InterviewStart = () => {
   const { user } = useUserData();
@@ -29,6 +42,14 @@ const InterviewStart = () => {
   const [stream, setStream] = useState<MediaStream | null>(null);
   const [isCameraOn, setIsCameraOn] = useState(false);
   const [isMicOn, setIsMicOn] = useState(false);
+  const { interviewData } = useInterview();
+  const [activeUser, setActiveUser] = useState<boolean>(false);
+  const [loading, setLoading] = useState<boolean>(true);
+  const [isCallActive, setIsCallActive] = useState(false);
+  const [messages, setMessages] = useState<Message[]>([]);
+  // const [caption, setCaption] = useState<string>("");
+
+  const [vapi] = useState(() => new Vapi(VAPI_PUBLIC_KEY));
 
   const startCamera = async () => {
     try {
@@ -79,10 +100,153 @@ const InterviewStart = () => {
     }
   };
 
+  // ----------------------------VAPI SETUP--------------------------------
+  // useEffect(() => {
+  //   if (!interviewData) return;
+
+  //   if (!interviewData.jobTitle) {
+  //     toast.error("Job title is missing for this interview.");
+  //     return;
+  //   }
+  //   startCall();
+  // }, [interviewData]);
+
+  const startCall = async () => {
+    const questionList = interviewData?.questions
+      ?.map((q: any) => q.question)
+      .join(", ");
+
+    const jobTitle = interviewData?.jobTitle;
+    try {
+      await vapi.start({
+        model: {
+          provider: "openai",
+          model: "gpt-4.1-mini",
+          messages: [
+            {
+              role: "system",
+              content: `
+You are an AI interviewer conducting a verbal mock interview for the position of ${jobTitle}.
+Your goal is to ask each question clearly and conversationally, like a friendly human interviewer.
+
+Begin with a warm introduction:
+"Hey there! Welcome to your ${jobTitle} interview. Let's get started with a few questions!"
+
+Ask **one question at a time** and pause to let the candidate respond before moving on.
+Keep your tone natural, curious, and friendly — not robotic.
+
+Here are the interview questions to ask one by one:
+${questionList}
+
+💡 If the candidate struggles, gently offer a hint or rephrase the question, but don't reveal the full answer.
+Example:
+"Need a little hint? Think about how you'd handle state updates in React."
+
+After each answer, give a short and engaging response such as:
+"Nice, that makes sense!"
+"Interesting approach!"
+"That's close — maybe think about scalability next time."
+
+Keep the flow light and engaging. Use casual transitions like:
+"Alright, next one!" or "Let's dive into something trickier!"
+
+Key Guidelines:
+- Keep responses concise and human-like.
+- Be encouraging and adaptive.
+- Maintain focus on the ${jobTitle} domain.
+          `.trim(),
+            },
+          ],
+        },
+        voice: {
+          provider: "vapi",
+          voiceId: "Hana",
+        },
+        transcriber: {
+          provider: "deepgram",
+          model: "nova-2",
+          language: "en-US",
+        },
+        firstMessage: `Hi ${
+          user?.userName || "there"
+        }, how are you? Ready for your interview on ${jobTitle}?`,
+        endCallMessage:
+          "Thanks for chatting! That was a solid interview — see you crushing it soon!",
+        endCallPhrases: ["goodbye", "bye", "end call", "hang up"],
+
+        // silenceTimeoutSeconds: 20,
+        maxDurationSeconds: 300,
+      });
+
+      console.log("🎤 Vapi Interview started successfully!");
+    } catch (error) {
+      console.error("❌ Error starting call:", error);
+      // setVapiError(error);
+      setLoading(false);
+    }
+  };
+
+  vapi.on("speech-start", () => {
+    setActiveUser(true);
+  });
+
+  vapi.on("speech-end", () => {
+    setActiveUser(false);
+  });
+
+  vapi.on("call-start", () => {
+    console.log("Call has started");
+    setIsCallActive(true);
+    setLoading(false);
+    toast.info("Interview Has been started", {
+      description: (
+        <span className="text-sm text-gray-500 font-medium">
+          Your Interview Has Been started!{" "}
+          <span className="text-blue-600">All the best</span>
+        </span>
+      ),
+    });
+  });
+
+  // ---------------------------VAPI MESSAGE SETUP--------------------------
+  useEffect(() => {
+    vapi.on("message", (message: any) => {
+      if (message.type === "transcript" && message.transcriptType === "final") {
+        const role = message.role === "user" ? "user" : "assistant";
+        const content = message.transcript;
+
+        //  Prevent duplicates
+        setMessages((prev) => {
+          if (prev.length > 0) {
+            const lastMsg = prev[prev.length - 1];
+            if (lastMsg.type === role && lastMsg.content === content) {
+              return prev;
+            }
+          }
+          return [...prev, { type: role, content }];
+        });
+
+        // Show captions only for assistant
+        // if (role === "assistant") {
+        //   setCaption(content);
+        //   setTimeout(() => setCaption(""), 2000);
+        // }
+      }
+    });
+  }, [vapi]);
+
   const handleEnd = () => {
     stopCamera();
+    vapi.stop();
     setIsMicOn(false);
+    toast.success("Call ended");
   };
+
+  // const stopCall = () => {
+  //   vapi.stop();
+  // };
+  console.log("🎯 Current Job: start-----------", interviewData.jobTitle);
+  console.log("🧠 Questions: start-------------", interviewData.questions);
 
   // optional: cleanup on unmount
   useEffect(() => {
@@ -117,12 +281,19 @@ const InterviewStart = () => {
         {/* LEFT */}
         <div className="flex-1 p-2">
           <div className="flex justify-between mb-2">
-            <div className="flex gap-4">
-              <div className="w-5 h-5 bg-green-300 rounded-full animate-bounce"></div>
-              <p className="font-inter text-base tracking-wide">
-                Connecting...
-              </p>
-            </div>
+            {loading ? (
+              <div className="flex gap-4">
+                <div className="w-5 h-5 bg-red-400 rounded-full animate-bounce"></div>
+                <p className="font-inter text-base tracking-wide">
+                  Connecting...
+                </p>
+              </div>
+            ) : (
+              <div className="flex gap-4">
+                <div className="w-5 h-5 bg-green-300 rounded-full animate-bounce"></div>
+                <p className="font-inter text-base tracking-wide">Connected</p>
+              </div>
+            )}
 
             <p className="font-semibold font-sora text-xl">00:00</p>
           </div>
@@ -153,7 +324,11 @@ const InterviewStart = () => {
               </div>
               <div className="mt-10 flex flex-col space-y-1">
                 <AI_Voice />
-                <p className="text-center font-inter text-sm">Listening</p>
+                {activeUser && !loading ? (
+                  <p className="text-center font-inter text-sm">Speaking</p>
+                ) : (
+                  <p className="text-center font-inter text-sm">Listening</p>
+                )}
               </div>
             </div>
           </div>
@@ -210,14 +385,41 @@ const InterviewStart = () => {
             </p>
           </div>
 
-          <div className="flex flex-col items-center justify-center h-full ">
-            <h2 className="font-inter text-lg text-muted-foreground mb-2">No Transcriptions Available</h2>
-            <LuGhost  className="w-6 h-6 text-muted-foreground" />
-          </div>
+          {messages.length === 0 ? (
+            <div className="flex flex-col items-center justify-center h-full ">
+              <h2 className="font-inter text-lg text-muted-foreground mb-2">
+                No Transcriptions Available
+              </h2>
+              <LuGhost className="w-6 h-6 text-muted-foreground" />
+            </div>
+          ) : (
+            <div className="space-y-3 h-[380px] mt-5 overflow-y-scroll">
+              {messages.map((msg, i) => (
+                <div
+                  key={i}
+                  className={`flex ${
+                    msg.type === "assistant" ? "justify-start" : "justify-end"
+                  }`}
+                >
+                  <div
+                    className={`max-w-[70%] px-4 py-2 rounded-2xl text-xs tracking-tight font-inter shadow-sm ${
+                      msg.type === "assistant"
+                        ? "bg-white text-foreground rounded-bl-none"
+                        : "bg-primary text-primary-foreground rounded-br-none"
+                    }`}
+                  >
+                    {msg.content}
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
 
           <div className="w-full mt-auto">
             <Separator className="my-2" />
-            <Button className="font-inter text-sm w-full bg-white text-black cursor-pointer">Download Transcribe <LuDownload className="w-4 h-4" /></Button>
+            <Button className="font-inter text-sm w-full bg-white text-black hover:bg-gray-100 cursor-pointer">
+              Download Transcribe <LuDownload className="w-4 h-4" />
+            </Button>
           </div>
         </div>
       </div>

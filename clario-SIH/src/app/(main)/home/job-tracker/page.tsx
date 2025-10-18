@@ -47,6 +47,7 @@ import ShimmerText from "@/components/kokonutui/shimmer-text";
 import { motion, AnimatePresence } from "framer-motion";
 import { useRouter } from "next/navigation";
 import { AnimatedCircularProgressBar } from "@/components/ui/animated-circular-progress-bar";
+import { useInterview } from "@/context/InterviewContext";
 
 const stages = [
   {
@@ -105,6 +106,7 @@ const JobTracker = () => {
   const [prepOpen, setPrepOpen] = useState(false);
   const [loading, setLoading] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
+  const { setInterviewData } = useInterview();
   const [form, setForm] = useState({
     job_title: "",
     company: "",
@@ -249,12 +251,20 @@ const JobTracker = () => {
     setIsLoading(true);
 
     try {
-      const response = await axios.post("/qna-generate", {
+      const response = await axios.post("/api/ai/qna-generate", {
         jobTitle: job.job_title,
         jobDescription: job.description,
       });
 
+      const questions = response.data?.data?.interviewQuestions || [];
+
+      setInterviewData({
+        jobTitle: job.job_title,
+        questions,
+      });
+
       console.log("🧠 AI Response:", response.data);
+      toast.success("Interview QnA generated successfully!");
     } catch (error: any) {
       console.error(
         "❌ Error generating QnA:",
