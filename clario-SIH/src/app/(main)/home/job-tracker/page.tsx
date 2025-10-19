@@ -47,7 +47,7 @@ import {
   DragEndEvent,
   useDroppable,
   useDraggable,
-  DragOverlay, 
+  DragOverlay,
 } from "@dnd-kit/core";
 import { CSS } from "@dnd-kit/utilities"; // For transform styles during drag
 import axios from "axios";
@@ -252,6 +252,17 @@ const JobTracker = () => {
 
   // --------------------------------QNA GENERATION--------------------
   const handleInterviewQna = async (job: any) => {
+    if (!user?.isPro == true) {
+      toast.info("Upgrade to Pro", {
+        description: (
+          <span className="text-sm text-gray-500 font-medium">
+            You need to upgrade to Pro to use this feature.
+            <span className="text-blue-600 cursor-pointer">Upgrade</span>
+          </span>
+        ),
+      });
+      return;
+    }
     console.log("Job Title:", job.job_title);
     console.log("Job Description:", job.description);
 
