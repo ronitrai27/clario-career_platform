@@ -22,6 +22,15 @@ import { toast } from "sonner";
 import Vapi from "@vapi-ai/web";
 import AI_Voice from "@/components/kokonutui/ai-voice";
 import { useInterview } from "@/context/InterviewContext";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog";
+import axios from "axios";
 
 const VAPI_PUBLIC_KEY = process.env.NEXT_PUBLIC_VAPI_PUBLIC_KEY;
 
@@ -47,7 +56,10 @@ const InterviewStart = () => {
   const [loading, setLoading] = useState<boolean>(true);
   const [isCallActive, setIsCallActive] = useState(false);
   const [messages, setMessages] = useState<Message[]>([]);
-  // const [caption, setCaption] = useState<string>("");
+  const [callFinished, setCallFinished] = useState<boolean>(false);
+  const [feedbackloading, setFeedbackLoading] = useState<boolean>(false);
+
+  const [isDialogOpen, setIsDialogOpen] = useState(false);
 
   const [vapi] = useState(() => new Vapi(VAPI_PUBLIC_KEY));
 
@@ -208,6 +220,45 @@ Key Guidelines:
     });
   });
 
+  vapi.on("call-end", () => {
+    setIsCallActive(false);
+    setCallFinished(true);
+  });
+  useEffect(() => {
+    if (callFinished) {
+      GenerateFeedback();
+      setIsDialogOpen(true);
+      toast.success("Interview Has been Ended", {
+        description: (
+          <span className="text-sm text-gray-500 font-medium">
+            Your Interview Has Been Ended!{" "}
+          </span>
+        ),
+      });
+    }
+  }, [callFinished]);
+
+  // ------------------------GENERATE FEEDBACK FUNCTION------------
+  const GenerateFeedback = async () => {
+    setFeedbackLoading(true);
+
+    try {
+      const response = await axios.post("/api/feedback", {
+        conversation: messages,
+      });
+
+      console.log("🧠 Feedback Response:", response.data);
+      toast.success("Feedback generated successfully!");
+
+      // storing feedback in database.
+    } catch (error: any) {
+      console.error("❌ Feedback Error:", error);
+      toast.error("Failed to generate feedback. Try again!");
+    } finally {
+      setFeedbackLoading(false);
+    }
+  };
+
   // ---------------------------VAPI MESSAGE SETUP--------------------------
   useEffect(() => {
     vapi.on("message", (message: any) => {
@@ -313,20 +364,16 @@ Key Guidelines:
               <div className="  bg-white border rounded-full w-16 h-16 flex items-center justify-center shrink-0 -mb-5">
                 <h1 className="font-extrabold font-inter text-2xl">AI</h1>
               </div>
-              <div className="mt-10 flex flex-col space-y-1">
-                <AI_Voice />
-                {!loading ? (
-                  activeUser ? (
+              {!loading && (
+                <div className="mt-10 flex flex-col space-y-1">
+                  <AI_Voice />
+                  {activeUser ? (
                     <p className="text-center font-inter text-sm">Speaking</p>
                   ) : (
                     <p className="text-center font-inter text-sm">Listening</p>
-                  )
-                ) : (
-                  <p className="text-center font-inter text-sm text-red-500">
-                    Not Connected!
-                  </p>
-                )}
-              </div>
+                  )}
+                </div>
+              )}
             </div>
           </div>
 
@@ -420,6 +467,12 @@ Key Guidelines:
           </div>
         </div>
       </div>
+
+      <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
+        <DialogContent className="p-0 overflow-hidden rounded-md max-w-md ">
+          <h1>snjdkfbof</h1>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 };
