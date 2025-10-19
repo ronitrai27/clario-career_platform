@@ -294,6 +294,12 @@ const JobTracker = () => {
       setIsLoading(false);
     }
   };
+
+  // ---------------------------DRAG AND DROP---------------------
+  const handleDragEnd = (event: DragEndEvent) => {
+    const { active, over } = event;
+  };
+
   return (
     <div className="h-full  bg-gray-50 p-2 pb-8">
       <div className="w-full flex px-8 gap-5 my-6">
@@ -366,77 +372,83 @@ const JobTracker = () => {
             </p>
           </div>
           {/* Right side all columns */}
-          <div className="flex  min-w-max gap-4">
-            {stages.map((stage) => (
-              <div
-                key={stage.key}
-                className="flex flex-col w-[300px] overflow-y-auto bg-white rounded-md shadow-sm border border-gray-200"
-              >
+  
+          <DndContext
+            collisionDetection={closestCenter}
+            onDragEnd={handleDragEnd}
+          >
+            <div className="flex  min-w-max gap-4">
+              {stages.map((stage) => (
                 <div
-                  className={`text-center py-3 font-semibold border-b border-gray-200 rounded shadow mb-5 ${stage.color}`}
+                  key={stage.key}
+                  className="flex flex-col w-[300px] overflow-y-auto bg-white rounded-md shadow-sm border border-gray-200"
                 >
-                  <h1 className="font-sora text-base text-white  flex items-center justify-center gap-5">
-                    {stage.name}
-                  </h1>
-                </div>
+                  <div
+                    className={`text-center py-3 font-semibold border-b border-gray-200 rounded shadow mb-5 ${stage.color}`}
+                  >
+                    <h1 className="font-sora text-base text-white  flex items-center justify-center gap-5">
+                      {stage.name}
+                    </h1>
+                  </div>
 
-                <div className="flex-1 space-y-3 py-2 px-3">
-                  {jobs
-                    .filter((job) => job.stage === stage.key)
-                    .map((job) => (
-                      <Card
-                        key={job.id}
-                        className={`p-2  border-none shadow-sm hover:shadow-md rounded-md transition  ${stage.cardcolor}`}
-                      >
-                        <CardContent className="flex flex-col h-[200px] p-1">
-                          <div className="flex flex-col h-full">
-                            <h2 className="font-semibold font-inter text-base tracking-wide  capitalize flex items-center  max-w-[200px] truncate  gap-2">
-                              <LuBriefcaseBusiness className="w-4 h-4 mr-2 text-gray-800 shrink-0" />
-                              {job.job_title}
-                            </h2>
-                            <p className="text-base font-inter tracking-tight flex items-center  gap-2">
-                              <LuBuilding2 className="w-4 h-4 mr-2" />
-                              {job.company}
-                            </p>
-
-                            <div className="mt-2 font-inter text-sm flex items-center justify-between w-full capitalize">
-                              <p>
-                                <span className="font-semibold">Type</span>:{" "}
-                                {job.type}
+                  <div className="flex-1 space-y-3 py-2 px-3">
+                    {jobs
+                      .filter((job) => job.stage === stage.key)
+                      .map((job) => (
+                        <Card
+                          key={job.id}
+                          className={`p-2  border-none shadow-sm hover:shadow-md rounded-md transition  ${stage.cardcolor}`}
+                        >
+                          <CardContent className="flex flex-col h-[200px] p-1">
+                            <div className="flex flex-col h-full">
+                              <h2 className="font-semibold font-inter text-base tracking-wide  capitalize flex items-center  max-w-[200px] truncate  gap-2">
+                                <LuBriefcaseBusiness className="w-4 h-4 mr-2 text-gray-800 shrink-0" />
+                                {job.job_title}
+                              </h2>
+                              <p className="text-base font-inter tracking-tight flex items-center  gap-2">
+                                <LuBuilding2 className="w-4 h-4 mr-2" />
+                                {job.company}
                               </p>
-                              <p>
-                                <span className="font-semibold">Stage</span>:{" "}
-                                {job.stage}
-                              </p>
-                            </div>
-                            <p className="mt-4 line-clamp-2 font-inter text-sm tracking-tight text-center">
-                              {job.description}
-                            </p>
 
-                            <div className="flex items-center justify-evenly w-full mt-auto">
-                              <Button
-                                variant="outline"
-                                className={`text-xs font-inter cursor-pointer `}
-                                onClick={() => handleInterviewQna(job)}
-                              >
-                                Start Prep{" "}
-                                <LuActivity className="w-4 h-4 ml-2" />
-                              </Button>
-                              <Button
-                                variant="outline"
-                                className="text-xs font-inter cursor-pointer"
-                              >
-                                View <LuPen className="w-4 h-4 ml-2" />
-                              </Button>
+                              <div className="mt-2 font-inter text-sm flex items-center justify-between w-full capitalize">
+                                <p>
+                                  <span className="font-semibold">Type</span>:{" "}
+                                  {job.type}
+                                </p>
+                                <p>
+                                  <span className="font-semibold">Stage</span>:{" "}
+                                  {job.stage}
+                                </p>
+                              </div>
+                              <p className="mt-4 line-clamp-2 font-inter text-sm tracking-tight text-center">
+                                {job.description}
+                              </p>
+
+                              <div className="flex items-center justify-evenly w-full mt-auto">
+                                <Button
+                                  variant="outline"
+                                  className={`text-xs font-inter cursor-pointer `}
+                                  onClick={() => handleInterviewQna(job)}
+                                >
+                                  Start Prep{" "}
+                                  <LuActivity className="w-4 h-4 ml-2" />
+                                </Button>
+                                <Button
+                                  variant="outline"
+                                  className="text-xs font-inter cursor-pointer"
+                                >
+                                  View <LuPen className="w-4 h-4 ml-2" />
+                                </Button>
+                              </div>
                             </div>
-                          </div>
-                        </CardContent>
-                      </Card>
-                    ))}
+                          </CardContent>
+                        </Card>
+                      ))}
+                  </div>
                 </div>
-              </div>
-            ))}
-          </div>
+              ))}
+            </div>
+          </DndContext>
         </div>
       </div>
 

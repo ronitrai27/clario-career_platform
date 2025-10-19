@@ -3,7 +3,7 @@ import { useUserData } from "@/context/UserDataProvider";
 import React, { useState } from "react";
 import { GraduationCap, Map, Users, FileText } from "lucide-react";
 import Link from "next/link";
-import { LuChevronDown } from "react-icons/lu";
+import { LuChevronDown, LuNewspaper, LuVideo } from "react-icons/lu";
 import { is } from "zod/v4/locales";
 
 type Profession =
@@ -89,48 +89,47 @@ export default function ActionBox() {
         {/* OTHERS ----------------------- */}
         {isOpen && (
           <>
-            <Link href="/home/mentor-connect">
-              <div className="relative overflow-hidden rounded-md shadow-lg px-3 py-2 text-black hover:scale-105 transition bg-gradient-to-br from-white via-white to-pink-50 cursor-pointer border-l-8 border-pink-500">
+            <Link href="/home/interview-prep">
+              <div className="relative overflow-hidden rounded-md shadow-lg px-3 py-2 text-black hover:scale-105 transition bg-gradient-to-br from-white via-white to-pink-50 cursor-pointer border-l-8 border-amber-500">
                 <div className="flex  items-center gap-3">
-                  <div className="p-2 bg-pink-100/70 rounded-full backdrop-blur-sm">
-                    <Users className="w-6 h-6 text-pink-500" />
+                  <div className="p-2 bg-yellow-100 rounded-full backdrop-blur-sm">
+                    <LuVideo className="w-6 h-6 text-amber-600" />
                   </div>
                   <h3 className="text-lg font-medium leading-tight font-inter">
-                    Connect Mentors
+                    Interview Prep
                   </h3>
                 </div>
                 <div>
                   <p className="mt-3 text-sm font-sora text-center">
-                    {" "}
-                    Learn from mentors who’ve walked the path before you.
+                    Prepare for interviews with confidence.
                   </p>
                 </div>
               </div>
             </Link>
             {/* 5 */}
-            <Link href="/home/mentor-connect">
-              <div className="relative overflow-hidden rounded-md shadow-lg px-3 py-2 text-black hover:scale-105 transition bg-gradient-to-br from-white via-white to-pink-50 cursor-pointer border-l-8 border-pink-500">
+            <Link href="/home/career-board">
+              <div className="relative overflow-hidden rounded-md shadow-lg px-3 py-2 text-black hover:scale-105 transition bg-gradient-to-br from-white via-white to-green-50 cursor-pointer border-l-8 border-green-500">
                 <div className="flex  items-center gap-3">
-                  <div className="p-2 bg-pink-100/70 rounded-full backdrop-blur-sm">
-                    <Users className="w-6 h-6 text-pink-500" />
+                  <div className="p-2 bg-green-100/70 rounded-full backdrop-blur-sm">
+                    <Users className="w-6 h-6 text-green-600" />
                   </div>
                   <h3 className="text-lg font-medium leading-tight font-inter">
-                    Connect Mentors
+                   Career Board
                   </h3>
                 </div>
                 <div>
                   <p className="mt-3 text-sm font-sora text-center">
                     {" "}
-                    Learn from mentors who’ve walked the path before you.
+                    Get Latest Industry insights, resources and opportunities
                   </p>
                 </div>
               </div>
             </Link>
             {/* 6 */}
-            <div className="relative overflow-hidden rounded-md shadow-lg px-3 py-2 text-black hover:scale-105 transition bg-gradient-to-br from-white to-blue-100 cursor-pointer  border-l-8 border-blue-500">
+            <div className="relative overflow-hidden rounded-md shadow-lg px-3 py-2 text-black hover:scale-105 transition bg-gradient-to-br from-white to-purple-100 cursor-pointer  border-l-8 border-purple-500">
               <div className="flex  items-center gap-4">
                 <div className="p-2 bg-blue-500/15 rounded-full backdrop-blur-sm">
-                  <FileText className="w-6 h-6 text-blue-500" />
+                  <FileText className="w-6 h-6 text-purple-500" />
                 </div>
                 <h3 className="text-lg font-semibold font-raleway">
                   AI Resume Maker
