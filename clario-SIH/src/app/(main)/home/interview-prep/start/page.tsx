@@ -225,12 +225,6 @@ Key Guidelines:
           }
           return [...prev, { type: role, content }];
         });
-
-        // Show captions only for assistant
-        // if (role === "assistant") {
-        //   setCaption(content);
-        //   setTimeout(() => setCaption(""), 2000);
-        // }
       }
     });
   }, [vapi]);
@@ -242,9 +236,6 @@ Key Guidelines:
     toast.success("Call ended");
   };
 
-  // const stopCall = () => {
-  //   vapi.stop();
-  // };
   console.log("🎯 Current Job: start-----------", interviewData.jobTitle);
   console.log("🧠 Questions: start-------------", interviewData.questions);
 
@@ -324,10 +315,16 @@ Key Guidelines:
               </div>
               <div className="mt-10 flex flex-col space-y-1">
                 <AI_Voice />
-                {activeUser && !loading ? (
-                  <p className="text-center font-inter text-sm">Speaking</p>
+                {!loading ? (
+                  activeUser ? (
+                    <p className="text-center font-inter text-sm">Speaking</p>
+                  ) : (
+                    <p className="text-center font-inter text-sm">Listening</p>
+                  )
                 ) : (
-                  <p className="text-center font-inter text-sm">Listening</p>
+                  <p className="text-center font-inter text-sm text-red-500">
+                    Not Connected!
+                  </p>
                 )}
               </div>
             </div>

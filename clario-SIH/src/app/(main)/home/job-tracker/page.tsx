@@ -41,7 +41,15 @@ import { createClient } from "@/lib/supabase/client";
 import { useUserData } from "@/context/UserDataProvider";
 import { Card, CardHeader, CardContent } from "@/components/ui/card";
 import { toast } from "sonner";
-import { DndContext, closestCenter, DragEndEvent } from "@dnd-kit/core";
+import {
+  DndContext,
+  closestCenter,
+  DragEndEvent,
+  useDroppable,
+  useDraggable,
+  DragOverlay, 
+} from "@dnd-kit/core";
+import { CSS } from "@dnd-kit/utilities"; // For transform styles during drag
 import axios from "axios";
 import ShimmerText from "@/components/kokonutui/shimmer-text";
 import { motion, AnimatePresence } from "framer-motion";
