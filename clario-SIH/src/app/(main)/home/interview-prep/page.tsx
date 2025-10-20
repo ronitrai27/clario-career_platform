@@ -4,7 +4,7 @@ import { Separator } from "@/components/ui/separator";
 import SingleCard from "../../_components/InterviewSingleCard";
 import { LuCircleFadingArrowUp } from "react-icons/lu";
 import { Button } from "@/components/ui/button";
-import { LucideActivity, LucideHistory } from "lucide-react";
+import { GhostIcon, LucideActivity, LucideHistory } from "lucide-react";
 import Image from "next/image";
 import { useEffect, useState } from "react";
 import { InterviewFeedback } from "@/lib/types/allTypes";
@@ -104,7 +104,7 @@ const InterviewDefault = () => {
           <h1 className="text-2xl font-semibold font-sora tracking-wide ml-4 -mt-4">
             Interviews History <LucideHistory className="inline w-6 h-6 ml-2" />
           </h1>
-          {feedbacks.length > 0 ? (
+          {feedbacks.length < 0 ? (
             // All cards will be displayed
             <div className="grid grid-cols-3 gap-5 mt-6">
               {feedbacks.map((fb) => {
@@ -141,8 +141,9 @@ const InterviewDefault = () => {
               })}
             </div>
           ) : (
-            <div>
-              <p>nothing found </p>
+            <div className="mt-20 w-full flex flex-col items-center justify-center">
+              <p className="font-semibold text-muted-foreground mb-6  font-inter text-xl">No Interviews Created</p>
+              <GhostIcon className="w-10 h-10 text-gray-400" />
             </div>
           )}
         </div>
