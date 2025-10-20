@@ -108,3 +108,22 @@ export type JobTrackerCard = {
 };
 // stage: "saved" | "applied" | "interviewing" | "negotiating" | "hired" | "rejected";
 // type: "full-time" | "internship" | "contract" | "freelance" | "part-time";
+
+// OTHERS TABLE
+export interface InterviewFeedback {
+  id: number; 
+  created_at: string; 
+  userId: any; 
+  jobTitle: string;
+  interviewInsights: {
+    feedback: {
+      rating: {
+        technicalSkills?: number;
+        communication?: number;
+        problemSolving?: number;
+        experience?: number;
+      };
+      summary?: string;
+    };
+  };
+}

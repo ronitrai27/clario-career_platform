@@ -6,10 +6,13 @@ import { SidebarTrigger } from "@/components/ui/sidebar";
 import Image from "next/image";
 import React from "react";
 import {
+  LuActivity,
   LuChevronLeft,
   LuDownload,
+  LuEye,
   LuFileVideo,
   LuGhost,
+  LuLoader,
   LuMessagesSquare,
   LuMic,
   LuMicOff,
@@ -17,7 +20,7 @@ import {
   LuVideoOff,
 } from "react-icons/lu";
 import { Button } from "@/components/ui/button";
-import { X } from "lucide-react";
+import { LucideLoader2, X } from "lucide-react";
 import { toast } from "sonner";
 import Vapi from "@vapi-ai/web";
 import AI_Voice from "@/components/kokonutui/ai-voice";
@@ -31,6 +34,8 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog";
 import axios from "axios";
+import { useRouter } from "next/navigation";
+import { createClient } from "@/lib/supabase/client";
 
 const VAPI_PUBLIC_KEY = process.env.NEXT_PUBLIC_VAPI_PUBLIC_KEY;
 
@@ -47,6 +52,7 @@ interface Message {
 
 const InterviewStart = () => {
   const { user } = useUserData();
+  const router = useRouter();
   const videoRef = useRef<HTMLVideoElement>(null);
   const [stream, setStream] = useState<MediaStream | null>(null);
   const [isCameraOn, setIsCameraOn] = useState(false);
@@ -58,6 +64,7 @@ const InterviewStart = () => {
   const [messages, setMessages] = useState<Message[]>([]);
   const [callFinished, setCallFinished] = useState<boolean>(false);
   const [feedbackloading, setFeedbackLoading] = useState<boolean>(false);
+  const supabase = createClient();
 
   const [isDialogOpen, setIsDialogOpen] = useState(false);
 
@@ -247,10 +254,23 @@ Key Guidelines:
         conversation: messages,
       });
 
-      console.log("🧠 Feedback Response:", response.data);
+      const feedbackData = response.data?.data;
+      console.log("🧠 Feedback Response:", feedbackData);
+
+      const { data, error } = await supabase.from("others").insert([
+        {
+          userId: user?.id,
+          interviewInsights: feedbackData,
+        },
+      ]);
+
       toast.success("Feedback generated successfully!");
 
-      // storing feedback in database.
+      if (error) {
+        console.error("❌ Supabase Insert Error:", error);
+        toast.error("Failed to save feedback to database!");
+        toast.success("Feedback generated successfully!");
+      }
     } catch (error: any) {
       console.error("❌ Feedback Error:", error);
       toast.error("Failed to generate feedback. Try again!");
@@ -294,6 +314,104 @@ Key Guidelines:
   useEffect(() => {
     return () => stopCamera();
   }, []);
+
+  // ------------------------TESTING--------------------------
+
+  const demoConversation = [
+    { type: "assistant", content: "Hi, Renit. How are you?" },
+    {
+      type: "assistant",
+      content: "Ready for your interview on React and Next.js vs Vue?",
+    },
+    { type: "assistant", content: "Able to work with MongoDB, PostgreSQL..." },
+    {
+      type: "user",
+      content: "Uh, yes. I'm ready for that. I'm pretty excited.",
+    },
+    {
+      type: "assistant",
+      content:
+        "Awesome. Let's kick things off, tell me among React, Next.js, Vue.js",
+    },
+    { type: "assistant", content: "Which one will you use and why?" },
+    {
+      type: "user",
+      content: "Well, I will use Next.js for sure, because of its SSR and SSG",
+    },
+    { type: "assistant", content: "Thats great renit" },
+    {
+      type: "assistant",
+      content: "Now tell me about your experience with react",
+    },
+    {
+      type: "user",
+      content:
+        "I have worked with React for 2 years, where i learned lazy loading, hooks, context api",
+    },
+    {
+      type: "assistant",
+      content: "okay so tell me with your backend experience",
+    },
+    {
+      type: "user",
+      content: "Yes i worked with node , express , flask and even supabase.",
+    },
+    {
+      type: "assistant",
+      content: "Great, tell me something bout your projects?",
+    },
+    {
+      type: "assistant",
+      content:
+        "Tell me any third party packages you have worked with in your project",
+    },
+    {
+      type: "user",
+      content:
+        "yes, i created a neuratwin web app,  that uses openai api to generate text, langchain , mongodb , vapi ai for voice assistants, and sync with googpe calenders.",
+    },
+  ];
+
+  const testing = async () => {
+    setIsDialogOpen(true);
+    setFeedbackLoading(true);
+    toast.success("Interview Has been Ended", {
+      description: (
+        <span className="text-sm text-gray-500 font-medium">
+          Your Interview Has Been Ended!{" "}
+        </span>
+      ),
+    });
+    try {
+      const response = await axios.post("/api/feedback", {
+        conversation: demoConversation,
+      });
+      const feedbackData = response.data?.data;
+      console.log("🧠 Feedback Response:", feedbackData);
+
+      const { data, error } = await supabase.from("others").insert([
+        {
+          userId: user?.id,
+          jobTitle: interviewData?.jobTitle,
+          interviewInsights: feedbackData,
+        },
+      ]);
+
+      toast.success("Feedback generated successfully!");
+
+      if (error) {
+        console.error("❌ Supabase Insert Error:", error);
+        toast.error("Failed to save feedback to database!");
+        toast.success("Feedback generated successfully!");
+      }
+    } catch (error: any) {
+      console.error("❌ Feedback Error:", error);
+      toast.error("Failed to generate feedback. Try again!");
+    } finally {
+      setFeedbackLoading(false);
+    }
+  };
+
   return (
     <div className="w-full h-screen overflow-hidden  bg-white p-4">
       <div className="flex justify-between w-full">
@@ -391,7 +509,6 @@ Key Guidelines:
               )}
               Video
             </Button>
-
             {/*  Mic Button */}
             <Button
               variant={isMicOn ? "default" : "outline"}
@@ -405,7 +522,6 @@ Key Guidelines:
               )}
               Mic
             </Button>
-
             {/*  End Button */}
             <Button
               variant="destructive"
@@ -414,6 +530,11 @@ Key Guidelines:
             >
               <X className="w-4 h-4 mr-2" />
               End
+            </Button>
+
+            {/* TESTING BUTTON */}
+            <Button className="text-sm font-inter" onClick={testing}>
+              Test
             </Button>
           </div>
         </div>
@@ -469,8 +590,32 @@ Key Guidelines:
       </div>
 
       <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
-        <DialogContent className="p-0 overflow-hidden rounded-md max-w-md ">
-          <h1>snjdkfbof</h1>
+        <DialogContent className="p-4  rounded-md max-w-md  overflow-hidden ">
+          <h1 className="text-center font-semibold font-inter text-xl">
+            Interview Ended Successfully{" "}
+            <LuActivity className="inline w-5 h-5 ml-2" />
+          </h1>
+          <p className=" mt-3 font-inter text-center text-muted-foreground">
+            Kindly wait , insights are being generated for you. Then you can
+            sefely leave this board.
+          </p>
+
+          {feedbackloading ? (
+            <Button className="mt-5">
+              <LucideLoader2 className="w-6 h-6 animate-spin " />
+              Generating
+            </Button>
+          ) : (
+            <Button
+              className="font-inter text-sm mt-5"
+              onClick={() => router.push("/home/interview-prep")}
+            >
+              <LuEye className="w-5 h-5 mr-2" />
+              View Insights
+            </Button>
+          )}
+
+          {/* <Image src="/element1.png" alt="success" width={100} height={100} className="mx-auto h-full w-full object-cover -mt-20" /> */}
         </DialogContent>
       </Dialog>
     </div>
