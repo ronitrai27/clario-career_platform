@@ -100,7 +100,7 @@ const InterviewDefault = () => {
         </div>
         <Separator orientation="vertical" className="mx-2 " />
         {/* Right side */}
-        <div className="flex-1 h-full bg-white rounded-md p-4">
+        <div className="flex-1 h-full  rounded-md p-4">
           <h1 className="text-2xl font-semibold font-sora tracking-wide ml-4 -mt-4">
             Interviews History <LucideHistory className="inline w-6 h-6 ml-2" />
           </h1>
@@ -152,10 +152,10 @@ const InterviewDefault = () => {
       <Dialog open={!!selected} onOpenChange={() => setSelected(null)}>
         <DialogContent className="max-w-md">
           <DialogHeader>
-            <DialogTitle className="font-sora text-xl">
-              {selected?.jobTitle}
+            <DialogTitle className="font-sora text-xl text-center">
+              {selected?.jobTitle || "Interview"}
             </DialogTitle>
-            <p className="text-sm text-gray-500">
+            <p className="text-sm font-inter text-gray-500">
               {selected &&
                 format(new Date(selected.created_at), "dd MMM yyyy, hh:mm a")}
             </p>
@@ -164,20 +164,34 @@ const InterviewDefault = () => {
           {selected && (
             <div className="space-y-4 mt-4">
               {Object.entries(selected.interviewInsights.feedback.rating).map(
-                ([key, value]) => (
-                  <div key={key}>
-                    <div className="flex justify-between text-sm mb-1">
-                      <span className="capitalize font-medium">{key}</span>
-                      <span className="text-gray-600">{value ?? 0}/10</span>
-                    </div>
-                    <Progress value={(value ?? 0) * 10} />
-                  </div>
-                )
-              )}
+                ([key, value]) => {
+                  const score = value ?? 0;
+                  const getColor = () => {
+                    if (score <= 3) return "bg-red-500";
+                    if (score <= 6) return "bg-orange-400";
+                    return "bg-green-500";
+                  };
 
+                  return (
+                    <div key={key}>
+                      <div className="flex justify-between text-sm mb-1">
+                        <span className="capitalize font-medium">{key}</span>
+                        <span className="text-gray-600">{score}/10</span>
+                      </div>
+
+                      <div className="relative w-full h-2 bg-gray-200 rounded-full overflow-hidden">
+                        <div
+                          className={`h-full ${getColor()} rounded-full transition-all duration-500`}
+                          style={{ width: `${score * 10}%` }}
+                        />
+                      </div>
+                    </div>
+                  );
+                }
+              )}
               <div className="mt-5">
                 <h4 className="font-sora font-semibold mb-2">Summary</h4>
-                <p className="text-sm text-gray-700 leading-relaxed">
+                <p className="text-sm text-gray-800 font-inter leading-relaxed">
                   {selected.interviewInsights.feedback.summary}
                 </p>
               </div>

@@ -3,7 +3,15 @@ import { Button } from "@/components/ui/button";
 import { useSidebar } from "@/components/ui/sidebar";
 import { Separator } from "@/components/ui/separator";
 import { JobTrackerCard } from "@/lib/types/allTypes";
-import { Filter, Icon, Info, InfoIcon, LucideCheckCircle } from "lucide-react";
+import {
+  Delete,
+  Edit,
+  Filter,
+  Icon,
+  Info,
+  InfoIcon,
+  LucideCheckCircle,
+} from "lucide-react";
 import Image from "next/image";
 import React, { useEffect, useState } from "react";
 import {
@@ -124,6 +132,14 @@ const JobTracker = () => {
     applied_date: "",
     note: "",
   });
+
+  const [isOpenJobDialog, setIsOpenJobDialog] = useState(false);
+  const [selectedJob, setSelectedJob] = useState<JobTrackerCard>();
+
+  const handleViewJob = (job: JobTrackerCard) => {
+    setSelectedJob(job);
+    setIsOpenJobDialog(true);
+  };
 
   useEffect(() => {
     const fetchJobs = async () => {
@@ -372,7 +388,6 @@ const JobTracker = () => {
             </p>
           </div>
           {/* Right side all columns */}
-  
           <DndContext
             collisionDetection={closestCenter}
             onDragEnd={handleDragEnd}
@@ -436,6 +451,7 @@ const JobTracker = () => {
                                 <Button
                                   variant="outline"
                                   className="text-xs font-inter cursor-pointer"
+                                  onClick={() => handleViewJob(job)}
                                 >
                                   View <LuPen className="w-4 h-4 ml-2" />
                                 </Button>
@@ -722,6 +738,57 @@ const JobTracker = () => {
               )}
             </div>
           </div>
+        </DialogContent>
+      </Dialog>
+
+      {/* 🔹 Job Details Dialog */}
+      <Dialog open={isOpenJobDialog} onOpenChange={setIsOpenJobDialog}>
+        <DialogContent className="max-w-lg">
+          <DialogHeader>
+            <DialogTitle className="text-lg font-semibold text-center font-sora capitalize">
+              {selectedJob?.job_title || "Job Details"}
+            </DialogTitle>
+          </DialogHeader>
+
+          {selectedJob ? (
+            <div className="space-y-2 font-inter text-base">
+              <p>
+                <span className="font-semibold">Stage:</span>{" "}
+                {selectedJob.stage}
+              </p>
+              <p>
+                <span className="font-semibold">Company:</span>{" "}
+                {selectedJob.company}
+              </p>
+              <p>
+                <span className="font-semibold">Applied Date:</span>{" "}
+                {selectedJob.applied_date || "Not specified"}
+              </p>
+              <p>
+                <span className="font-semibold">Type:</span> {selectedJob.type}
+              </p>
+              <p>
+                <span className="font-semibold">Description:</span>{" "}
+                {selectedJob.description}
+              </p>
+              <p>
+                <span className="font-semibold">Note:</span>{" "}
+                {selectedJob.note || "No notes yet"}
+              </p>
+            </div>
+          ) : (
+            <p className="text-sm text-gray-500">No job selected</p>
+          )}
+
+          <DialogFooter className="flex items-center gap-5">
+            <Button type="button" variant="outline" className="bg-gray-100 cursor-pointer font-inter">
+              <Edit className="w-4 h-4 mr-2" /> Edit
+            </Button>
+
+            <Button type="button" variant="destructive" >
+              <Delete className="w-4 h-4 mr-2" /> Delete
+            </Button>
+          </DialogFooter>
         </DialogContent>
       </Dialog>
     </div>

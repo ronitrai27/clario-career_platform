@@ -533,9 +533,9 @@ Key Guidelines:
             </Button>
 
             {/* TESTING BUTTON */}
-            <Button className="text-sm font-inter" onClick={testing}>
+            {/* <Button className="text-sm font-inter" onClick={testing}>
               Test
-            </Button>
+            </Button> */}
           </div>
         </div>
         {/* RIGHT */}
