@@ -20,7 +20,7 @@ import {
   LuVideoOff,
 } from "react-icons/lu";
 import { Button } from "@/components/ui/button";
-import { LucideLoader2, X } from "lucide-react";
+import { LucideLoader2, Timer, X } from "lucide-react";
 import { toast } from "sonner";
 import Vapi from "@vapi-ai/web";
 import AI_Voice from "@/components/kokonutui/ai-voice";
@@ -69,6 +69,12 @@ const InterviewStart = () => {
   const [isDialogOpen, setIsDialogOpen] = useState(false);
 
   const [vapi] = useState(() => new Vapi(VAPI_PUBLIC_KEY));
+
+  const scrollRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    scrollRef.current?.scrollIntoView({ behavior: "smooth" });
+  }, [messages]);
 
   const startCamera = async () => {
     try {
@@ -260,6 +266,7 @@ Key Guidelines:
       const { data, error } = await supabase.from("others").insert([
         {
           userId: user?.id,
+          jobTitle: interviewData?.jobTitle,
           interviewInsights: feedbackData,
         },
       ]);
@@ -315,9 +322,39 @@ Key Guidelines:
     return () => stopCamera();
   }, []);
 
+  // -------------------TIMER-----------------------------------
+  const [seconds, setSeconds] = useState(0);
+  useEffect(() => {
+    let interval: NodeJS.Timeout | null = null;
+
+    if (isCallActive) {
+      interval = setInterval(() => {
+        setSeconds((prev) => prev + 1);
+      }, 1000);
+    } else {
+      // Reset timer when call ends
+      setSeconds(0);
+      if (interval) clearInterval(interval);
+    }
+
+    return () => {
+      if (interval) clearInterval(interval);
+    };
+  }, [isCallActive]);
+
+  const formatTime = (totalSeconds: number) => {
+    const hrs = Math.floor(totalSeconds / 3600)
+      .toString()
+      .padStart(2, "0");
+    const mins = Math.floor((totalSeconds % 3600) / 60)
+      .toString()
+      .padStart(2, "0");
+    const secs = (totalSeconds % 60).toString().padStart(2, "0");
+    return `${hrs}:${mins}:${secs}`;
+  };
   // ------------------------TESTING--------------------------
 
-  const demoConversation = [
+  const demoConversation: Message[] = [
     { type: "assistant", content: "Hi, Renit. How are you?" },
     {
       type: "assistant",
@@ -455,7 +492,9 @@ Key Guidelines:
               </div>
             )}
 
-            <p className="font-semibold font-sora text-xl">00:00</p>
+            <p className="text-xl flex items-center gap-3 font-semibold">
+              <Timer /> {formatTime(seconds)}
+            </p>
           </div>
           {/* VIDEO PART */}
           <div className="flex  justify-center w-full h-[520px] border rounded-lg shadow relative overflow-hidden">
@@ -575,6 +614,7 @@ Key Guidelines:
                   >
                     {msg.content}
                   </div>
+                  <div ref={scrollRef} />
                 </div>
               ))}
             </div>

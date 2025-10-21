@@ -187,7 +187,7 @@ export default function MentorConnect() {
           </div>
         )}
 
-        <div className="flex items-center justify-center gap-6 my-7">
+        <div className="flex items-center justify-center gap-6 mt-8">
           <h2 className=" text-2xl font-semibold font-sora text-center">
             Discover More By Category
           </h2>
@@ -241,7 +241,7 @@ export default function MentorConnect() {
             return (
               <div
                 key={mentor.id}
-                className="bg-white border border-gray-200 shadow-md rounded-md h-[280px] w-[310px] overflow-hidden relative flex flex-col"
+                className="bg-white border border-gray-200 shadow-md rounded-md h-[300px] w-[330px] overflow-hidden relative flex flex-col"
               >
                 {/* HEADER */}
                 <div className={`h-16 ${bgColor} w-full relative`}>
@@ -286,7 +286,10 @@ export default function MentorConnect() {
                   <div className="mt-auto pb-3">
                     <Button
                       variant="outline"
-                      className="font-inter text-sm w-full"
+                      className="font-inter text-sm w-full cursor-pointer"
+                      onClick={() =>
+                        router.push(`/home/mentor-connect/${mentor.id}`)
+                      }
                     >
                       Connect <LuScreenShare className="ml-2" />
                     </Button>

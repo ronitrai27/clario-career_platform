@@ -96,3 +96,40 @@
 //             );
 //           })}
 //         </div>
+
+// ------------------------------------------------------
+//   <div className="flex gap-6 mt-auto justify-center">
+//                 <Button
+//                   onClick={() => {
+//                     setSessionType("10");
+//                     setOpen(true);
+//                   }}
+//                   className="cursor-pointer text-sm font-inter tracking-tight"
+//                   size="sm"
+//                   variant="outline"
+//                 >
+//                   <LuTimer className="mr-2" /> 10 Min
+//                 </Button>
+//                 <Button
+//                   onClick={() => {
+//                     setSessionType("30");
+//                     setOpen(true);
+//                   }}
+//                   className="cursor-pointer text-sm font-inter tracking-tight"
+//                   size="sm"
+//                   variant="outline"
+//                 >
+//                   <LuTimer className="mr-2" /> 30 Min
+//                 </Button>
+//                 <Button
+//                   onClick={() => {
+//                     setSessionType("45");
+//                     setOpen(true);
+//                   }}
+//                   className="cursor-pointer text-sm font-inter tracking-tight"
+//                   size="sm"
+//                   variant="outline"
+//                 >
+//                   <LuTimer className="mr-2" /> 45 Min
+//                 </Button>
+//               </div>

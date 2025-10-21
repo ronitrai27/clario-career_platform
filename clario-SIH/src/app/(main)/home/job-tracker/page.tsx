@@ -222,7 +222,7 @@ const JobTracker = () => {
         const nextIndex = (prev + 1) % messages.length;
 
         if (nextIndex === 0 && prev === messages.length - 1) {
-          toast.success("Interview prep is ready!");
+          // toast.success("Interview prep is ready!");
           setShowInstructions(true);
         }
 

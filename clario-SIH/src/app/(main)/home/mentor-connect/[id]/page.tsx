@@ -52,7 +52,9 @@ export default function MentorConnectPage() {
   const [mentorLoading, setMentorLoading] = useState<boolean>(false);
 
   // booking dialog state
-  const [sessionType, setSessionType] = useState<"30" | "45" | null>(null);
+  const [sessionType, setSessionType] = useState<"30" | "45" | "10" | null>(
+    null
+  );
   const [notes, setNotes] = useState("");
   const [date, setDate] = useState<Date | undefined>(new Date());
   const [open, setOpen] = useState(false);
@@ -101,7 +103,7 @@ export default function MentorConnectPage() {
       return;
     }
 
-    const cost = sessionType === "30" ? 20 : 35;
+    const cost = sessionType === "10" ? 10 : sessionType === "30" ? 20 : 35;
 
     // check credits
     if (user.remainingCredits < cost) {
@@ -116,7 +118,11 @@ export default function MentorConnectPage() {
           mentor_id: mentorId,
           student_id: user.id,
           session_type:
-            sessionType === "30" ? "30 min session" : "45 min session",
+            sessionType === "10"
+              ? "10 min session"
+              : sessionType === "30"
+              ? "30 min session"
+              : "45 min session",
           status: "pending",
           requested_at: new Date().toISOString(),
           scheduled_at: date.toISOString(),
@@ -198,10 +204,6 @@ export default function MentorConnectPage() {
             <p className="text-black text-lg font-inter font-medium mt-1">
               <LuMail className="inline mr-2 -mt-1" /> {mentor?.email}
             </p>
-            <p className="text-black text-lg font-inter font-medium capitalize mt-1">
-              <LuBriefcaseBusiness className="inline mr-2 -mt-1" />{" "}
-              {mentor?.current_position}
-            </p>
           </div>
         </div>
         <div className="absolute -bottom-5 right-36 flex items-center gap-10">
@@ -224,48 +226,60 @@ export default function MentorConnectPage() {
       <div className="mt-10 flex h-full px-8 gap-5">
         {/* LEFT SIDE */}
         <div className="w-[68%] h-full">
+          <h2 className="font-inter underline underline-offset-4 text-lg font-semibold mt-5">
+            Current Ocupation
+          </h2>
+          <p className="text-black text-lg font-inter font-medium capitalize mt-3 mb-4">
+            {mentor?.current_position}
+          </p>
           <h2 className="font-inter underline underline-offset-4 text-lg font-semibold">
             About Me
           </h2>
-          <p className="mt-4 text-base font-inter tracking-wide">
+          <p className="mt-3 text-base font-inter tracking-wide">
             {mentor?.bio}
           </p>
-          <h2 className="font-inter underline underline-offset-4 text-lg font-semibold mt-10">
+          <h2 className="font-inter underline underline-offset-4 text-lg font-semibold mt-8">
             Expertise
           </h2>
-          <p className="mt-4 text-lg font-semibold font-inter capitalize">
+          <p className="mt-3 text-lg font-semibold font-inter capitalize">
             {" "}
             {mentor?.expertise?.join(", ") || "No expertise added"}
           </p>
 
-         <div className="bg-gradient-to-br from-yellow-400 to-amber-100 h-48 rounded-lg p-4 mt-14">
-           <h2 className="text-center mt-2 mb-2 text-xl font-semibold font-sora">
-            Book Session
-          </h2>
-          <p className="text-center text-base font-inter tracking-tight">Book a session with {mentor?.full_name} and get guidance on your career choices. Make 1:1 Video call and discuss your concerns</p>
-          <div className="flex gap-8 mt-6 justify-center">
-            <Button
-              onClick={() => {
-                setSessionType("30");
-                setOpen(true);
-              }}
-              className="cursor-pointer"
-              variant="outline"
-            >
-              <LuTimer className="mr-2" /> 30 Min Session
-            </Button>
-            <Button
-              onClick={() => {
-                setSessionType("45");
-                setOpen(true);
-              }}
-              className="cursor-pointer"
-              variant="outline"
-            >
-              <LuTimer className="mr-2" /> 45 Min Session
-            </Button>
+          {/* SESSION BOOKING */}
+          <div className="bg-gradient-to-br from-yellow-100 to-yellow-400 h-48 rounded-lg p-4 mt-14 relative overflow-hidden">
+            <Image
+              src="/element3.png"
+              alt="element"
+              width={400}
+              height={400}
+              className="absolute -top-1/2 -left-10"
+            />
+            <div className="w-[380px] ml-auto h-full bg-white/20 rounded-lg p-1 flex flex-col">
+              <h2 className="text-center mt-2 mb-2 text-xl font-semibold font-sora">
+                Book Session
+              </h2>
+              <p className="font-inter text-sm text-center leading-relaxed tracking-tight">
+                Book 1:1 session with {mentor?.full_name} and get expert
+                guidance and unlock your career potential
+              </p>
+
+              <div className="flex gap-6 mt-auto justify-center">
+                <Button
+                  // onClick={() => {
+                  //   setSessionType("10");
+                  //   setOpen(true);
+                  // }}
+                  className="cursor-pointer text-sm font-inter tracking-tight"
+                  size="sm"
+                  variant="outline"
+                >
+                  <LuTimer className="mr-2" /> Book Now
+                </Button>
+               
+              </div>
+            </div>
           </div>
-         </div>
         </div>
         <Separator orientation="vertical" className="" />
         {/* RIGHT SIDE */}
