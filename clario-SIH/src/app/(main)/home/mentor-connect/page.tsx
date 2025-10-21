@@ -98,7 +98,13 @@ export default function MentorConnect() {
     "border-yellow-500",
     "border-pink-500",
   ];
-  const bgColors = ["bg-white", "bg-white", "bg-white", "bg-white"];
+  const bgColors = [
+    "bg-red-500",
+    "bg-blue-500",
+    "bg-green-500",
+    "bg-yellow-500",
+    "bg-purple-500",
+  ];
 
   function getRandomBorderColor(id: string) {
     const index = id
@@ -220,7 +226,7 @@ export default function MentorConnect() {
               My Bookings
             </Button>
             {/* Filters */}
-             <Button className="font-inter text-sm " variant="outline">
+            <Button className="font-inter text-sm " variant="outline">
               <LuFilter className="mr-2" />
               Filters
             </Button>
@@ -228,97 +234,62 @@ export default function MentorConnect() {
         </div>
 
         {/* ALL mentors */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 mt-5  gap-x-6 gap-y-14 px-2 max-w-[1260px] mx-auto">
+        <div className="grid grid-cols-2 md:grid-cols-3 mt-5  lg:gap-x-12 md:gap-x-8 gap-y-14 px-2 max-w-[1260px] mx-auto">
           {mentorData.map((mentor) => {
             const bgColor = getRandomBgColor(mentor.id);
             const borderColor = getRandomBorderColor(mentor.id);
             return (
               <div
                 key={mentor.id}
-                className={`border-l-4 ${borderColor} rounded-md shadow-sm bg-white hover:shadow-md transition-shadow duration-200 overflow-hidden h-[240px]`}
+                className="bg-white border border-gray-200 shadow-md rounded-md h-[280px] w-[310px] overflow-hidden relative flex flex-col"
               >
-                <div className="flex h-full">
-                  {/* Left Section */}
-                  <div
-                    className={`w-[65%] ${bgColor} flex flex-col justify-between p-3`}
-                  >
-                    <div className="space-y-2">
-                      <p className="text-lg font-semibold font-inter text-center tracking-tight capitalize">
-                        {mentor?.current_position || "Position unavailable"}
-                      </p>
-                      <p className="text-base font-inter text-center mb-3 line-clamp-2">
-                        {mentor?.bio || "No bio available"}
-                      </p>
-                      <h2 className="text-sm font-raleway text-center">
-                        Expertise:{" "}
-                        {mentor?.expertise?.join(", ") || "No expertise added"}
-                      </h2>
-                    </div>
-
-                    <div className="fmt-4 w-full">
-                      <Button
-                        size="sm"
-                        variant="outline"
-                        className="w-full cursor-pointer"
-                        onClick={() =>
-                          router.push(`/home/mentor-connect/${mentor.id}`)
-                        }
-                      >
-                        Connect <LuScreenShare className="ml-2" />
-                      </Button>
-                    </div>
+                {/* HEADER */}
+                <div className={`h-16 ${bgColor} w-full relative`}>
+                  <Image
+                    src={mentor?.avatar || "/user.png"}
+                    alt={mentor?.full_name || "User"}
+                    width={75}
+                    height={75}
+                    className="rounded-full border border-gray-200 absolute top-5 left-5 z-20"
+                  />
+                  <div className="absolute top-0 right-0 w-16 h-16">
+                    <div className="w-full h-full bg-white/25 rounded-tr-2xl rotate-45 transform origin-top-right"></div>
                   </div>
-                  <Separator orientation="vertical" className="bg-gray-300" />
 
-                  {/* Right Section */}
-                  <div className="flex flex-col items-center justify-center w-[35%] px-2 py-4 text-center space-y-2 ">
-                    <span
-                      className={`inline-block -mt-4 mb-6 px-2 py-1 text-xs text-black font-inter rounded-full font-medium ${
-                        mentor?.availability
-                          ? "bg-green-200 text-green-800"
-                          : "bg-red-200 text-red-800"
-                      }`}
-                    >
-                      {mentor?.availability ? "Available" : "Available"}
-                    </span>
-                    <div className="relative mb-4">
-                      <Image
-                        src={mentor?.avatar || "/user.png"}
-                        alt={mentor?.full_name || "User"}
-                        width={75}
-                        height={75}
-                        className="rounded-full border border-gray-200"
-                      />
-                      <p className=" absolute -bottom-2 right-1 bg-white border-2 border-yellow-500 rounded-full px-2 flex items-center text-sm">
-                        <Star
-                          className="inline mr-1 fill-yellow-500 text-yellow-400"
-                          size={15}
-                        />{" "}
-                        {mentor?.rating}
-                      </p>
-                    </div>
+                  <div className="absolute top-0 left-0 w-16 h-16">
+                    <div className="w-full h-full bg-white/30 rounded-tr-2xl rotate-6 transform origin-top-right"></div>
+                  </div>
 
-                    <h2 className="text-lg font-semibold text-gray-900 capitalize">
-                      {mentor?.full_name}
-                    </h2>
-                    <Link
-                      target="_blank"
-                      href={
-                        mentor?.linkedin ||
-                        "https://www.linkedin.com/in/ronit-rai-aa53a1300/"
-                      }
-                      className="text-base text-blue-600 hover:underline truncate max-w-[100px]"
+                  <div className="absolute py-1 px-3 text-sm font-inter rounded-full bg-gray-50 border top-12 right-5">
+                    <Star
+                      className="inline mr-1 fill-yellow-500 text-yellow-400"
+                      size={15}
+                    />{" "}
+                    {mentor?.rating}
+                  </div>
+                </div>
+
+                {/* BODY */}
+                <div className="px-4 py-2 mt-6 flex flex-col flex-grow">
+                  <h3 className="font-inter text-base font-semibold tracking-tight capitalize">
+                    {mentor?.full_name}
+                  </h3>
+                  <h3 className="font-inter text-base text-muted-foreground capitalize">
+                    {mentor?.current_position}
+                  </h3>
+                  <h2 className="text-sm font-inter mt-3 text-center">
+                    <span className="font-semibold">Expertise: </span>
+                    {mentor?.expertise?.join(" , ") || "No expertise added"}
+                  </h2>
+
+                  {/* FOOTER  */}
+                  <div className="mt-auto pb-3">
+                    <Button
+                      variant="outline"
+                      className="font-inter text-sm w-full"
                     >
-                      <div className="flex items-center gap-2">
-                        <p className=" font-inter tracking-tight">linkedin</p>
-                        <Image
-                          src="/linkedin.png"
-                          alt="linkedin"
-                          width={20}
-                          height={20}
-                        />
-                      </div>
-                    </Link>
+                      Connect <LuScreenShare className="ml-2" />
+                    </Button>
                   </div>
                 </div>
               </div>

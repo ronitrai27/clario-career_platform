@@ -743,7 +743,7 @@ const JobTracker = () => {
 
       {/* 🔹 Job Details Dialog */}
       <Dialog open={isOpenJobDialog} onOpenChange={setIsOpenJobDialog}>
-        <DialogContent className="max-w-lg">
+        <DialogContent className={`max-w-lg `}>
           <DialogHeader>
             <DialogTitle className="text-lg font-semibold text-center font-sora capitalize">
               {selectedJob?.job_title || "Job Details"}
@@ -781,7 +781,7 @@ const JobTracker = () => {
           )}
 
           <DialogFooter className="flex items-center gap-5">
-            <Button type="button" variant="outline" className="bg-gray-100 cursor-pointer font-inter">
+            <Button type="button" variant="outline" className="bg-blue-500 text-white cursor-pointer font-inter">
               <Edit className="w-4 h-4 mr-2" /> Edit
             </Button>
 

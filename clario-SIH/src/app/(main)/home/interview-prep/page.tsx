@@ -104,7 +104,7 @@ const InterviewDefault = () => {
           <h1 className="text-2xl font-semibold font-sora tracking-wide ml-4 -mt-4">
             Interviews History <LucideHistory className="inline w-6 h-6 ml-2" />
           </h1>
-          {feedbacks.length < 0 ? (
+          {feedbacks.length > 0 ? (
             // All cards will be displayed
             <div className="grid grid-cols-3 gap-5 mt-6">
               {feedbacks.map((fb) => {
