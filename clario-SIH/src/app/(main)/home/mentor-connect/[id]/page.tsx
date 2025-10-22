@@ -232,6 +232,10 @@ export default function MentorConnectPage() {
             <p className="text-black text-lg font-inter font-medium mt-1">
               <LuMail className="inline mr-2 -mt-1" /> {mentor?.email}
             </p>
+
+            <p className="text-red-500 text-lg font-inter font-medium mt-1">
+              {!mentor?.availability && " Unavailable"}
+            </p>
           </div>
         </div>
         <div className="absolute -bottom-5 right-36 flex items-center gap-10">
@@ -332,13 +336,13 @@ export default function MentorConnectPage() {
               relative flex flex-col items-center justify-center 
               w-[180px] h-[180px] rounded-2xl cursor-pointer 
               border border-gray-200 shadow-sm 
-              bg-white/80 backdrop-blur-md transition-all duration-300
+              bg-white backdrop-blur-md transition-all duration-300
               hover:shadow-lg hover:scale-105 hover:border-transparent
             `}
                   >
                     {/* Gradient hover overlay */}
                     <div
-                      className={`absolute inset-0 bg-gradient-to-br ${session.color} opacity-0 hover:opacity-20 transition-opacity duration-300 rounded-2xl`}
+                      className={`absolute inset-0 bg-gradient-to-br ${session.color} opacity-20 transition-opacity duration-300 rounded-2xl`}
                     ></div>
 
                     <p className="font-inter text-lg tracking-tight text-center mb-2 z-10">
@@ -376,8 +380,8 @@ export default function MentorConnectPage() {
               <h2 className="text-2xl font-sora">{mentor?.rating}</h2>
             </div>
           </div>
-          <h2 className="text-xl font-medium text-center my-10 font-sora">
-            Other Mentors
+          <h2 className="text-xl font-semibold text-center my-10 font-sora">
+            Check Other Mentors
           </h2>
           <div className="flex  mt-5">
             <div className="flex flex-col gap-4 w-[340px] px-5 mb-20">
@@ -386,7 +390,7 @@ export default function MentorConnectPage() {
                   key={mentor.id}
                   className="flex flex-col items-center gap-4 p-3 rounded-xl border shadow-sm bg-white "
                 >
-                  <div className="flex items-center justify-center gap-6">
+                  <div className="flex items-center justify-center gap-6 relative">
                     <Image
                       src={mentor.avatar || "/user.png"}
                       alt={mentor.full_name}
@@ -394,6 +398,11 @@ export default function MentorConnectPage() {
                       height={100}
                       className="w-12 h-12 rounded-full object-cover"
                     />
+                    <div className="absolute left-0 top-10 rounded-full border border-yellow-500 bg-yellow-50 py-1 px-2 text-xs tracking-tight">
+                      <span className="text-yellow-600 ">
+                        ⭐ {mentor.rating}
+                      </span>
+                    </div>
 
                     <div className="flex flex-col">
                       <h3 className="font-semibold font-inter text-lg">
@@ -405,20 +414,9 @@ export default function MentorConnectPage() {
                     </div>
                   </div>
 
-                  <div className="flex items-center gap-3 mt-1">
-                    <span
-                      className={`text-xs font-medium px-2 py-1 rounded ${
-                        mentor.availability
-                          ? "bg-green-100 text-green-700"
-                          : "bg-red-100 text-red-700"
-                      }`}
-                    >
-                      {mentor.availability ? "Available" : "Unavailable"}
-                    </span>
-                    <span className="text-yellow-600 text-sm">
-                      ⭐ {mentor.rating}
-                    </span>
-                  </div>
+                  <Button variant="outline" size="sm" className="font-inter text-sm mt-4 w-full">
+                    Connect <LuScreenShare />
+                  </Button>
                 </div>
               ))}
             </div>
@@ -440,7 +438,7 @@ export default function MentorConnectPage() {
             <p className="text-muted-foreground -mt-2 tracking-tight text-center font-inter text-sm mb-3">
               You selected:{" "}
               <span className="font-semibold">
-                {sessionType === "30" ? "30 min" : "45 min"}
+                {sessionType === "10" ? "10 min" : sessionType === "30" ? "30 min" : "45 min"}
               </span>{" "}
               session with your mentor. Fill the below form to book this
               session.
