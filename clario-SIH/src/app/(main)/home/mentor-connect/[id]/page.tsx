@@ -28,6 +28,7 @@ import { Input } from "@/components/ui/input";
 import {
   LuBookmark,
   LuBriefcaseBusiness,
+  LuCoins,
   LuLoader,
   LuMail,
   LuMessageCircle,
@@ -40,6 +41,33 @@ import {
 import { toast } from "sonner";
 import Image from "next/image";
 import { Separator } from "@/components/ui/separator";
+
+const sessions = [
+  {
+    time: "10",
+    label: "Rapid Q&A",
+    duration: "10 Minutes",
+    image: "/10.png",
+    color: "from-yellow-400 to-amber-600",
+    coins: 15,
+  },
+  {
+    time: "30",
+    label: "Deep Dive",
+    duration: "30 Minutes",
+    image: "/30.png",
+    color: "from-yellow-400 to-amber-600",
+    coins: 20,
+  },
+  {
+    time: "45",
+    label: "Full Coaching",
+    duration: "45 Minutes",
+    image: "/45.png",
+    color: "from-yellow-400 to-amber-600",
+    coins: 35,
+  },
+];
 
 export default function MentorConnectPage() {
   const params = useParams();
@@ -276,8 +304,65 @@ export default function MentorConnectPage() {
                 >
                   <LuTimer className="mr-2" /> Book Now
                 </Button>
-               
               </div>
+            </div>
+          </div>
+
+          {/* SESSIONS 10,30,45 */}
+          <div className="my-10 border border-dashed border-gray-300 p-3 relative rounded-md bg-gray-50">
+            <h1 className="font-inter text-xl font-semibold tracking-tight text-center">
+              Sessions Available
+            </h1>
+            <div className="flex justify-evenly w-full flex-wrap gap-6 py-6">
+              {sessions.map((session) => (
+                <div key={session.time} className="relative">
+                  {/* Coin badge */}
+                  <div className="absolute -top-3 -right-3 z-20 bg-amber-100 border border-amber-300 rounded-md py-1 px-3 text-xs font-inter tracking-tight flex items-center gap-1 shadow-sm">
+                    <LuCoins className="text-amber-500" />
+                    {session.coins} coins
+                  </div>
+
+                  {/* Card */}
+                  <div
+                    onClick={() => {
+                      setSessionType(session.time as "10" | "30" | "45");
+                      setOpen(true);
+                    }}
+                    className={`
+              relative flex flex-col items-center justify-center 
+              w-[180px] h-[180px] rounded-2xl cursor-pointer 
+              border border-gray-200 shadow-sm 
+              bg-white/80 backdrop-blur-md transition-all duration-300
+              hover:shadow-lg hover:scale-105 hover:border-transparent
+            `}
+                  >
+                    {/* Gradient hover overlay */}
+                    <div
+                      className={`absolute inset-0 bg-gradient-to-br ${session.color} opacity-0 hover:opacity-20 transition-opacity duration-300 rounded-2xl`}
+                    ></div>
+
+                    <p className="font-inter text-lg tracking-tight text-center mb-2 z-10">
+                      {session.label}
+                    </p>
+
+                    <Image
+                      src={session.image}
+                      alt={session.label}
+                      width={55}
+                      height={55}
+                      className="object-cover opacity-40 z-10 mb-2"
+                    />
+
+                    <Button
+                      size="sm"
+                      variant="outline"
+                      className="text-sm font-inter tracking-tight z-10 mt-2 transition-all hover:bg-gray-100"
+                    >
+                      <LuTimer className="mr-2" /> {session.duration}
+                    </Button>
+                  </div>
+                </div>
+              ))}
             </div>
           </div>
         </div>

@@ -124,7 +124,7 @@ const InterviewStart = () => {
       }
     }
   };
-
+ 
   // ----------------------------VAPI SETUP--------------------------------
   // useEffect(() => {
   //   if (!interviewData) return;
