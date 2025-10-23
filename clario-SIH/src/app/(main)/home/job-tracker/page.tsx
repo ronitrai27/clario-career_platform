@@ -57,7 +57,7 @@ import {
   useDraggable,
   DragOverlay,
 } from "@dnd-kit/core";
-import { CSS } from "@dnd-kit/utilities"; // For transform styles during drag
+import { CSS } from "@dnd-kit/utilities";
 import axios from "axios";
 import ShimmerText from "@/components/kokonutui/shimmer-text";
 import { motion, AnimatePresence } from "framer-motion";
@@ -123,6 +123,7 @@ const JobTracker = () => {
   const [loading, setLoading] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const { setInterviewData } = useInterview();
+  const [activeJob, setActiveJob] = useState<JobTrackerCard | null>(null);
   const [form, setForm] = useState({
     job_title: "",
     company: "",
@@ -222,7 +223,6 @@ const JobTracker = () => {
         const nextIndex = (prev + 1) % messages.length;
 
         if (nextIndex === 0 && prev === messages.length - 1) {
-          // toast.success("Interview prep is ready!");
           setShowInstructions(true);
         }
 
@@ -252,6 +252,7 @@ const JobTracker = () => {
 
     return () => clearInterval(timer);
   }, [showInstructions, router]);
+
   // ------Last animation MAGICUI----------------
   const [value, setValue] = useState(0);
   useEffect(() => {
@@ -268,21 +269,10 @@ const JobTracker = () => {
 
   // --------------------------------QNA GENERATION--------------------
   const handleInterviewQna = async (job: any) => {
-    // if (!user?.isPro == true) {
-    //   toast.info("Upgrade to Pro", {
-    //     description: (
-    //       <span className="text-sm text-gray-500 font-medium">
-    //         You need to upgrade to Pro to use this feature.
-    //         <span className="text-blue-600 cursor-pointer">Upgrade</span>
-    //       </span>
-    //     ),
-    //   });
-    //   return;
-    // }
     console.log("Job Title:", job.job_title);
     console.log("Job Description:", job.description);
 
-    setPrepOpen(true); // open dialog to show loading animation
+    setPrepOpen(true);
     setIsLoading(true);
 
     try {
@@ -312,20 +302,56 @@ const JobTracker = () => {
   };
 
   // ---------------------------DRAG AND DROP---------------------
-  const handleDragEnd = (event: DragEndEvent) => {
+  const handleDragStart = (event: any) => {
+    const jobId = event.active.id;
+    const job = jobs.find((j) => j.id === jobId);
+    setActiveJob(job || null);
+  };
+
+  const handleDragEnd = async (event: DragEndEvent) => {
     const { active, over } = event;
+    setActiveJob(null);
+
+    if (!over) return;
+
+    const jobId = active.id;
+    const newStage = over.id as string;
+
+    // Find the job being dragged
+    const job = jobs.find((j) => j.id === jobId);
+    if (!job || job.stage === newStage) return;
+
+    // Optimistically update UI
+    setJobs((prev) =>
+      prev.map((j) => (j.id === jobId ? { ...j, stage: newStage } : j))
+    );
+
+    // Update database
+    try {
+      const { error } = await supabase
+        .from("job_tracker")
+        .update({ stage: newStage })
+        .eq("id", jobId);
+
+      if (error) throw error;
+      toast.success(`Job moved to ${newStage}!`);
+    } catch (err) {
+      console.error("Error updating job stage:", err);
+      // Rollback on error
+      setJobs((prev) =>
+        prev.map((j) => (j.id === jobId ? { ...j, stage: job.stage } : j))
+      );
+      toast.error("Failed to update job stage. Please try again.");
+    }
   };
 
   return (
-    <div className="h-full  bg-gray-50 p-2 pb-8">
+    <div className="h-full bg-gray-50 p-2 pb-8">
       <div className="w-full flex px-8 gap-5 my-6">
         <p className="whitespace-nowrap text-2xl font-semibold font-sora flex gap-3 items-center">
           Your smart way of job tracking <LuChevronRight className="w-4 h-4" />
         </p>
         <div className="flex items-center gap-3 justify-end w-full">
-          {/* <p className="font-inter tracking-tight text-sm">
-            Bring jobs from career board to your job tracker
-          </p> */}
           <Button variant="outline" className="font-inter text-sm">
             <LuBookMarked className="w-4 h-4 mr-2" />
             Career Board
@@ -338,15 +364,17 @@ const JobTracker = () => {
         <Button
           variant="outline"
           className="font-inter text-sm bg-gradient-to-br from-blue-300 to-blue-500 text-white"
+          onClick={() => setOpen(true)}
         >
           Add <LuCircleFadingPlus className="w-4 h-4 ml-2" />
         </Button>
       </div>
+
       {/* Job tracker */}
       <div
         className={`w-full h-full mx-auto ${
           sidebarOpen ? "max-w-[1180px]" : "max-w-[1400px]"
-        }  `}
+        }`}
       >
         <div className="flex h-full mb-20 w-full overflow-x-auto scroll-smooth mt-5">
           {/* Left side */}
@@ -360,7 +388,7 @@ const JobTracker = () => {
                 className="w-full h-full object-cover rounded-md absolute opacity-40 inset-0 -top-10"
               />
               <div className="flex flex-col h-full">
-                <h1 className="font-inter font-semibold text-2xl  text-white text-center mt-10">
+                <h1 className="font-inter font-semibold text-2xl text-white text-center mt-10">
                   Get Ready to crack your dream job
                 </h1>
 
@@ -387,88 +415,57 @@ const JobTracker = () => {
               reorder
             </p>
           </div>
+
           {/* Right side all columns */}
           <DndContext
             collisionDetection={closestCenter}
+            onDragStart={handleDragStart}
             onDragEnd={handleDragEnd}
           >
-            <div className="flex  min-w-max gap-4">
+            <div className="flex min-w-max gap-4">
               {stages.map((stage) => (
-                <div
-                  key={stage.key}
-                  className="flex flex-col w-[300px] overflow-y-auto bg-white rounded-md shadow-sm border border-gray-200"
-                >
-                  <div
-                    className={`text-center py-3 font-semibold border-b border-gray-200 rounded shadow mb-5 ${stage.color}`}
-                  >
-                    <h1 className="font-sora text-base text-white  flex items-center justify-center gap-5">
-                      {stage.name}
-                    </h1>
-                  </div>
-
-                  <div className="flex-1 space-y-3 py-2 px-3">
-                    {jobs
-                      .filter((job) => job.stage === stage.key)
-                      .map((job) => (
-                        <Card
-                          key={job.id}
-                          className={`p-2  border-none shadow-sm hover:shadow-md rounded-md transition  ${stage.cardcolor}`}
-                        >
-                          <CardContent className="flex flex-col h-[200px] p-1">
-                            <div className="flex flex-col h-full">
-                              <h2 className="font-semibold font-inter text-base tracking-wide  capitalize flex items-center  max-w-[200px] truncate  gap-2">
-                                <LuBriefcaseBusiness className="w-4 h-4 mr-2 text-gray-800 shrink-0" />
-                                {job.job_title}
-                              </h2>
-                              <p className="text-base font-inter tracking-tight flex items-center  gap-2">
-                                <LuBuilding2 className="w-4 h-4 mr-2" />
-                                {job.company}
-                              </p>
-
-                              <div className="mt-2 font-inter text-sm flex items-center justify-between w-full capitalize">
-                                <p>
-                                  <span className="font-semibold">Type</span>:{" "}
-                                  {job.type}
-                                </p>
-                                <p>
-                                  <span className="font-semibold">Stage</span>:{" "}
-                                  {job.stage}
-                                </p>
-                              </div>
-                              <p className="mt-4 line-clamp-2 font-inter text-sm tracking-tight text-center">
-                                {job.description}
-                              </p>
-
-                              <div className="flex items-center justify-evenly w-full mt-auto">
-                                <Button
-                                  variant="outline"
-                                  className={`text-xs font-inter cursor-pointer `}
-                                  onClick={() => handleInterviewQna(job)}
-                                >
-                                  Start Prep{" "}
-                                  <LuActivity className="w-4 h-4 ml-2" />
-                                </Button>
-                                <Button
-                                  variant="outline"
-                                  className="text-xs font-inter cursor-pointer"
-                                  onClick={() => handleViewJob(job)}
-                                >
-                                  View <LuPen className="w-4 h-4 ml-2" />
-                                </Button>
-                              </div>
-                            </div>
-                          </CardContent>
-                        </Card>
-                      ))}
-                  </div>
-                </div>
+                <DroppableColumn key={stage.key} id={stage.key} stage={stage}>
+                  {jobs
+                    .filter((job) => job.stage === stage.key)
+                    .map((job) => (
+                      <DraggableJobCard
+                        key={job.id}
+                        job={job}
+                        stage={stage}
+                        onStartPrep={handleInterviewQna}
+                        onViewJob={handleViewJob}
+                      />
+                    ))}
+                </DroppableColumn>
               ))}
             </div>
+            <DragOverlay>
+              {activeJob ? (
+                <Card
+                  className={`p-2 border-none shadow-lg rounded-md w-[280px] opacity-80 rotate-3 ${
+                    stages.find((s) => s.key === activeJob.stage)?.cardcolor
+                  }`}
+                >
+                  <CardContent className="flex flex-col h-[200px] p-1">
+                    <div className="flex flex-col h-full">
+                      <h2 className="font-semibold font-inter text-base tracking-wide capitalize flex items-center max-w-[200px] truncate gap-2">
+                        <LuBriefcaseBusiness className="w-4 h-4 mr-2 text-gray-800 shrink-0" />
+                        {activeJob.job_title}
+                      </h2>
+                      <p className="text-base font-inter tracking-tight flex items-center gap-2">
+                        <LuBuilding2 className="w-4 h-4 mr-2" />
+                        {activeJob.company}
+                      </p>
+                    </div>
+                  </CardContent>
+                </Card>
+              ) : null}
+            </DragOverlay>
           </DndContext>
         </div>
       </div>
 
-      {/* 🟩 The Dialog */}
+      {/* Add Job Dialog */}
       <Dialog open={open} onOpenChange={setOpen}>
         <DialogContent className="sm:max-w-[500px]">
           <DialogHeader>
@@ -539,7 +536,6 @@ const JobTracker = () => {
                   <SelectItem value="part-time">Part-time</SelectItem>
                 </SelectContent>
               </Select>
-              {/* 🆕 Job Stage */}
               <Select
                 value={form.stage}
                 onValueChange={(value) => handleChange("stage", value)}
@@ -557,7 +553,6 @@ const JobTracker = () => {
                 </SelectContent>
               </Select>
             </div>
-            {/*  Applied Date */}
             <div className="space-y-1">
               <Label
                 htmlFor="applied_date"
@@ -624,7 +619,7 @@ const JobTracker = () => {
                   alt="element1"
                   width={900}
                   height={900}
-                  className=" h-full w-full -bottom-10 object-cover absolute z-20"
+                  className="h-full w-full -bottom-10 object-cover absolute z-20"
                 />
               ) : (
                 <Image
@@ -632,7 +627,7 @@ const JobTracker = () => {
                   alt="element1"
                   width={900}
                   height={900}
-                  className=" h-full w-full  object-cover absolute z-20"
+                  className="h-full w-full object-cover absolute z-20"
                 />
               )}
               {!showInstructions ? (
@@ -641,7 +636,7 @@ const JobTracker = () => {
                   alt="element1"
                   width={900}
                   height={900}
-                  className=" h-full w-full shrink-0 absolute -top-20 z-0"
+                  className="h-full w-full shrink-0 absolute -top-20 z-0"
                 />
               ) : (
                 <Image
@@ -649,7 +644,7 @@ const JobTracker = () => {
                   alt="element1"
                   width={900}
                   height={900}
-                  className=" h-full w-full shrink-0 absolute -top-10 z-0"
+                  className="h-full w-full shrink-0 absolute -top-10 z-0"
                 />
               )}
             </div>
@@ -658,8 +653,7 @@ const JobTracker = () => {
               {!showInstructions ? (
                 <>
                   <ShimmerText text="Preparing To Launch" />
-                  {/* Animated list */}
-                  <div className="flex flex-col space-y-4 ml-10 ">
+                  <div className="flex flex-col space-y-4 ml-10">
                     {messages.map((msg, index) => (
                       <motion.div
                         key={index}
@@ -689,15 +683,11 @@ const JobTracker = () => {
                         </span>
                       </motion.div>
                     ))}
-
-                    {/* Optional connecting line */}
                     <div className="border-l-2 border-gray-300 h-full absolute left-3 top-3"></div>
                   </div>
-                  {/* Bottom note */}
-                  <div className="mt-auto mb-4 p-2 ">
+                  <div className="mt-auto mb-4 p-2">
                     <motion.div
                       className="text-center bg-white border border-blue-500 p-2 rounded-lg text-black"
-                      // animate={{ opacity: [0.6, 1, 0.6] }}
                       transition={{ repeat: Infinity, duration: 2 }}
                     >
                       Please wait while the system is setting up your interview
@@ -711,7 +701,6 @@ const JobTracker = () => {
 
                   <div className="w-full mx-auto flex items-center justify-center">
                     <AnimatedCircularProgressBar
-                      // value={value}
                       gaugePrimaryColor="#3B82F6"
                       gaugeSecondaryColor="rgba(255, 255, 255, 0.3)"
                     />
@@ -741,9 +730,9 @@ const JobTracker = () => {
         </DialogContent>
       </Dialog>
 
-      {/* 🔹 Job Details Dialog */}
+      {/* Job Details Dialog */}
       <Dialog open={isOpenJobDialog} onOpenChange={setIsOpenJobDialog}>
-        <DialogContent className={`max-w-lg `}>
+        <DialogContent className="max-w-lg">
           <DialogHeader>
             <DialogTitle className="text-lg font-semibold text-center font-sora capitalize">
               {selectedJob?.job_title || "Job Details"}
@@ -781,16 +770,121 @@ const JobTracker = () => {
           )}
 
           <DialogFooter className="flex items-center gap-5">
-            <Button type="button" variant="outline" className="bg-blue-500 text-white cursor-pointer font-inter">
+            <Button
+              type="button"
+              variant="outline"
+              className="bg-blue-500 text-white cursor-pointer font-inter"
+            >
               <Edit className="w-4 h-4 mr-2" /> Edit
             </Button>
 
-            <Button type="button" variant="destructive" >
+            <Button type="button" variant="destructive">
               <Delete className="w-4 h-4 mr-2" /> Delete
             </Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>
+    </div>
+  );
+};
+
+// ==================== DROPPABLE COLUMN ====================
+const DroppableColumn = ({ id, stage, children }: any) => {
+  const { setNodeRef, isOver } = useDroppable({ id });
+
+  return (
+    <div
+      ref={setNodeRef}
+      className={`flex flex-col w-[300px] overflow-y-auto bg-white rounded-md shadow-sm border-2 transition-all ${
+        isOver ? "border-blue-500 bg-blue-50" : "border-gray-200"
+      }`}
+    >
+      <div
+        className={`text-center py-3 font-semibold border-b border-gray-200 rounded shadow mb-5 ${stage.color}`}
+      >
+        <h1 className="font-sora text-base text-white flex items-center justify-center gap-5">
+          {stage.name}
+        </h1>
+      </div>
+
+      <div className="flex-1 space-y-3 py-2 px-3 min-h-[200px]">
+        {children}
+      </div>
+    </div>
+  );
+};
+
+// ==================== DRAGGABLE JOB CARD ====================
+const DraggableJobCard = ({ job, stage, onStartPrep, onViewJob }: any) => {
+  const { attributes, listeners, setNodeRef, transform, isDragging } =
+    useDraggable({
+      id: job.id,
+    });
+
+  const style = {
+    transform: CSS.Translate.toString(transform),
+    opacity: isDragging ? 0.5 : 1,
+  };
+
+  return (
+    <div ref={setNodeRef} style={style} {...attributes} {...listeners}>
+      <Card
+        className={`p-2 border-none shadow-sm hover:shadow-md rounded-md transition cursor-grab active:cursor-grabbing ${
+          stage.cardcolor
+        } ${isDragging ? "ring-2 ring-blue-400" : ""}`}
+      >
+        <CardContent className="flex flex-col h-[200px] p-1">
+          <div className="flex flex-col h-full">
+            <h2 className="font-semibold font-inter text-base tracking-wide capitalize flex items-center max-w-[200px] truncate gap-2">
+              <LuBriefcaseBusiness className="w-4 h-4 mr-2 text-gray-800 shrink-0" />
+              {job.job_title}
+            </h2>
+            <p className="text-base font-inter tracking-tight flex items-center gap-2">
+              <LuBuilding2 className="w-4 h-4 mr-2" />
+              {job.company}
+            </p>
+
+            <div className="mt-2 font-inter text-sm flex items-center justify-between w-full capitalize">
+              <p>
+                <span className="font-semibold">Type</span>: {job.type}
+              </p>
+              <p>
+                <span className="font-semibold">Stage</span>: {job.stage}
+              </p>
+            </div>
+            <p className="mt-4 line-clamp-2 font-inter text-sm tracking-tight text-center">
+              {job.description}
+            </p>
+
+            <div
+              className="flex items-center justify-evenly w-full mt-auto"
+              onClick={(e) => e.stopPropagation()}
+              onPointerDown={(e) => e.stopPropagation()}
+            >
+              <Button
+                variant="outline"
+                className="text-xs font-inter cursor-pointer"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  onStartPrep(job);
+                }}
+              >
+                Start Prep <LuActivity className="w-4 h-4 ml-2" />
+              </Button>
+              <Button
+                variant="outline"
+                className="text-xs font-inter cursor-pointer"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  onViewJob(job);
+                }}
+              >
+                View <LuPen className="w-4 h-4 ml-2" />
+              </Button>
+            </div>
+          </div>
+        </CardContent>
+      </Card>
     </div>
   );
 };
