@@ -22,24 +22,6 @@ export interface MentorVideo {
   video_url: string;
 }
 
-const expertiseGroups: Record<string, string[]> = {
-  "career/ path guidance": [
-    "career/ path guidance",
-    "counseling & guidance",
-    "choose career paths",
-  ],
-  "counseling & guidance": [
-    "career/ path guidance",
-    "counseling & guidance",
-    "choose career paths",
-  ],
-  "choose career paths": [
-    "career/ path guidance",
-    "counseling & guidance",
-    "choose career paths",
-  ],
-};
-
 export async function getMatchingMentors(
   userMainFocus: string
 ): Promise<DBMentor[]> {
@@ -63,23 +45,19 @@ export async function getMatchingMentors(
     console.log(`Cache miss for key: ${cacheKey}, querying Supabase`);
   }
 
-  let query = supabase.from("mentors").select("*");
-
-  if (focus === "others") {
-    query = query.order("created_at", { ascending: false }).limit(6);
-  } else {
-    const validFocuses = expertiseGroups[focus] || [focus];
-    query = query.overlaps("expertise", validFocuses).limit(6);
-  }
-
-  const { data, error } = await query;
+  const { data, error } = await supabase
+    .from("mentors")
+    .select("*")
+    .gt("rating", 4)
+    .order("rating", { ascending: false })
+    .limit(6);
 
   if (error) {
     console.error("Mentors fetch error:", error);
     return [];
   }
 
-  //  10-minute TTL (600 seconds)
+  // 10-minute TTL (600 seconds)
   if (data && data.length > 0) {
     await redis.set(cacheKey, JSON.stringify(data), { ex: 600 });
     console.log("Mentors fetched db, cached in redis");
@@ -305,7 +283,7 @@ export async function getSuggestedCollegeData(
   const supabase = createClient();
 
   const normalizedDegrees = userDegrees.map((degree) => {
-    return degree.toLowerCase().trim().split(" ")[0]; 
+    return degree.toLowerCase().trim().split(" ")[0];
   });
 
   const normalizedState = userState.toLowerCase().trim();
@@ -493,3 +471,22 @@ export async function paginatedColleges(
 
 //   return result;
 // }
+
+// -----------------------------------------------------
+// 4. GET all reviews by mentor_id
+export async function getReviewsByMentorId(mentorId: string) {
+  const supabase = createClient();
+
+  const { data, error } = await supabase
+    .from("mentor_sessions")
+    .select("reviews")
+    .eq("mentor_id", mentorId)
+    .not("reviews", "is", null);
+
+  if (error) {
+    console.error("❌ Error fetching reviews:", error);
+    return null;
+  }
+
+  return data || [];
+}

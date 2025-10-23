@@ -29,6 +29,7 @@ import {
   LuBookmark,
   LuBriefcaseBusiness,
   LuCoins,
+  LuGhost,
   LuLoader,
   LuMail,
   LuMessageCircle,
@@ -78,6 +79,9 @@ export default function MentorConnectPage() {
 
   const [recomentors, recoSetMentors] = useState<DBMentor[]>([]);
   const [mentorLoading, setMentorLoading] = useState<boolean>(false);
+  const [selectedDate, setSelectedDate] = useState<Date | undefined>(
+    new Date()
+  );
 
   // booking dialog state
   const [sessionType, setSessionType] = useState<"30" | "45" | "10" | null>(
@@ -257,25 +261,33 @@ export default function MentorConnectPage() {
       {/* ----------------------------- */}
       <div className="mt-10 flex h-full px-8 gap-5">
         {/* LEFT SIDE */}
-        <div className="w-[68%] h-full">
-          <h2 className="font-inter underline underline-offset-4 text-lg font-semibold mt-5">
-            Current Ocupation
-          </h2>
-          <p className="text-black text-lg font-inter font-medium capitalize mt-3 mb-4">
-            {mentor?.current_position}
-          </p>
+        <div className="w-[70%] h-full">
+          <div className="flex items-center gap-5 mb-8 mt-8 h-[60px]">
+            <div>
+              <h2 className="font-inter underline underline-offset-4 text-lg font-semibold ">
+                Current Ocupation
+              </h2>
+              <p className="text-black text-lg font-inter font-medium capitalize mt-3 ">
+                {mentor?.current_position}
+              </p>
+            </div>
+            <Separator orientation="vertical" className="mx-4 bg-gray-600" />
+            <div>
+              <h2 className="font-inter underline underline-offset-4 text-lg font-semibold ">
+                Expertise
+              </h2>
+              <p className="mt-3 text-base tracking-tight font-medium font-inter capitalize">
+                {" "}
+                {mentor?.expertise?.join(", ") || "No expertise added"}
+              </p>
+            </div>
+          </div>
+
           <h2 className="font-inter underline underline-offset-4 text-lg font-semibold">
             About Me
           </h2>
           <p className="mt-3 text-base font-inter tracking-wide">
             {mentor?.bio}
-          </p>
-          <h2 className="font-inter underline underline-offset-4 text-lg font-semibold mt-8">
-            Expertise
-          </h2>
-          <p className="mt-3 text-lg font-semibold font-inter capitalize">
-            {" "}
-            {mentor?.expertise?.join(", ") || "No expertise added"}
           </p>
 
           {/* SESSION BOOKING */}
@@ -369,10 +381,23 @@ export default function MentorConnectPage() {
               ))}
             </div>
           </div>
+
+          {/* REVIEWS SECTION */}
+          <div className="my-10 bg-gray-50 w-full border border-gray-200 rounded h-[300px] p-2 flex flex-col">
+            <h2 className="text-xl font-inter text-center">Reviews</h2>
+            <p className="text-center text-muted-foreground font-inter text-sm">
+              Check what others have said about mentor {mentor?.full_name}
+            </p>
+
+            <div className="h-full flex flex-col items-center justify-center">
+              <LuGhost className="text-4xl text-gray-600" />
+              <p className="text-center font-inter text-sm">No reviews Found</p>
+            </div>
+          </div>
         </div>
         <Separator orientation="vertical" className="" />
         {/* RIGHT SIDE */}
-        <div className="w-[32%] h-full mt-5 ">
+        <div className="w-[30%] h-full mt-5 ">
           <div className="flex flex-col  bg-yellow-50 p-3 rounded-md shadow justify-center mx-auto w-[200px]">
             <h2 className="font-inter text-xl font-semibold">Rating</h2>
             <div className="flex items-center gap-4">
@@ -414,7 +439,11 @@ export default function MentorConnectPage() {
                     </div>
                   </div>
 
-                  <Button variant="outline" size="sm" className="font-inter text-sm mt-4 w-full">
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    className="font-inter text-sm mt-4 w-full"
+                  >
                     Connect <LuScreenShare />
                   </Button>
                 </div>
@@ -438,7 +467,11 @@ export default function MentorConnectPage() {
             <p className="text-muted-foreground -mt-2 tracking-tight text-center font-inter text-sm mb-3">
               You selected:{" "}
               <span className="font-semibold">
-                {sessionType === "10" ? "10 min" : sessionType === "30" ? "30 min" : "45 min"}
+                {sessionType === "10"
+                  ? "Rapid Q&A"
+                  : sessionType === "30"
+                  ? "Deep Dive"
+                  : "Full Coaching"}
               </span>{" "}
               session with your mentor. Fill the below form to book this
               session.
@@ -466,7 +499,9 @@ export default function MentorConnectPage() {
                       variant="outline"
                       className="w-full justify-between font-normal"
                     >
-                      {new Date().toLocaleDateString()}
+                      {selectedDate
+                        ? selectedDate.toLocaleDateString()
+                        : "Select a date"}
                       <ChevronDownIcon />
                     </Button>
                   </PopoverTrigger>
@@ -476,8 +511,19 @@ export default function MentorConnectPage() {
                   >
                     <Calendar
                       mode="single"
-                      selected={new Date()}
-                      disabled={() => true}
+                      selected={selectedDate}
+                      onSelect={(newDate) => {
+                        setSelectedDate(newDate);
+                        if (newDate && date) {
+                          const updated = new Date(date);
+                          updated.setFullYear(newDate.getFullYear());
+                          updated.setMonth(newDate.getMonth());
+                          updated.setDate(newDate.getDate());
+                          setDate(updated);
+                        } else if (newDate) {
+                          setDate(newDate);
+                        }
+                      }}
                     />
                   </PopoverContent>
                 </Popover>

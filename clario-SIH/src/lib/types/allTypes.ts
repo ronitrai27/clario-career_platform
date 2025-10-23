@@ -16,7 +16,7 @@ export type DBMentor = {
   video_url: string | null;
 };
 
-export type DBUser =  {
+export type DBUser = {
   id: number;
   userName: string;
   userEmail: string;
@@ -34,24 +34,24 @@ export type DBUser =  {
   isQuizDone: boolean;
   latitude: number;
   longitude: number;
-}
+};
 
-export type UserQuizData =  {
-  id: number; 
-  created_at: string; 
+export type UserQuizData = {
+  id: number;
+  created_at: string;
   quizInfo: Record<string, any>; //depends on user current_status and mainFocus
-  userId: string; 
-  user_current_status: string; 
-  user_mainFocus: string; 
+  userId: string;
+  user_current_status: string;
+  user_mainFocus: string;
   selectedCareer: string;
-}
+};
 
 export type UserCalendarEvent = {
   id: string;
   user_id: string;
   title: string;
   start: Date; // mapped from start_time
-  end: Date;   // mapped from end_time
+  end: Date; // mapped from end_time
   created_at?: string;
   updated_at?: string;
 };
@@ -71,13 +71,13 @@ export type MentorProfile = {
 };
 
 export type College = {
-  id: string; 
+  id: string;
   college_name: string;
   location: string;
   best_suit_for: string[];
   fees: string;
   placement: string;
-  // inserted_at: string; 
+  // inserted_at: string;
   type: string;
 };
 
@@ -85,23 +85,24 @@ export type MentorSession = {
   id: string;
   mentor_id: string;
   student_id: string;
-  session_type: "30 min session" | "45 min session";
+  session_type: "10 min session" | "30 min session" | "45 min session";
   status: "pending" | "accepted" | "rejected" | "completed";
-  requested_at: string;   
+  requested_at: string;
   scheduled_at?: string | null;
   completed_at?: string | null;
   notes?: string | null;
   vc_link?: string | null;
+  reviews?: string ;
 };
 
 export type JobTrackerCard = {
   id: number;
-  created_at: string; 
-  userId: any; 
+  created_at: string;
+  userId: any;
   stage: string;
   job_title: string;
   company: string;
-  applied_date: string; 
+  applied_date: string;
   type: string;
   description: string;
   note: string;
@@ -111,9 +112,9 @@ export type JobTrackerCard = {
 
 // OTHERS TABLE
 export interface InterviewFeedback {
-  id: number; 
-  created_at: string; 
-  userId: any; 
+  id: number;
+  created_at: string;
+  userId: any;
   jobTitle: string;
   interviewInsights: {
     feedback: {

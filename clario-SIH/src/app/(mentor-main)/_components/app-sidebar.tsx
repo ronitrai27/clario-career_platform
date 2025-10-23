@@ -127,6 +127,22 @@ export function AppSidebar() {
             </p>
           </Link>
         </SidebarMenuItem>
+        {/* ALL REQUEST + HISTORY */}
+         <SidebarMenuItem
+          className={`flex cursor-pointer duration-200 ease-in-out rounded py-1 px-3
+      ${
+        pathname === "/dashboard/history"
+          ? "bg-blue-400 scale-105 hover:bg-white/10"
+          : "hover:bg-white/10 hover:scale-105"
+      }`}
+        >
+          <Link href="/dashboard/upload" className="w-full">
+            <p className="flex items-center gap-3 font-medium font-inter text-base text-white tracking-wide">
+              <LuHistory className="text-xl" />
+              History
+            </p>
+          </Link>
+        </SidebarMenuItem>
 
         {/* MESSAGES */}
         <SidebarMenuItem
@@ -178,6 +194,8 @@ export function AppSidebar() {
             </p>
           </Link>
         </SidebarMenuItem>
+
+        
       </SidebarContent>
 
       <SidebarFooter className="px-1 overflow-hidden">
