@@ -66,6 +66,7 @@ import SuggestedCollegeScroll from "../_components/SuggestedCollegeScroll";
 import MessageNamesList from "./test/showchats/page";
 import confetti from "canvas-confetti";
 import AiSuggestedBoxHome from "../_components/AiSuggestedBoxHome";
+import { useNotificationStore } from "@/lib/store/NotificationStore";
 
 const fallbackAvatars = [
   "/a1.png",
@@ -80,7 +81,7 @@ export default function HomePage() {
   const supabase = createClient();
   const router = useRouter();
   const { user, loading, ensureUserInDB } = useUserData();
-   const { open: sidebarOpen, isMobile } = useSidebar();
+  const { open: sidebarOpen, isMobile } = useSidebar();
   const [mentors, setMentors] = useState<DBMentor[]>([]);
   const [mentorLoading, setMentorLoading] = useState<boolean>(false);
   const [discoverUsers, setDiscoverUsers] = useState<DBUser[]>([]);
@@ -92,6 +93,16 @@ export default function HomePage() {
   useEffect(() => {
     ensureUserInDB();
   }, []);
+
+  // ------------FETCHING NOTIFICATIONS---------------------
+  const notifications = useNotificationStore((state) => state.notifications);
+  const fetchNotifications = useNotificationStore(
+    (state) => state.fetchNotifications
+  );
+
+  useEffect(() => {
+    if (user?.id) fetchNotifications(user?.id);
+  }, [user?.id, fetchNotifications]);
 
   const getAvatar = (mentor: any) => {
     if (mentor.avatar) return mentor.avatar;
@@ -182,12 +193,20 @@ export default function HomePage() {
           <div className="w-[75%] px-2">
             <SlidingCards />
             {loading ? (
-              <div className={`mt-3 ${sidebarOpen ? "max-w-[810px]" : "max-w-[1100px]"} max-w-[800px] mx-auto flex justify-between items-center`}>
+              <div
+                className={`mt-3 ${
+                  sidebarOpen ? "max-w-[810px]" : "max-w-[1100px]"
+                } max-w-[800px] mx-auto flex justify-between items-center`}
+              >
                 <Skeleton className="h-[40px] w-[300px] rounded-full" />
                 <Skeleton className="h-[40px] w-[300px] rounded-full" />
               </div>
             ) : (
-               <div className={`mt-5 ${sidebarOpen ? "max-w-[810px]" : "w-[1100px]"} max-w-[800px] mx-auto flex justify-between items-center`}>
+              <div
+                className={`mt-5 ${
+                  sidebarOpen ? "max-w-[810px]" : "w-[1100px]"
+                } max-w-[800px] mx-auto flex justify-between items-center`}
+              >
                 <h1 className="text-4xl font-semibold font-sora tracking-tight max-w-[380px] truncate">
                   Welcome, {user?.userName}
                 </h1>
@@ -196,11 +215,15 @@ export default function HomePage() {
             )}
 
             {/* ACTION BOX */}
-          
+
             <ActionBox />
 
             {/* MENTORS !! */}
-            <div className={`${sidebarOpen ? "max-w-[880px]" : "w-[1020px]"} mx-auto mt-6 bg-white  border border-gray-200 p-2 rounded-xl  overflow-hidden`}>
+            <div
+              className={`${
+                sidebarOpen ? "max-w-[880px]" : "w-[1020px]"
+              } mx-auto mt-6 bg-white  border border-gray-200 p-2 rounded-xl  overflow-hidden`}
+            >
               <div className="flex items-center justify-between pr-8">
                 <h2 className="text-[26px] pt-4 tracking-tight font-medium font-inter mb-3 pl-2">
                   Recommended Mentors{" "}
@@ -210,7 +233,7 @@ export default function HomePage() {
                 <div>
                   <Button
                     variant="outline"
-                    onClick={()=>router.push('/home/mentor-connect')}
+                    onClick={() => router.push("/home/mentor-connect")}
                     className="cursor-pointer text-sm tracking-tight font-inter"
                   >
                     View More{" "}
@@ -301,7 +324,7 @@ export default function HomePage() {
             </div>
 
             {/* AI SUGGESSTIONS  */}
-           <AiSuggestedBoxHome/>
+            <AiSuggestedBoxHome />
           </div>
           {/* --------------Right side--------------- */}
           <div className="w-[24%]  flex flex-col gap-14  items-center h-full ">
@@ -388,9 +411,34 @@ export default function HomePage() {
                 <LuMailbox className="text-gray-600 text-2xl" />
               </div>
 
-              <div className="mt-4 h-full items-center justify-center flex flex-col">
-                <LuMailbox className="text-gray-600 text-4xl" />
-                <p className="text-lg font-sora">No messages yet..</p>
+              {/* Content */}
+              <div className="mt-6 flex-1 overflow-y-auto h-full">
+                {notifications.length === 0 ? (
+                  <div className="h-full flex flex-col items-center justify-center gap-2">
+                    <LuMailbox className="text-gray-600 text-4xl" />
+                    <p className="text-lg font-sora">No messages yet..</p>
+                  </div>
+                ) : (
+                  <div className="space-y-3">
+                    {notifications.map((notif) => (
+                      <div key={notif.id ?? Math.random()} className="flex gap-2 p-1 bg-blue-50 border border-blue-200 rounded-md w-full">
+                        <Image
+                        src={user?.avatar || "/user.png"}
+                        alt="user"
+                        height={100}
+                        width={100}
+                        className="w-10 h-10 rounded-full object-cover"
+                        />
+
+                        <div className="w-full">
+                          <p className="text-xs tracking-wide font-light font-inter line-clamp-2">{notif.message}</p>
+                          <p className="text-xs mt-2 ml-10 text-muted-foreground font-inter">{notif.created_at ? new Date(notif.created_at).toLocaleString() : ""}</p>
+                        </div>
+                        
+                      </div>
+                    ))}
+                  </div>
+                )}
               </div>
             </div>
           </div>
@@ -513,10 +561,10 @@ export default function HomePage() {
                   <div className="">
                     <Button
                       // onClick={handleClose}
-                      onClick={()=>setStep(2)}
+                      onClick={() => setStep(2)}
                       className="w-full h-9 font-inter text-sm bg-gradient-to-r from-blue-400 to-blue-600 hover:from-blue-700 hover:to-blue-800 text-white font-semibold rounded-lg shadow-lg hover:shadow-xl transition-all duration-200 cursor-pointer"
                     >
-                    Continue
+                      Continue
                       <LuChevronRight className="ml-2" />
                     </Button>
                   </div>
@@ -530,7 +578,8 @@ export default function HomePage() {
                     Next Step !
                   </p>
                   <p className="text-gray-600 text-base leading-relaxed text-center font-inter">
-                    Now its time to decide your Career Path. AI powered career adviser will guide you through the process.
+                    Now its time to decide your Career Path. AI powered career
+                    adviser will guide you through the process.
                   </p>
 
                   <div className="space-y-3 py-2">
@@ -541,7 +590,7 @@ export default function HomePage() {
                     <div className="space-y-3">
                       <div className="flex items-start gap-2 p-2.5 rounded-lg bg-gradient-to-r from-blue-50 to-indigo-50 border border-blue-100">
                         <div className="w-7 h-7 bg-blue-500 rounded-lg flex items-center justify-center flex-shrink-0 mt-0.5">
-                         <p className="text-white font-extrabold">1</p>
+                          <p className="text-white font-extrabold">1</p>
                         </div>
                         <div>
                           <p className="font-medium text-gray-900 text-sm">
@@ -555,28 +604,31 @@ export default function HomePage() {
 
                       <div className="flex items-start gap-2 p-2.5 rounded-lg bg-gradient-to-r from-purple-50 to-violet-50 border border-purple-100">
                         <div className="w-7 h-7 bg-purple-500 rounded-lg flex items-center justify-center flex-shrink-0 mt-0.5">
-                         <p className="text-white font-extrabold">2</p>
+                          <p className="text-white font-extrabold">2</p>
                         </div>
                         <div>
                           <p className="font-medium text-gray-900 text-sm">
                             Ask Bout Your Career
                           </p>
                           <p className="text-gray-600 text-xs mt-0.5 font-inter">
-                            Ask your confusion and career options according to your interests.
+                            Ask your confusion and career options according to
+                            your interests.
                           </p>
                         </div>
                       </div>
 
                       <div className="flex items-start gap-2 p-2.5 rounded-lg bg-gradient-to-r from-emerald-50 to-teal-50 border border-emerald-100">
                         <div className="w-7 h-7 bg-emerald-500 rounded-lg flex items-center justify-center flex-shrink-0 mt-0.5">
-                         <p className="text-white font-extrabold">3</p>
+                          <p className="text-white font-extrabold">3</p>
                         </div>
                         <div>
                           <p className="font-medium text-gray-900 text-sm">
                             Select your career
                           </p>
                           <p className="text-gray-600 text-xs mt-0.5 font-inter">
-                            After getting career options, tell your AI Career Adviser about desired career that suits you the best.
+                            After getting career options, tell your AI Career
+                            Adviser about desired career that suits you the
+                            best.
                           </p>
                         </div>
                       </div>
@@ -588,15 +640,15 @@ export default function HomePage() {
                       onClick={handleClose}
                       className=" h-9 font-inter text-xs bg-gradient-to-r from-blue-400 to-blue-600 hover:from-blue-700 hover:to-blue-800 text-white rounded-lg shadow-lg hover:shadow-xl transition-all duration-200 cursor-pointer"
                     >
-                    Talk to AI Adviser
+                      Talk to AI Adviser
                       <LuChevronRight className="ml-2" />
                     </Button>
-                     <Button
+                    <Button
                       onClick={handleClose}
                       variant="outline"
                       className=" h-9 font-inter text-xs bg-gray-50 rounded-lg shadow-lg hover:shadow-xl transition-all duration-200 cursor-pointer"
                     >
-                   Set up Later
+                      Set up Later
                       <LuChevronRight className="ml-2" />
                     </Button>
                   </div>

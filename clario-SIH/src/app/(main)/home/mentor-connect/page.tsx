@@ -221,7 +221,7 @@ export default function MentorConnect() {
               Available
             </div>
             {/* Bookings */}
-            <Button className="font-inter text-sm " variant="outline">
+            <Button className="font-inter text-sm cursor-pointer" variant="outline" onClick={()=>router.push("/home/mentor-connect/bookings")}>
               <LuHistory className="mr-2" />
               My Bookings
             </Button>

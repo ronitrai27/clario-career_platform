@@ -10,6 +10,7 @@ import {
   College,
 } from "../types/allTypes";
 import { redis } from "@/lib/redis";
+import { useNotificationStore } from "../store/NotificationStore";
 
 // Interface for the response structure
 interface PaginatedMentors {
@@ -28,7 +29,7 @@ export async function getMatchingMentors(
   const supabase = createClient();
 
   const focus = userMainFocus.toLowerCase().trim();
-  const cacheKey = `mentors:${focus}`; // create a unique key based on the focus
+  const cacheKey = `mentors:${focus}`;
 
   const cachedMentors = await redis.get(cacheKey);
 
@@ -489,4 +490,24 @@ export async function getReviewsByMentorId(mentorId: string) {
   }
 
   return data || [];
+}
+
+// NOTIFICATION FROM SESSION BOOKING
+export async function triggerSessionNotification({
+  userId,
+  sessionType,
+  mentorName,
+  scheduledAt,
+}: {
+  userId: any;
+  sessionType: string;
+  mentorName: string;
+  scheduledAt: Date;
+}) {
+  const message = `You have requested a ${sessionType} session with ${mentorName} (status: pending) on ${scheduledAt.toLocaleString()}`;
+
+  useNotificationStore.getState().addNotification({
+    userId,
+    message,
+  });
 }

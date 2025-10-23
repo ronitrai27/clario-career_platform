@@ -1,8 +1,11 @@
+"use client";
 import { ArrowRight, Book, LucideArrowRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import Image from "next/image";
+import { useRouter } from "next/navigation";
 
 const SingleCard = () => {
+  const router = useRouter();
   const card = {
     id: 2,
     title: "Connect With Skilled Mentors",
@@ -35,6 +38,7 @@ const SingleCard = () => {
             <div className="flex items-center gap-8">
               <Button
                 className={`bg-gradient-to-r ${card.buttonGradient} text-white rounded-lg font-medium transition-all duration-200 group cursor-pointer`}
+                onClick={()=>router.push("/home/mentor-connect")}
               >
                 Book Now
                 <Book
@@ -42,9 +46,7 @@ const SingleCard = () => {
                   className="group-hover:translate-x-1 transition-transform"
                 />
               </Button>
-              <Button className="cursor-pointer" variant="outline">
-                Learn More <LucideArrowRight size={18} />
-              </Button>
+             
             </div>
           </div>
         </div>

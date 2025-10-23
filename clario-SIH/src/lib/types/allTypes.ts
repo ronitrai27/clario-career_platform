@@ -128,3 +128,10 @@ export interface InterviewFeedback {
     };
   };
 }
+
+export type Notification = {
+  id: number; 
+  userId: string; 
+  message: string; 
+  created_at: string; 
+};

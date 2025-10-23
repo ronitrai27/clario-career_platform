@@ -139,7 +139,7 @@ export function AppSidebar() {
           <Link href="/dashboard/upload" className="w-full">
             <p className="flex items-center gap-3 font-medium font-inter text-base text-white tracking-wide">
               <LuHistory className="text-xl" />
-              History
+              All Sessions
             </p>
           </Link>
         </SidebarMenuItem>

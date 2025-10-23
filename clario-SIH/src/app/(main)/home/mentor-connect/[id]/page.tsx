@@ -6,6 +6,7 @@ import { DBMentor, MentorProfile } from "@/lib/types/allTypes";
 import {
   getAllMentorProfiles,
   getMatchingMentors,
+  triggerSessionNotification,
 } from "@/lib/functions/dbActions";
 import { Button } from "@/components/ui/button";
 import {
@@ -169,6 +170,19 @@ export default function MentorConnectPage() {
       toast.error("Failed to create session. Please try again.");
       return;
     }
+
+    // FIRING NOTIFICATION----------------
+    triggerSessionNotification({
+      userId: user.id,
+      sessionType:
+        sessionType === "10"
+          ? "10 min"
+          : sessionType === "30"
+          ? "30 min"
+          : "45 min",
+      mentorName: mentor?.full_name || "",
+      scheduledAt: date,
+    });
 
     const newCredits = user.remainingCredits - cost;
     const { error: updateError } = await supabase
