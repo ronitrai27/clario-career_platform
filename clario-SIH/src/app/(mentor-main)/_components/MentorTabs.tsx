@@ -17,6 +17,7 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from "@/components/ui/tooltip";
+import ConfirmTab from "./ConfirmTab";
 
 export default function MentorSessionsTabs() {
   const supabase = createClient();
@@ -133,6 +134,43 @@ export default function MentorSessionsTabs() {
     };
   }, [mentor?.id]);
 
+  // -------------------------------------------------------
+  // --------------------------ACCEPT / REJECT SESSION REQUEST-----------------------
+  // ---------------------------------------------------------
+  const handleAccept = async (sessionId: string) => {
+    const { error } = await supabase
+      .from("mentor_sessions")
+      .update({ status: "accepted" })
+      .eq("id", sessionId);
+
+    if (error) {
+      console.error("Error accepting session:", error);
+      toast.error("Failed to accept session");
+    } else {
+      toast.success("Session accepted!");
+      setPendingSessions((prev) =>
+        prev.filter((session) => session.id !== sessionId)
+      );
+    }
+  };
+
+  const handleReject = async (sessionId: string) => {
+    const { error } = await supabase
+      .from("mentor_sessions")
+      .update({ status: "rejected" })
+      .eq("id", sessionId);
+
+    if (error) {
+      console.error("Error rejecting session:", error);
+      toast.error("Failed to reject session");
+    } else {
+      toast.info("Session rejected!");
+      setPendingSessions((prev) =>
+        prev.filter((session) => session.id !== sessionId)
+      );
+    }
+  };
+
   return (
     <Tabs
       defaultValue="pending"
@@ -203,10 +241,16 @@ export default function MentorSessionsTabs() {
                 </TooltipProvider>
                 {/* ACTIONS- ACCEPT/REJECT */}
                 <div className="flex gap-5">
-                  <div className="bg-blue-500 w-8 h-8 rounded-full flex items-center justify-center">
+                  <div
+                    className="bg-blue-500 w-8 h-8 rounded-full flex items-center justify-center cursor-pointer"
+                    onClick={() => handleAccept(session?.id)}
+                  >
                     <Check className="cursor-pointer text-white" />
                   </div>
-                  <div className="bg-red-500 w-8 h-8 rounded-full flex items-center justify-center">
+                  <div
+                    className="bg-red-500 w-8 h-8 rounded-full flex items-center justify-center cursor-pointer"
+                    onClick={() => handleReject(session?.id)}
+                  >
                     <X className="cursor-pointer text-white" />
                   </div>
                 </div>
@@ -216,8 +260,8 @@ export default function MentorSessionsTabs() {
         )}
       </TabsContent>
 
-      <TabsContent value="accepted-rejected" className="p-6 bg-white">
-        <p className="text-center text-gray-600">confirmed one...</p>
+      <TabsContent value="accepted-rejected" className="p-4 bg-white">
+       <ConfirmTab/>
       </TabsContent>
 
       <TabsContent value="completed" className="p-6 bg-white">

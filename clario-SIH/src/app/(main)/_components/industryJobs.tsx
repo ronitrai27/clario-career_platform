@@ -205,7 +205,7 @@ export default function CareerTabsDemo() {
   }, [quizData?.selectedCareer]);
 
   return (
-    <div className="max-w-[1120px] bg-white rounded-lg mx-auto border p-6 mb-20">
+    <div className="max-w-[1120px]  mx-auto p-6 mb-20">
       <div className="w-full my-4 text-center">
         {activeTab === "jobs" && (
           <>
@@ -275,7 +275,7 @@ export default function CareerTabsDemo() {
               <LuBriefcase className="inline-block ml-3 text-blue-500" />
             </h2>
 
-            <div className="flex -mr-[320px] items-center gap-1 font-inter text-sm font-light bg-white ">
+            <div className="flex -mr-[320px] items-center gap-1 font-inter text-sm font-light">
               <LuChartColumnDecreasing className="w-7 h-7 text-gray-400 " />
               Track Jobs Easily
             </div>
@@ -299,7 +299,7 @@ export default function CareerTabsDemo() {
         )}
 
         <TabsContent value="jobs">
-          <div className="  bg-white">
+          <div className="">
             {loading ? (
               <p className="text-muted-foreground flex items-center justify-center text-center font-inter text-xl">
                 Loading jobs...
@@ -400,7 +400,7 @@ export default function CareerTabsDemo() {
         </TabsContent>
 
         <TabsContent value="colleges">
-          <div className="p-4  bg-white">
+          <div className="p-4 ">
             <CollegesList />
           </div>
         </TabsContent>
