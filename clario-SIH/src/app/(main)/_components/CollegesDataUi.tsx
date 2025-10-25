@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 import { paginatedColleges } from "@/lib/functions/dbActions";
 import type { College } from "@/lib/types/allTypes";
 import Image from "next/image";
-import { LuPi, LuPin } from "react-icons/lu";
+import { LuChevronRight, LuPi, LuPin } from "react-icons/lu";
 import { Input } from "@/components/ui/input";
 
 import {
@@ -14,11 +14,13 @@ import {
 } from "@/components/ui/popover";
 import { Building2, LucideActivity, Search } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { useQuizData } from "@/context/userQuizProvider";
 
 export default function CollegesList() {
   const [colleges, setColleges] = useState<College[]>([]);
   const [page, setPage] = useState(1);
   const [loading, setLoading] = useState(false);
+  const { quizData } = useQuizData();
 
   const [searchQuery, setSearchQuery] = useState("");
 
@@ -30,88 +32,138 @@ export default function CollegesList() {
     loadMoreColleges(1, true);
   }, []);
 
-  const loadMoreColleges = async (pageNum: number, reset = false, locationSearch?: string, collegeType?: string) => {
+  const loadMoreColleges = async (
+    pageNum: number,
+    reset = false,
+    locationSearch?: string,
+    collegeType?: string
+  ) => {
     setLoading(true);
-    const newColleges = await paginatedColleges(pageNum, 6, locationSearch || null, collegeType || null);
+    const newColleges = await paginatedColleges(
+      pageNum,
+      6,
+      locationSearch || null,
+      collegeType || null
+    );
     setColleges((prev) => (reset ? newColleges : [...prev, ...newColleges]));
     setLoading(false);
   };
 
-   const handleSearch = () => {
+  const handleSearch = () => {
     setPage(1);
     loadMoreColleges(1, true, searchQuery);
   };
 
   const handleCollegeTypeChange = (type: string) => {
-  const newType = collegeType === type ? null : type;
-  setCollegeType(newType);
-  setPage(1);
-  loadMoreColleges(1, true, searchQuery, newType!);
-};
-
+    const newType = collegeType === type ? null : type;
+    setCollegeType(newType);
+    setPage(1);
+    loadMoreColleges(1, true, searchQuery, newType!);
+  };
 
   return (
     <div>
-     
-      <div className="mb-10 flex items-center gap-10  px-8">
-        <div className="relative w-full max-w-[340px] flex justify-between items-center border border-blue-300 rounded-md px-4 bg-blue-50">
-          <Input
-            type="text"
-            placeholder="Search Colleges by Location..."
-            className="font-inter text-sm bg-transparent border-none shadow-none focus:outline-none focus:ring-0 focus-visible:border-0 focus-visible:ring-0 focus-visible:ring-offset-0"
-              value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
-          />
-
-          <Search className=" text-blue-600 cursor-pointer hover:scale-105" onClick={handleSearch} />
+      <div className="mb-10 flex items-center  gap-10  w-full">
+        <div className="bg-gradient-to-br from-slate-500 to-slate-800 w-[240px] h-[180px] shrink-0 rounded-lg p-4 flex flex-col ">
+          <h2 className="text-white font-inter text-xl leading-tight">
+            Get College Recomendation Based on your Interests
+          </h2>
+          <Button
+            size="sm"
+            variant="outline"
+            className="text-sm font-inter w-fit mt-auto ml-auto"
+          >
+            Check out <LuChevronRight />
+          </Button>
         </div>
-        <Button
-          onClick={() => setNearbyActive(!nearbyActive)}
-          className={`font-inter text-sm cursor-pointer flex items-center hover:bg-blue-100 hover:border-blue-500 hover:text-blue-600
-    ${nearbyActive ? "bg-blue-100 border-blue-500 text-blue-600" : ""}`}
-          variant={nearbyActive ? "default" : "outline"}
-        >
-          Recomended <Building2 className="ml-2" />
-        </Button>
 
-        <Popover>
-          <PopoverTrigger asChild>
-            <Button
-              className="font-inter text-sm capitalize cursor-pointer flex items-center"
-              variant="outline"
-            >
-              {collegeType ? collegeType : "Type"}{" "}
-              <LucideActivity className="ml-2" />
-            </Button>
-          </PopoverTrigger>
-          <PopoverContent className="w-48">
-            <div className="flex flex-col gap-2 font-inter">
-              <Button
-                variant={collegeType === "Private" ? "default" : "outline"}
-                className="cursor-pointer border-none shadow-none"
-               onClick={() => handleCollegeTypeChange("private")}
-              >
-                {" "}
-                Private College{" "}
-              </Button>{" "}
-              <Button
-              className="cursor-pointer border-none shadow-none"
-                variant={collegeType === "Government" ? "default" : "outline"}
-                onClick={() => handleCollegeTypeChange("government")}
-              >
-                {" "}
-                Government College{" "}
-              </Button>
+        <div className="flex flex-col space-y-6  w-full">
+          <div className="flex items-center gap-6 w-full">
+            <div className="relative w-full max-w-[400px] flex justify-between items-center border border-blue-300 rounded-md px-4 bg-blue-50">
+              <Input
+                type="text"
+                placeholder="Search Colleges by Location..."
+                className="font-inter text-sm bg-transparent border-none shadow-none focus:outline-none focus:ring-0 focus-visible:border-0 focus-visible:ring-0 focus-visible:ring-offset-0"
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+              />
+
+              <Search
+                className=" text-blue-600 cursor-pointer hover:scale-105"
+                onClick={handleSearch}
+              />
             </div>
-          </PopoverContent>
-        </Popover>
+            <Button
+              onClick={() => setNearbyActive(!nearbyActive)}
+              className={`font-inter text-sm cursor-pointer flex items-center hover:bg-blue-100 hover:border-blue-500 hover:text-blue-600
+    ${nearbyActive ? "bg-blue-100 border-blue-500 text-blue-600" : ""}`}
+              variant={nearbyActive ? "default" : "outline"}
+            >
+              Recomended <Building2 className="ml-2" />
+            </Button>
+
+            <Popover>
+              <PopoverTrigger asChild>
+                <Button
+                  className="font-inter text-sm capitalize cursor-pointer flex items-center"
+                  variant="outline"
+                >
+                  {collegeType ? collegeType : "Type"}{" "}
+                  <LucideActivity className="ml-2" />
+                </Button>
+              </PopoverTrigger>
+              <PopoverContent className="w-48">
+                <div className="flex flex-col gap-2 font-inter">
+                  <Button
+                    variant={collegeType === "Private" ? "default" : "outline"}
+                    className="cursor-pointer border-none shadow-none"
+                    onClick={() => handleCollegeTypeChange("private")}
+                  >
+                    {" "}
+                    Private College{" "}
+                  </Button>{" "}
+                  <Button
+                    className="cursor-pointer border-none shadow-none"
+                    variant={
+                      collegeType === "Government" ? "default" : "outline"
+                    }
+                    onClick={() => handleCollegeTypeChange("government")}
+                  >
+                    {" "}
+                    Government College{" "}
+                  </Button>
+                </div>
+              </PopoverContent>
+            </Popover>
+          </div>
+
+          <div className="flex items-center gap-5 w-full justify-end pr-20">
+            <p className="font-inter">Ai suggested Degrees</p>
+            {quizData?.quizInfo?.degree?.length > 0 ? (
+              quizData?.quizInfo.degree.map((deg: string, index: number) => (
+                <span
+                  key={index}
+                  className="bg-blue-100 text-blue-700 font-inter space-x-3 text-sm px-3 py-1 rounded-full shadow-sm"
+                >
+                  {deg}
+                </span>
+              ))
+            ) : (
+              <span className="text-gray-400 font-inter text-sm">
+                No degree selected
+              </span>
+            )}
+          </div>
+        </div>
       </div>
 
-       {!loading && colleges.length === 0 && (
-      <div className="my-8">
-          <p className="text-center text-gray-800 font-inter text-xl">No colleges found.</p>
-      </div>
-      ) }
+      {!loading && colleges.length === 0 && (
+        <div className="my-8">
+          <p className="text-center text-gray-800 font-inter text-xl">
+            No colleges found.
+          </p>
+        </div>
+      )}
 
       {/* Grid */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">

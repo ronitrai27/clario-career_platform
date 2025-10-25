@@ -105,7 +105,7 @@ export type JobTrackerCard = {
   applied_date: string;
   type: string;
   description: string;
-  note: string;
+  note?: string;
 };
 // stage: "saved" | "applied" | "interviewing" | "negotiating" | "hired" | "rejected";
 // type: "full-time" | "internship" | "contract" | "freelance" | "part-time";

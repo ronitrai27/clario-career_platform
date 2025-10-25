@@ -174,7 +174,7 @@ export default function MentorSessionsTabs() {
   return (
     <Tabs
       defaultValue="pending"
-      className="w-full max-w-5xl mx-auto mt-10 bg-gray-100 p-4 rounded-lg"
+      className="w-full max-w-[1080px] mx-auto mt-10 bg-gray-100 p-4 rounded-lg"
     >
       <TabsList className="grid w-full grid-cols-3 font-inter text-lg font-semibold">
         <TabsTrigger value="pending">Pending Request</TabsTrigger>
@@ -215,17 +215,19 @@ export default function MentorSessionsTabs() {
                   </div>
                 </div>
 
-                <p className="text-sm font-inter">
+                <p className="text-sm font-inter tracking-tight">
                   {session.scheduled_at
                     ? new Date(session.requested_at).toLocaleDateString()
                     : "Date of requested"}
                 </p>
 
-                <p className="text-sm font-inter">
+                <p className="text-sm font-inter tracking-tight">
                   {session.scheduled_at
                     ? new Date(session.scheduled_at).toLocaleString()
                     : ""}
                 </p>
+
+                <p>{session.session_type}</p>
 
                 <TooltipProvider>
                   <Tooltip>

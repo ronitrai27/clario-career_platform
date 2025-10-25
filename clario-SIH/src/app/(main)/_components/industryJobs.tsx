@@ -6,6 +6,15 @@ import axios from "axios";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useQuizData } from "@/context/userQuizProvider";
 import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogFooter,
+} from "@/components/ui/dialog";
+import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
+import {
   LuActivity,
   LuBriefcase,
   LuBuilding,
@@ -22,12 +31,23 @@ import {
   Search,
   Building2,
   LucideActivity,
+  Save,
 } from "lucide-react";
 import CareerCourses from "./CourseData";
 import { Separator } from "@/components/ui/separator";
 import CollegesList from "./CollegesDataUi";
 import Image from "next/image";
-import { CallTracker } from "assert";
+import { Label } from "@/components/ui/label";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { toast } from "sonner";
+import { createClient } from "@/lib/supabase/client";
+import { useUserData } from "@/context/UserDataProvider";
 
 interface Job {
   title: string;
@@ -165,6 +185,8 @@ const demoJobs: Job[] = [
 ];
 
 export default function CareerTabsDemo() {
+  const supabase = createClient();
+  const { user } = useUserData();
   const [activeTab, setActiveTab] = useState("jobs");
   const [jobs, setJobs] = useState<Job[]>([]);
   const [loading, setLoading] = useState(false);
@@ -203,6 +225,81 @@ export default function CareerTabsDemo() {
       setJobs(demoJobs);
     }
   }, [quizData?.selectedCareer]);
+
+  // -----------------------------------DIALOG AND JOB TRACKING------------------------->
+  const [open, setOpen] = useState(false);
+  const [form, setForm] = useState({
+    job_title: "",
+    company: "",
+    description: "",
+    stage: "saved",
+    type: "full-time",
+    applied_date: "",
+    note: "",
+  });
+
+  const handleOpen = (job: any) => {
+    setForm({
+      job_title: job.title || "",
+      company: job.company_name || "",
+      description: job.description || "",
+      stage: "saved",
+      type: "full-time",
+      applied_date: "",
+      note: "",
+    });
+    setOpen(true);
+  };
+
+  const handleChange = (
+    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
+  ) => {
+    setForm({ ...form, [e.target.name]: e.target.value });
+  };
+
+  const handleSave = async () => {
+    if (
+      !form.job_title.trim() ||
+      !form.description.trim() ||
+      !form.applied_date.trim()
+    ) {
+      toast.error(
+        "Please fill all required fields: title, description, and applied date."
+      );
+      return;
+    }
+
+    const { data, error } = await supabase.from("job_tracker").insert([
+      {
+        userId: user?.id,
+        job_title: form.job_title,
+        company: form.company,
+        description: form.description,
+        stage: form.stage,
+        type: form.type,
+        applied_date: form.applied_date,
+        note: form.note,
+        created_at: new Date().toISOString(),
+      },
+    ]);
+
+    if (error) {
+      console.error(error);
+      toast.error("Failed to save job. Please try again.");
+    } else {
+      toast.success("Job saved successfully!");
+      setOpen(false);
+      setForm({
+        job_title: "",
+        company: "",
+        description: "",
+        stage: "saved",
+        type: "full-time",
+        applied_date: "",
+        note: "",
+      });
+    }
+  };
 
   return (
     <div className="max-w-[1120px]  mx-auto p-6 mb-20">
@@ -367,7 +464,11 @@ export default function CareerTabsDemo() {
                         </a>
                         <ExternalLink className="inline-block ml-5 cursor-pointer" />
                       </Button>
-                      <Button className="w-fit" variant="outline">
+                      <Button
+                        className="w-fit"
+                        variant="outline"
+                        onClick={() => handleOpen(job)}
+                      >
                         {" "}
                         <LuChartColumnDecreasing className="w-7 h-7 text-gray-800 " />
                       </Button>
@@ -411,6 +512,123 @@ export default function CareerTabsDemo() {
           </div>
         </TabsContent>
       </Tabs>
+
+      <Dialog open={open} onOpenChange={setOpen}>
+        <DialogContent className="sm:max-w-lg">
+          <DialogHeader>
+            <DialogTitle className="font-inter text-xl font-semibold tracking-tight">
+              Track this Job <LuBriefcase className="inline-block ml-2" />
+            </DialogTitle>
+          </DialogHeader>
+
+          <div className="flex flex-col gap-3 mt-2">
+            <Label className="font-inter text-sm tracking-tight">
+              Job Title
+            </Label>
+            <Input
+              name="job_title"
+              value={form.job_title}
+              onChange={handleChange}
+              placeholder="Job Title"
+              className="font-inter -mt-2"
+            />
+            <Label className="font-inter text-sm tracking-tight">Company</Label>
+            <Input
+              name="company"
+              value={form.company}
+              onChange={handleChange}
+              placeholder="Company Name"
+              className="font-inter -mt-2"
+            />
+            <Label className="font-inter text-sm tracking-tight">
+              Description
+            </Label>
+            <Textarea
+              name="description"
+              value={form.description}
+              onChange={handleChange}
+              placeholder="Description"
+              rows={3}
+              className="font-inter -mt-2"
+            />
+            <div className="flex w-full justify-evenly">
+              <div>
+                <label className="text-sm font-medium mb-1 block font-inter">
+                  Stage
+                </label>
+                <Select
+                  value={form.stage}
+                  onValueChange={(value) => setForm({ ...form, stage: value })}
+                >
+                  <SelectTrigger>
+                    <SelectValue placeholder="Select Stage" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="saved">Saved</SelectItem>
+                    <SelectItem value="applied">Applied</SelectItem>
+                    <SelectItem value="interviewing">Interviewing</SelectItem>
+                    <SelectItem value="negotiating">Negotiating</SelectItem>
+                    <SelectItem value="hired">Hired</SelectItem>
+                    <SelectItem value="rejected">Rejected</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+
+              {/* Type Dropdown */}
+              <div>
+                <label className="text-sm font-medium mb-1 block font-inter">
+                  Type
+                </label>
+                <Select
+                  value={form.type}
+                  onValueChange={(value) => setForm({ ...form, type: value })}
+                >
+                  <SelectTrigger>
+                    <SelectValue placeholder="Select Type" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="full-time">Full-time</SelectItem>
+                    <SelectItem value="internship">Internship</SelectItem>
+                    <SelectItem value="contract">Contract</SelectItem>
+                    <SelectItem value="freelance">Freelance</SelectItem>
+                    <SelectItem value="part-time">Part-time</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+            </div>
+            <Label className="font-inter text-sm tracking-tight">
+              Applied Date
+            </Label>
+            <Input
+              name="applied_date"
+              type="date"
+              value={form.applied_date}
+              onChange={handleChange}
+              placeholder="Applied Date"
+              className="font-inter -mt-2"
+            />
+            <Label className="font-inter text-sm tracking-tight">
+              Any Note (optional)
+            </Label>
+            <Textarea
+              name="note"
+              value={form.note}
+              onChange={handleChange}
+              placeholder="Additional Notes"
+              className="font-inter -mt-2"
+            />
+          </div>
+
+          <DialogFooter className="mt-4">
+            <Button variant="outline" onClick={() => setOpen(false)}>
+              Cancel
+            </Button>
+            <Button onClick={handleSave} className="cursor-pointer">
+              Save <Save className="ml-2" />
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }

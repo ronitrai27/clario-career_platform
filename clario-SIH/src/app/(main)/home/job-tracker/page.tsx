@@ -57,7 +57,7 @@ import {
   useDraggable,
   DragOverlay,
 } from "@dnd-kit/core";
-import { CSS } from "@dnd-kit/utilities"; // For transform styles during drag
+import { CSS } from "@dnd-kit/utilities";
 import axios from "axios";
 import ShimmerText from "@/components/kokonutui/shimmer-text";
 import { motion, AnimatePresence } from "framer-motion";
@@ -123,6 +123,7 @@ const JobTracker = () => {
   const [loading, setLoading] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const { setInterviewData } = useInterview();
+  const [activeJob, setActiveJob] = useState<JobTrackerCard | null>(null);
   const [form, setForm] = useState({
     job_title: "",
     company: "",
@@ -205,6 +206,7 @@ const JobTracker = () => {
     }
   };
 
+  // =================================================
   // -------------ANIMATION IN DIALOG------------------
   const [activeIndex, setActiveIndex] = useState(0);
   const [showInstructions, setShowInstructions] = useState(false);
@@ -266,19 +268,20 @@ const JobTracker = () => {
     return () => clearInterval(interval);
   }, []);
 
+  // =================================================================
   // --------------------------------QNA GENERATION--------------------
   const handleInterviewQna = async (job: any) => {
-    // if (!user?.isPro == true) {
-    //   toast.info("Upgrade to Pro", {
-    //     description: (
-    //       <span className="text-sm text-gray-500 font-medium">
-    //         You need to upgrade to Pro to use this feature.
-    //         <span className="text-blue-600 cursor-pointer">Upgrade</span>
-    //       </span>
-    //     ),
-    //   });
-    //   return;
-    // }
+    if (!user?.isPro == true) {
+      toast.info("Upgrade to Pro", {
+        description: (
+          <span className="text-sm text-gray-500 font-medium">
+            You need to upgrade to Pro to use this feature.
+            <span className="text-blue-600 cursor-pointer">Upgrade</span>
+          </span>
+        ),
+      });
+      return;
+    }
     console.log("Job Title:", job.job_title);
     console.log("Job Description:", job.description);
 
@@ -311,9 +314,49 @@ const JobTracker = () => {
     }
   };
 
+  // ============================================================
   // ---------------------------DRAG AND DROP---------------------
-  const handleDragEnd = (event: DragEndEvent) => {
+  const handleDragStart = (event: any) => {
+    const jobId = event.active.id;
+    const job = jobs.find((j) => j.id === jobId);
+    setActiveJob(job || null);
+  };
+
+  const handleDragEnd = async (event: DragEndEvent) => {
     const { active, over } = event;
+    setActiveJob(null);
+
+    if (!over) return;
+
+    const jobId = active.id;
+    const newStage = over.id as string;
+
+    // Find the job being dragged
+    const job = jobs.find((j) => j.id === jobId);
+    if (!job || job.stage === newStage) return;
+
+    // Optimistically update UI
+    setJobs((prev) =>
+      prev.map((j) => (j.id === jobId ? { ...j, stage: newStage } : j))
+    );
+
+    // Update database
+    try {
+      const { error } = await supabase
+        .from("job_tracker")
+        .update({ stage: newStage })
+        .eq("id", jobId);
+
+      if (error) throw error;
+      toast.success(`Job moved to ${newStage}!`);
+    } catch (err) {
+      console.error("Error updating job stage:", err);
+      // Rollback on error
+      setJobs((prev) =>
+        prev.map((j) => (j.id === jobId ? { ...j, stage: job.stage } : j))
+      );
+      toast.error("Failed to update job stage. Please try again.");
+    }
   };
 
   return (
@@ -390,85 +433,53 @@ const JobTracker = () => {
           {/* Right side all columns */}
           <DndContext
             collisionDetection={closestCenter}
+            onDragStart={handleDragStart}
             onDragEnd={handleDragEnd}
           >
-            <div className="flex  min-w-max gap-4">
+            <div className="flex min-w-max gap-4">
               {stages.map((stage) => (
-                <div
-                  key={stage.key}
-                  className="flex flex-col w-[300px] overflow-y-auto bg-white rounded-md shadow-sm border border-gray-200"
-                >
-                  <div
-                    className={`text-center py-3 font-semibold border-b border-gray-200 rounded shadow mb-5 ${stage.color}`}
-                  >
-                    <h1 className="font-sora text-base text-white  flex items-center justify-center gap-5">
-                      {stage.name}
-                    </h1>
-                  </div>
-
-                  <div className="flex-1 space-y-3 py-2 px-3">
-                    {jobs
-                      .filter((job) => job.stage === stage.key)
-                      .map((job) => (
-                        <Card
-                          key={job.id}
-                          className={`p-2  border-none shadow-sm hover:shadow-md rounded-md transition  ${stage.cardcolor}`}
-                        >
-                          <CardContent className="flex flex-col h-[200px] p-1">
-                            <div className="flex flex-col h-full">
-                              <h2 className="font-semibold font-inter text-base tracking-wide  capitalize flex items-center  max-w-[200px] truncate  gap-2">
-                                <LuBriefcaseBusiness className="w-4 h-4 mr-2 text-gray-800 shrink-0" />
-                                {job.job_title}
-                              </h2>
-                              <p className="text-base font-inter tracking-tight flex items-center  gap-2">
-                                <LuBuilding2 className="w-4 h-4 mr-2" />
-                                {job.company}
-                              </p>
-
-                              <div className="mt-2 font-inter text-sm flex items-center justify-between w-full capitalize">
-                                <p>
-                                  <span className="font-semibold">Type</span>:{" "}
-                                  {job.type}
-                                </p>
-                                <p>
-                                  <span className="font-semibold">Stage</span>:{" "}
-                                  {job.stage}
-                                </p>
-                              </div>
-                              <p className="mt-4 line-clamp-2 font-inter text-sm tracking-tight text-center">
-                                {job.description}
-                              </p>
-
-                              <div className="flex items-center justify-evenly w-full mt-auto">
-                                <Button
-                                  variant="outline"
-                                  className={`text-xs font-inter cursor-pointer `}
-                                  onClick={() => handleInterviewQna(job)}
-                                >
-                                  Start Prep{" "}
-                                  <LuActivity className="w-4 h-4 ml-2" />
-                                </Button>
-                                <Button
-                                  variant="outline"
-                                  className="text-xs font-inter cursor-pointer"
-                                  onClick={() => handleViewJob(job)}
-                                >
-                                  View <LuPen className="w-4 h-4 ml-2" />
-                                </Button>
-                              </div>
-                            </div>
-                          </CardContent>
-                        </Card>
-                      ))}
-                  </div>
-                </div>
+                <DroppableColumn key={stage.key} id={stage.key} stage={stage}>
+                  {jobs
+                    .filter((job) => job.stage === stage.key)
+                    .map((job) => (
+                      <DraggableJobCard
+                        key={job.id}
+                        job={job}
+                        stage={stage}
+                        onStartPrep={handleInterviewQna}
+                        onViewJob={handleViewJob}
+                      />
+                    ))}
+                </DroppableColumn>
               ))}
             </div>
+            <DragOverlay>
+              {activeJob ? (
+                <Card
+                  className={`p-2 border-none shadow-lg rounded-md w-[280px] opacity-80 rotate-3 ${
+                    stages.find((s) => s.key === activeJob.stage)?.cardcolor
+                  }`}
+                >
+                  <CardContent className="flex flex-col h-[200px] p-1">
+                    <div className="flex flex-col h-full">
+                      <h2 className="font-semibold font-inter text-base tracking-wide capitalize flex items-center max-w-[200px] truncate gap-2">
+                        <LuBriefcaseBusiness className="w-4 h-4 mr-2 text-gray-800 shrink-0" />
+                        {activeJob.job_title}
+                      </h2>
+                      <p className="text-base font-inter tracking-tight flex items-center gap-2">
+                        <LuBuilding2 className="w-4 h-4 mr-2" />
+                        {activeJob.company}
+                      </p>
+                    </div>
+                  </CardContent>
+                </Card>
+              ) : null}
+            </DragOverlay>
           </DndContext>
         </div>
       </div>
 
-      {/* 🟩 The Dialog */}
+      {/* The Dialog */}
       <Dialog open={open} onOpenChange={setOpen}>
         <DialogContent className="sm:max-w-[500px]">
           <DialogHeader>
@@ -781,16 +792,135 @@ const JobTracker = () => {
           )}
 
           <DialogFooter className="flex items-center gap-5">
-            <Button type="button" variant="outline" className="bg-blue-500 text-white cursor-pointer font-inter">
+            <Button
+              type="button"
+              variant="outline"
+              className="bg-blue-500 text-white cursor-pointer font-inter"
+            >
               <Edit className="w-4 h-4 mr-2" /> Edit
             </Button>
 
-            <Button type="button" variant="destructive" >
+            <Button type="button" variant="destructive">
               <Delete className="w-4 h-4 mr-2" /> Delete
             </Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>
+    </div>
+  );
+};
+
+// ==================== DROPPABLE COLUMN ====================
+const DroppableColumn = ({ id, stage, children }: any) => {
+  const { setNodeRef, isOver } = useDroppable({ id });
+
+  return (
+    <div
+      ref={setNodeRef}
+      className={`flex flex-col w-[300px] overflow-y-auto rounded-md shadow-sm border transition-all duration-200 ease-in-out
+        ${
+          isOver
+            ? `border-[${stage.color.replace("bg-", "")}-500] ${
+                stage.cardcolor
+              } scale-[1.02]`
+            : "border-gray-200 bg-white"
+        }`}
+    >
+      <div
+        className={`text-center py-3 font-semibold border-b border-gray-200 rounded shadow-sm mb-5 ${stage.color}`}
+      >
+        <h1 className="font-sora text-base text-white flex items-center justify-center gap-5">
+          {stage.name}
+        </h1>
+      </div>
+
+      <div className="flex-1 space-y-3 py-2 px-3 min-h-[200px] transition-all">
+        {children}
+      </div>
+    </div>
+  );
+};
+
+// ==================== DRAGGABLE JOB CARD ====================
+const DraggableJobCard = ({ job, stage, onStartPrep, onViewJob }: any) => {
+  const { attributes, listeners, setNodeRef, transform, isDragging } =
+    useDraggable({
+      id: job.id,
+    });
+
+  const style = {
+    transform: CSS.Translate.toString(transform),
+    transition: isDragging
+      ? "none"
+      : "transform 0.2s ease, box-shadow 0.2s ease",
+    zIndex: isDragging ? 50 : 1,
+  };
+
+  return (
+    <div ref={setNodeRef} style={style} {...attributes} {...listeners}>
+      <Card
+        className={`p-2 border-none rounded-md cursor-grab active:cursor-grabbing transition-all duration-200 ease-in-out
+          ${stage.cardcolor}
+          ${
+            isDragging
+              ? "scale-[1.05] shadow-2xl ring-2 ring-blue-400 rotate-1"
+              : "hover:shadow-md shadow-sm"
+          }
+        `}
+      >
+        <CardContent className="flex flex-col h-[200px] p-1">
+          <div className="flex flex-col h-full">
+            <h2 className="font-semibold font-inter text-base tracking-wide capitalize flex items-center max-w-[200px] truncate gap-2">
+              <LuBriefcaseBusiness className="w-4 h-4 mr-2 text-gray-800 shrink-0" />
+              {job.job_title}
+            </h2>
+            <p className="text-base font-inter tracking-tight flex items-center gap-2">
+              <LuBuilding2 className="w-4 h-4 mr-2" />
+              {job.company}
+            </p>
+
+            <div className="mt-2 font-inter text-sm flex items-center justify-between w-full capitalize">
+              <p>
+                <span className="font-semibold">Type</span>: {job.type}
+              </p>
+              <p>
+                <span className="font-semibold">Stage</span>: {job.stage}
+              </p>
+            </div>
+
+            <p className="mt-4 line-clamp-2 font-inter text-sm tracking-tight text-center">
+              {job.description}
+            </p>
+
+            <div
+              className="flex items-center justify-evenly w-full mt-auto"
+              onClick={(e) => e.stopPropagation()}
+              onPointerDown={(e) => e.stopPropagation()}
+            >
+              <Button
+                variant="outline"
+                className="text-xs font-inter cursor-pointer"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  onStartPrep(job);
+                }}
+              >
+                Start Prep <LuActivity className="w-4 h-4 ml-2" />
+              </Button>
+              <Button
+                variant="outline"
+                className="text-xs font-inter cursor-pointer"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  onViewJob(job);
+                }}
+              >
+                View <LuPen className="w-4 h-4 ml-2" />
+              </Button>
+            </div>
+          </div>
+        </CardContent>
+      </Card>
     </div>
   );
 };
