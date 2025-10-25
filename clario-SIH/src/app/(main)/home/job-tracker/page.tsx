@@ -359,6 +359,31 @@ const JobTracker = () => {
     }
   };
 
+  // =====================================================
+  // ---------------------------DETELE JOB CARD-------------
+
+  const handleDeleteJob = async () => {
+    if (!selectedJob?.id) {
+      toast.error("No job selected to delete.");
+      return;
+    }
+
+    const { error } = await supabase
+      .from("job_tracker")
+      .delete()
+      .eq("id", selectedJob.id);
+
+    if (error) {
+      console.error(error);
+      toast.error("Failed to delete job. Please try again.");
+    } else {
+      toast.success("Job deleted successfully!");
+      setIsOpenJobDialog(false);
+
+      setJobs((prev: any[]) => prev.filter((job) => job.id !== selectedJob.id));
+    }
+  };
+
   return (
     <div className="h-full  bg-gray-50 p-2 pb-8">
       <div className="w-full flex px-8 gap-5 my-6">
@@ -800,7 +825,12 @@ const JobTracker = () => {
               <Edit className="w-4 h-4 mr-2" /> Edit
             </Button>
 
-            <Button type="button" variant="destructive">
+            <Button
+              type="button"
+              variant="destructive"
+              onClick={handleDeleteJob}
+              className="font-inter text-sm cursor-pointer"
+            >
               <Delete className="w-4 h-4 mr-2" /> Delete
             </Button>
           </DialogFooter>
