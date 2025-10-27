@@ -2,7 +2,7 @@
 
 import type React from "react"
 import { cn } from "@/lib/utils"
-import { Check, Calendar, Target, Users, UserRound, GraduationCap } from "lucide-react"
+import { Check, Calendar, Target, Users, UserRound, GraduationCap, Mic2, SpeakerIcon, EarIcon } from "lucide-react"
 
 type StepMeta = {
   key: number
@@ -14,7 +14,7 @@ const steps: StepMeta[] = [
   { key: 1, label: "Basics", icon: <UserRound className="h-4 w-4" /> },
   { key: 2, label: "Profile", icon: <GraduationCap className="h-4 w-4" /> },
   { key: 3, label: "Focus", icon: <Target className="h-4 w-4" /> },
-  { key: 4, label: "Calendar", icon: <Calendar className="h-4 w-4" /> },
+  { key: 4, label: "Info", icon: <EarIcon className="h-4 w-4" /> },
   { key: 5, label: "Invite", icon: <Users className="h-4 w-4" /> },
 ]
 
@@ -38,7 +38,7 @@ export function StepIndicator({
         />
       </div>
 
-      <ol className="grid grid-cols-5 gap-2">
+      <ol className="flex items-center justify-between px-10">
         {steps.map((s) => {
           const isCompleted = s.key < current
           const isActive = s.key === current

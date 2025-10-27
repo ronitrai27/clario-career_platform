@@ -122,7 +122,7 @@ const Webpage = () => {
       </main>
 
       {/* SECTION 2  STATS*/}
-      <section className="my-20 px-4 py-4 w-full max-w-[1350px] mx-auto relative min-h-screen">
+      <section className="my-20 px-4 py-4 w-full max-w-[1350px] mx-auto relative ">
         <div className="flex justify-between w-full ">
           <div>
             <h2 className=" text-muted-foreground font-inter text-3xl font-extrabold opacity-40">
@@ -149,24 +149,88 @@ const Webpage = () => {
           <div className="w-[50%]">
             <div className="flex mt-10 w-full gap-8">
               <div className="flex flex-col space-y-5 w-full">
+                {/* 1 */}
                 <div className="border rounded-xl p-4 h-[360px] flex flex-col">
                   <h2 className="font-inter font-semibold opacity-50 tracking-tight">
                     Lorem ipsum dolor sit amet consectetur adipisicing elit.
                     Dicta, dolorum.
                   </h2>
+
+                  <div className="mt-auto flex items-center justify-between">
+                    <h2 className="font-sora text-5xl font-extrabold">90% </h2>
+                    <p>Lorem, ipsum dolor.</p>
+                  </div>
                 </div>
-                <div className="border rounded-xl p-4 h-[200px]"></div>
+                {/* 2 */}
+                <div className="border rounded-xl p-4 h-[120px] flex items-center justify-center gap-5">
+                  <div className="flex -space-x-5">
+                    <Image
+                      src="/a1.png"
+                      alt="Client 1"
+                      width={58}
+                      height={58}
+                      className="rounded-full h-[50px] w-[50px] sm:h-[50px] sm:w-[50px] border-2 border-white shadow-md object-cover"
+                    />
+                    <Image
+                      src="/a4.png"
+                      alt="Client 2"
+                      width={58}
+                      height={58}
+                      className="rounded-full  h-[50px] w-[50px] sm:h-[50px] sm:w-[50px] border-2 border-white shadow-md object-cover"
+                    />
+                    <Image
+                      src="/a3.png"
+                      alt="Client 3"
+                      width={58}
+                      height={58}
+                      className="rounded-full  h-[50px] w-[50px] sm:h-[50px] sm:w-[50px] border-2 border-white shadow-md object-cover"
+                    />
+                    <div
+                      className="rounded-full  h-[50px] w-[50px] sm:h-[50px] sm:w-[50px] border-2 border-white shadow-md bg-white flex items-center
+               justify-center"
+                    >
+                      <LuPlus className="text-[25px] text-black cursor-pointer" />
+                    </div>
+                  </div>
+                  <p className="font-semibold font-inter text-xl">200+ </p>
+                </div>
               </div>
 
               <div className="flex flex-col space-y-5 w-full">
-                <div className="border rounded-xl p-4 h-[360px]"></div>
-                <div className="border rounded-xl p-4 h-[200px]"></div>
+                <div className="border rounded-xl p-4 h-[360px] flex flex-col">
+                  <p className="font-inter text-lg tracking-tight leading-tight">
+                    Lorem ipsum dolor sit amet consectetur adipisicing elit.
+                    Amet aliquam eaque nulla!
+                  </p>
+                  <div className="mt-auto">
+                    <p className="text-5xl font-extrabold font-sora">500+</p>
+                    <p>Lorem ipsum dolor sit.</p>
+                  </div>
+                </div>
+                <div className=" p-4 h-[120px]">
+                  <p className="font-inter tracking-tight text-blue-600">
+                    Lorem ipsum dolor sit amet consectetur adipisicing. Libero,
+                    iure.
+                  </p>
+                </div>
               </div>
             </div>
           </div>
           {/* RIGHT SIDE */}
-          <div className="w-[45%] bg-gradient-to-br from-slate-700 to-slate-900 rounded-xl relative overflow-hidden">
-            <LuTrendingUp className="absolute w-[400px] h-[400px] text-white opacity-15 -left-10 -bottom-10" />
+          <div className="w-[45%] bg-gradient-to-br from-slate-700 to-slate-900 rounded-xl relative overflow-hidden p-4 flex flex-col">
+            <h2 className="font-inter text-white text-xl tracking-tight ">
+              Lorem ipsum dolor sit amet consectetur, adipisicing elit. A
+              veritatis vel totam dolores excepturi, quod obcaecati eaque modi
+              beatae mollitia?
+            </h2>
+            <LuTrendingUp className="absolute w-[400px] h-[400px] text-white opacity-15 -left-10 -bottom-5" />
+
+            <div className="mt-auto flex justify-between">
+              <p className="font-sora text-6xl font-extrabold text-white">
+                4.8/5
+              </p>
+              <div></div>
+            </div>
           </div>
         </div>
 
@@ -250,7 +314,7 @@ const Webpage = () => {
         <p className="font-inter text-xl opacity-50 mt-2 text-center tracking-wide text-muted-foreground ">
           Lorem ipsum dolor sit, amet consectetur adipisicing elit.lorem5
         </p>
-        <div className="w-full grid md:grid-cols-3 justify-items-center mt-20">
+        <div className="w-full grid md:grid-cols-3 justify-items-center mt-20 md:max-w-[1080px] mx-auto ">
           {/* 1 */}
           <div className="w-[320px] h-[320px] rounded-xl bg-gradient-to-br from-slate-600 to-slate-900 p-4 flex flex-col">
             <div className="flex -space-x-5">
@@ -291,7 +355,7 @@ const Webpage = () => {
             <div className="mt-auto">
               <Separator className="my-4 bg-muted-foreground" />
 
-              <h2 className="font-sora text-xl font-semibold text-white">
+              <h2 className="font-sora text-lg font-semibold text-white">
                 Lorem ipsum, dolor sit amet consectetur adipisicing elit.
               </h2>
             </div>
@@ -312,26 +376,32 @@ const Webpage = () => {
             </p>
 
             <div className="mt-auto">
-              <h2 className="font-sora text-xl font-semibold text-white backdrop-blur-xl p-2 rounded-xl overflow-hidden">
+              <h2 className="font-sora text-lg font-semibold text-white backdrop-blur-xl px-2 py-4 rounded-xl overflow-hidden">
                 Lorem ipsum, dolor sit amet consectetur adipisicing elit.
               </h2>
             </div>
           </div>
 
           {/* 3 */}
-          <div className="w-[320px] h-[320px] rounded-xl bg-white shadow-md border border-gray-200 p-4 flex flex-col relative overflow-hidden">
-            <p className="text-white font-inter text-base tracking-tight">
-              Lorem ipsum dolor sit amet consectetur adipisicing elit. Corrupti,
-              numquam.
-            </p>
+          <div className="w-[320px] h-[320px] rounded-xl bg-gradient-to-br from-blue-100 to-indigo-700 shadow-md border border-gray-200 p-4 flex flex-col relative overflow-hidden">
+            <div className="p-2 backdrop-blur-lg bg-white/30 rounded-xl">
+              <div className="flex items-center gap-4">
+                <Image
+                  src="/a4.png"
+                  alt="Client 2"
+                  width={58}
+                  height={58}
+                  className="rounded-full  h-[50px] w-[50px] sm:h-[50px] sm:w-[50px] border-2 border-white shadow-md object-cover"
+                />
+                <p className="font-inter text-white ">Rakesh sharma</p>
+              </div>
 
-            <div className="mt-auto">
-              <Separator className="my-4 bg-muted-foreground" />
-
-              <h2 className="font-sora text-xl font-semibold text-white backdrop-blur-xl p-2 rounded-xl overflow-hidden">
-                Lorem ipsum, dolor sit amet consectetur adipisicing elit.
-              </h2>
+              <p className="font-sora text-4xl font-extrabold text-white mt-5 ">500+</p>
+              <p className="font-inter text-base text-white tracking-tight mt-2">Lorem ipsum dolor sit amet cons.</p>
             </div>
+
+            <h2 className="font-sora text-2xl tracking-tight font-semibold mt-auto text-center">Lorem, ipsum dolor.</h2>
+            <p className="font-inter text-lg text-center leading-tight mt-2">Lorem ipsum, dolor sit amet consectetur adipisicing elit.</p>
           </div>
         </div>
       </section>

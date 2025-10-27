@@ -37,46 +37,45 @@ import { useRouter } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
 
 type Profession =
-  | "10th Student"
   | "12th Student"
   | "Diploma"
   | "Graduate"
-  | "Postgraduate";
+  // | "Postgraduate"
+  | "Working professional";
 
 const PROFESSION_OPTIONS: Profession[] = [
-  "10th Student",
   "12th Student",
   "Diploma",
   "Graduate",
-  "Postgraduate",
+  // "Postgraduate",
+  "Working professional",
 ];
 
 const FOCUS_BY_PROFESSION: Record<Profession, string[]> = {
-  "10th Student": [
-    "Career/ Path guidance",
-    // "Board exam excellence",
-    "Skill building",
-    // "Others"
-  ],
   "12th Student": [
-    // "Crack competitive exams",
+    "Crack competitive exams",
     "Choose Career paths",
     "Skill building",
-    // "Others"
+    "Others",
   ],
   Diploma: [
     "Job/Internship opportunities",
     "Career/ Path guidance",
     "Skill building",
+    "Others",
   ],
-  "Graduate": [
+  Graduate: [
     "Job/Internship opportunities",
     "Career/ Path guidance",
+    "Skill building",
+    "Others",
   ],
-  "Postgraduate": [
-    "Research opportunities",
-    "Higher studies",
-    "Job placement",
+  // Postgraduate: ["Research opportunities", "Higher studies", "Job placement"],
+  "Working professional": [
+    "Career growth",
+    "Career/ Path guidance",
+    "Skill building",
+    "Others",
   ],
 };
 
@@ -274,7 +273,9 @@ export function OnboardingCard() {
         <CardDescription className="text-pretty font-raleway text-base font-medium">
           Complete the steps to get tailored guidance for your goals.
         </CardDescription>
-        <StepIndicator current={step} onStepClick={(s) => setStep(s)} />
+        <div className="w-full ">
+          <StepIndicator current={step} onStepClick={(s) => setStep(s)} />
+        </div>
       </CardHeader>
 
       <CardContent className="space-y-8">
@@ -351,7 +352,9 @@ export function OnboardingCard() {
                 />
               </div>
             </div>
-              <p className="text-sm -mt-3 font-inter text-muted-foreground">Make sure to write full name of your school Instituion/school.</p>
+            <p className="text-sm -mt-3 font-inter text-muted-foreground">
+              Make sure to write full name of your school Instituion/school.
+            </p>
           </section>
         )}
 
@@ -359,7 +362,7 @@ export function OnboardingCard() {
           <section className="space-y-4" aria-label="Current profile">
             <div className="space-y-2 mt-4">
               <Label className="font-raleway font-semibold text-base">
-                What best describes you Currently? <span className="text-blue-600">(Choose 12th student for now !!)</span>
+                What best describes you Currently?
               </Label>
               <Select
                 value={data.profession}
@@ -388,7 +391,7 @@ export function OnboardingCard() {
               <Label className="font-raleway text-base font-semibold">
                 Based on your profile, what’s your main focus right now?
               </Label>
-              <p><span className="text-blue-600">(Choose Career/path guidance for now !!)</span></p>
+              <p></p>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-3 mt-5">
                 {focusOptions.map((opt) => {
                   const selected = data.focus === opt;
@@ -419,45 +422,22 @@ export function OnboardingCard() {
         {step === 4 && (
           <section className="space-y-4" aria-label="Connect Google Calendar">
             <div className="rounded-md border p-4">
-              <div className="flex gap-3">
-                <div className="space-y-1">
+              <div className="flex gap-3 w-full">
+                <div className="space-y-1 w-full">
                   <div className="font-medium font-inter text-center">
-                    Stay on track with calendar reminders
+                    Where did you find Clario?
                   </div>
                   <p className="text-sm text-muted-foreground text-center font-inter">
-                    Connect Google Calendar to auto-create reminders for
-                    milestones, study plans, and application deadlines.
+                    Tell us how you found out about Clario
                   </p>
                 </div>
               </div>
-              <div className="mt-4 flex items-center gap-3">
-                {!data.calendarConnected ? (
-                  <Button
-                    onClick={handleConnectCalendar}
-                    disabled={busy}
-                    className="bg-blue-50 mx-auto my-5 border rounded border-blue-500 font-inter text-black hover:bg-white cursor-pointer"
-                  >
-                    <Image
-                      src="/search.png"
-                      alt="Google"
-                      width={20}
-                      height={20}
-                    />
-                    Connect Google Calendar
-                  </Button>
-                ) : (
-                  <>
-                    <div className="text-sm text-emerald-700 bg-emerald-50 border border-emerald-200 rounded px-2 py-1">
-                      Connected as unknown
-                    </div>
-                    <Button
-                      variant="outline"
-                      onClick={handleDisconnectCalendar}
-                    >
-                      Disconnect
-                    </Button>
-                  </>
-                )}
+              <div className="mt-8 flex items-center gap-3">
+                <Input
+                  type="text"
+                  placeholder="Eg: blogs..."
+                  className="w-[70%] mx-auto font-inter"
+                />
               </div>
             </div>
             <p className="text-xs text-muted-foreground">

@@ -98,13 +98,11 @@ const CareerCoach = () => {
         // console.log("summary--------",summary);
       }
 
-      if (firstQuiz.user_current_status != "10th student") {
-        const stream = firstQuiz.quizInfo?.stream;
-        if (typeof stream === "string") {
-          setQuizStream(stream);
-          // console.log("stream--------",stream);
-        }
+      const stream = firstQuiz.quizInfo?.stream;
+      if (typeof stream === "string") {
+        setQuizStream(stream);
       }
+
       setQuizDataLoading(false);
     };
 
@@ -143,10 +141,8 @@ const CareerCoach = () => {
         summary: quizSummary,
       };
 
-      // Add stream if user is not a 10th student
-      if (user?.current_status !== "10th student") {
-        ctx.stream = quizStream;
-      }
+      ctx.stream = quizStream;
+
       // console.log("Context passing to AI:", ctx);
 
       const aiReply = await runAgent(ctx);
@@ -158,7 +154,6 @@ const CareerCoach = () => {
       };
 
       setMessages((prev) => [...prev, aiMessage]);
-      // Fetch follow-up questions
       (async () => {
         try {
           const { data } = await axios.post("/api/ai/follow-up", {
@@ -274,7 +269,8 @@ const CareerCoach = () => {
                       </div>
                     </div>
                     <p className="mt-4 max-w-[250px] mx-auto text-center font-inter text-gray-200 text-sm">
-                      Test your knowledge. AI Voice Assistant made for Interview Preparations.
+                      Test your knowledge. AI Voice Assistant made for Interview
+                      Preparations.
                     </p>
                   </div>
                   {/* 2 */}
@@ -459,7 +455,8 @@ const CareerCoach = () => {
                 AI Voice Assistant
               </h2>
               <p className="text-center text-sm font-light tracking-tight font-inter mt-3 px-2">
-                AI Voice Assistant made for Interview Preparations. Try it out now
+                AI Voice Assistant made for Interview Preparations. Try it out
+                now
               </p>
 
               <div className="w-full flex items-center justify-center mt-5">

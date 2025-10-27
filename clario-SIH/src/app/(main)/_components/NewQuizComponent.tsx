@@ -3,7 +3,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { quizData, QuizSection } from "./QuizData";
+import { QuizData, quizData, QuizSection } from "./QuizData";
 import { useUserData } from "@/context/UserDataProvider";
 import { Progress } from "@/components/ui/progress";
 import { Button } from "@/components/ui/button";
@@ -53,10 +53,10 @@ export default function Quiz() {
     return <p>Loading user data...</p>;
   }
 
-  const gradeKey = current_status.startsWith("10") ? "10" : "12";
+  const gradeKey = current_status as keyof QuizData;
 
   function getQuizSet(
-    gradeKey: "10" | "12",
+    gradeKey: keyof QuizData,
     current_status: string,
     mainFocus: string
   ): QuizSection | undefined {
