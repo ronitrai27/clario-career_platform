@@ -15,6 +15,8 @@ import {
   LuAArrowUp,
   LuArrowUpRight,
   LuChevronDown,
+  LuChevronLeft,
+  LuChevronRight,
   LuChevronUp,
   LuGlobe,
   LuLoader,
@@ -477,11 +479,25 @@ const CareerCoach = () => {
             </div>
           </div>
 
-          <div className="bg-white p-2 shadow-md rounded-lg w-full h-[268px]">
-            <h2 className="text-center font-inter text-base ">
-              History <LucideHistory className="ml-4 inline" size={20} />
+          <div className="bg-gradient-to-br from-slate-600 to-slate-900 p-4 shadow-md rounded-lg w-full h-[268px] relative overflow-hidden">
+            <h2 className="font-sora text-2xl font-extrabold tracking-wide text-white">
+              Know your <br /> career{" "}
+              <span className="text-blue-500 text-3xl font-inter">Fit</span>
             </h2>
-            <Separator className="my-2" />
+            <p className="font-inter tracking-tight text-gray-200 text-sm mt-4">
+              Get to know how much your career is fit for you with help of AI
+            </p>
+
+            <Button variant="outline" size="sm" className="font-inter mt-5">
+              Find Now <LuChevronRight className="ml-2" />
+            </Button>
+            <Image
+              src="/ca2.png"
+              alt="AI Assistant"
+              width={120}
+              height={120}
+              className=" object-cover absolute -bottom-10 -right-5"
+            />
           </div>
         </div>
       </div>

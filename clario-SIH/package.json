@@ -63,6 +63,8 @@
     "dotenv": "^17.2.2",
     "duck-duck-scrape": "^2.2.7",
     "framer-motion": "^12.23.12",
+    "html-to-image": "^1.11.13",
+    "html2canvas": "^1.4.1",
     "imagekit": "^6.0.0",
     "jsonrepair": "^3.13.0",
     "lucide-react": "^0.542.0",

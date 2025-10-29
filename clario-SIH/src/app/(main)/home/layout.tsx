@@ -15,6 +15,7 @@ export default function Layout({ children }: { children: React.ReactNode }) {
     (pathname.startsWith("/home/mentor-connect/") &&
       pathname !== "/home/mentor-connect" && pathname !== "/home/mentor-connect/bookings") ||
     pathname === "/home/profile" ||
+    pathname === "/home/settings/billing" ||
     pathname === "/home/interview-prep/start";
 
   return (

@@ -334,6 +334,7 @@ export function AppSidebar() {
 
                 <Button
                   variant="ghost"
+                  onClick={()=>router.push('/home/settings/billing')}
                   className="justify-start gap-2 w-full font-roboto hover:bg-gray-50 rounded-none cursor-pointer"
                 >
                   <LuCreditCard className="text-[18px]" />

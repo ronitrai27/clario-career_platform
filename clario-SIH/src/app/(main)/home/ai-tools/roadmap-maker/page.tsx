@@ -29,6 +29,7 @@ import DefaultRoadmap from "@/app/(main)/_components/DeafultRoadmap";
 import { Separator } from "@/components/ui/separator";
 import Image from "next/image";
 import { useQuizData } from "@/context/userQuizProvider";
+import { toast } from "sonner";
 
 const steps = [
   "Getting tools ready...",
@@ -50,6 +51,8 @@ const RoadmapMaker = () => {
   const [loadingRoadmap, setLoadingRoadmap] = useState(false);
   const [roadmap, setRoadmap] = useState<any>(null);
   const [error, setError] = useState<string | null>(null);
+
+  const [histRoadmap, setHistRoadmap] = useState<any[]>([]);
 
   const userCareerFocuses =
     focus === "career/ path guidance" || focus === "choose career paths";
@@ -73,6 +76,26 @@ const RoadmapMaker = () => {
       if (interval) clearInterval(interval);
     };
   }, [loadingRoadmap, steps.length]);
+
+  // ==================================
+  // HISTORY ROADMAP
+  useEffect(() => {
+    const fetchRoadmaps = async () => {
+      if (!user?.id) return;
+      const { data, error } = await supabase
+        .from("roadmapUsers")
+        .select("*")
+        .eq("user_id", user?.id)
+        .order("created_at", { ascending: false });
+
+      if (error) console.error(error);
+      else setHistRoadmap(data || []);
+    };
+
+    fetchRoadmaps();
+  }, [user?.id]);
+
+  // ====================================
 
   useEffect(() => {
     if (!user?.id) return;
@@ -123,6 +146,11 @@ const RoadmapMaker = () => {
     } finally {
       setLoadingRoadmap(false);
     }
+  };
+  // ======================================
+  const SetHistoryRoadmap = async (item: any) => {
+    toast.success("Roadmap loaded successfully!");
+    setRoadmap(item.roadmap_data);
   };
 
   if (loading) {
@@ -175,21 +203,32 @@ const RoadmapMaker = () => {
 
             {/* History tab */}
             <TabsContent value="history" className="w-full max-w-[400px]">
-              {!quizDataLoading ? (
+              {histRoadmap.length > 0 ? (
+                <div className="flex flex-col mt-4 space-y-3 px-4">
+                  {histRoadmap.map((item) => (
+                    <div
+                      key={item.id}
+                      onClick={() => SetHistoryRoadmap(item)}
+                      className="border rounded-lg p-2 hover:bg-gray-50 bg-white cursor-pointer flex justify-between items-center transition-all"
+                    >
+                      <div>
+                        <h3 className="text-sm capitalize font-inter tracking-tight">
+                          {item.roadmap_data?.roadmapTitle ||
+                            "Untitled Roadmap"}
+                        </h3>
+                        <p className="text-xs text-gray-600 font-sora">
+                          {new Date(item.created_at).toLocaleDateString()}
+                        </p>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              ) : (
                 <div className="mt-4 bg-white border border-gray-200 rounded-md p-4 shadow-sm text-center">
                   <p className="text-gray-700 font-inter text-sm">
                     📜 Your past quiz attempts and generated roadmaps will
                     appear here.
                   </p>
-                </div>
-              ) : (
-                <div className="mt-6 grid grid-cols-1 gap-3 w-full">
-                  {Array.from({ length: 5 }).map((_, idx) => (
-                    <div
-                      key={idx}
-                      className="h-12 w-full rounded-xl bg-gray-200 animate-pulse"
-                    />
-                  ))}
                 </div>
               )}
             </TabsContent>

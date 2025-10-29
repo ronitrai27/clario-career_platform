@@ -312,6 +312,13 @@ export default function CareerTabsDemo() {
       <div className="w-full my-4 text-center bg-gradient-to-br from-blue-300 to-pink-300 py-12 rounded-lg relative overflow-hidden">
         {activeTab === "jobs" && (
           <>
+           <Image
+              src="/ca2.png"
+              alt="ca1"
+              width={150}
+              height={150}
+              className="absolute -top-3 -left-4"
+            />
             <h1 className="text-4xl font-inter font-semibold mb-2">
               Recommended Jobs for you{" "}
               <LuBriefcase className="inline-block ml-3" />
@@ -481,14 +488,14 @@ export default function CareerTabsDemo() {
                     {/* push this container to bottom */}
                     <div className="flex items-center justify-between gap-10 mt-auto w-full">
                       <Button
-                        className="cursor-pointer w-3/4 bg-blue-50 border-blue-200"
+                        className="cursor-pointer w-3/4 bg-gradient-to-r from-blue-300 to-pink-200 text-black"
                         variant="outline"
                       >
                         <a
                           href={job.apply_options[0].link}
                           target="_blank"
                           rel="noopener noreferrer"
-                          className="text-black  font-inter text-xs inline-block cursor-pointer"
+                          className="font-inter text-sm inline-block cursor-pointer"
                         >
                           Click to Apply{" "}
                         </a>
