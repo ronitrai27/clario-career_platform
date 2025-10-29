@@ -28,7 +28,7 @@ const CareerBoard = () => {
   const { quizData } = useQuizData();
 
   return (
-    <div className="bg-gray-50 w-full h-full p-4">
+    <div className="bg-gray-50 w-full h-full p-4 pt-8">
       <SingleCard />
 
       {user?.isQuizDone === false ? (

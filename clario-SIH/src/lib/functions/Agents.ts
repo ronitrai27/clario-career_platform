@@ -7,8 +7,9 @@ import { Type } from "@google/genai";
 import { getSelectedCareer, updateSelectedCareer } from "./dbActions";
 import { retrivalServer } from "./pineconeQuery";
 import { toast } from "sonner";
+import { tavilySearching } from "./tavily";
 
-const ai = new GoogleGenAI({ apiKey: process.env.NEXT_PUBLIC_GEMINI_API_KEY!});
+const ai = new GoogleGenAI({ apiKey: process.env.NEXT_PUBLIC_GEMINI_API_KEY! });
 
 type AgentContext = {
   question: string;
@@ -32,25 +33,45 @@ const history: Array<{
 
 // ----------------------TOOLS---------------------------
 //webSearch tool----------------------------------------
-async function tavilySearch(query: string): Promise<string> {
-  const resp = await fetch("https://api.tavily.com/search", {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-      Authorization: `Bearer ${process.env.NEXT_PUBLIC_TAVILY_API_KEY!}`,
-    },
-    body: JSON.stringify({
-      query,
-      max_results: 5,
-    }),
-  });
+// async function tavilySearch(query: string): Promise<string> {
+//   const resp = await fetch("https://api.tavily.com/search", {
+//     method: "POST",
+//     headers: {
+//       "Content-Type": "application/json",
+//       Authorization: `Bearer ${process.env.NEXT_PUBLIC_TAVILY_API_KEY!}`,
+//     },
+//     body: JSON.stringify({
+//       query,
+//       max_results: 3,
+//     }),
+//   });
 
-  const data = await resp.json();
-  return data.results.map((r: any) => r.content).join("\n\n---\n\n");
+//   const data = await resp.json();
+//   console.log("===data from TAVILY====", data);
+//   return data.results.map((r: any) => r.content).join("\n\n---\n\n");
+// }
+
+export async function tavilySearch(query: string): Promise<string> {
+  try { 
+
+    const result = await tavilySearching(query);
+
+    if (!result || result.includes("Error")) {
+      throw new Error("No results from Tavily");
+    }
+
+    return result;
+  } catch (error) {
+    console.error("Error fetching Tavily results:", error);
+    return "Tavily search failed. Please try again later.";
+  }
 }
+
+// ==========================================================
 // Pinecone query tool----------------------------------------
 async function retrival(userQuery: string): Promise<string> {
   try {
+    console.log("====Pinecone query called===");
     const result = await retrivalServer(userQuery);
     return result;
   } catch (err) {
@@ -59,16 +80,16 @@ async function retrival(userQuery: string): Promise<string> {
   }
 }
 // GET selectedCareer Tool--------------------------------
-async function getCareerTool(userId: any) {
-  try {
-    const career = await getSelectedCareer(userId);
-    toast.success("User Career retrieved successfully!");
-    return career;
-  } catch (error) {
-    console.error("Error in getCareerTool:", error);
-    return null;
-  }
-}
+// async function getCareerTool(userId: any) {
+//   try {
+//     const career = await getSelectedCareer(userId);
+//     toast.success("User Career retrieved successfully!");
+//     return career;
+//   } catch (error) {
+//     console.error("Error in getCareerTool:", error);
+//     return null;
+//   }
+// }
 //  UPDATE selectedCareer tool----------------------------------------
 async function updateCareerTool(userId: any, selectedCareer: string) {
   try {
@@ -112,21 +133,6 @@ const retrivalDeclaration = {
     required: ["userQuery"],
   },
 };
-const getCareerDeclaration = {
-  name: "getCareerTool",
-  description:
-    "Retrieve the selected career choice for a specific user from the userQuizData table.",
-  parameters: {
-    type: Type.OBJECT,
-    properties: {
-      // userId: {
-      //   type: Type.STRING,
-      //   description:
-      //     "The unique identifier of the user whose career data is being requested.",
-      // },
-    },
-  },
-};
 
 const updateCareerDeclaration = {
   name: "updateCareerTool",
@@ -150,7 +156,7 @@ const updateCareerDeclaration = {
 type ToolMap = {
   retrival: (args: { userQuery: string }) => Promise<string>;
   tavilySearch: (args: { query: string }) => Promise<string>;
-  getCareerTool: (args: { userId: any }) => Promise<string | null>;
+  // getCareerTool: (args: { userId: any }) => Promise<string | null>;
   updateCareerTool: (args: {
     userId: any;
     selectedCareer: string;
@@ -172,7 +178,7 @@ export async function runAgent(ctx: AgentContext) {
     retrival: ({ userQuery }) => retrival(userQuery),
     tavilySearch: ({ query }) => tavilySearch(query),
 
-    getCareerTool: () => getCareerTool(userId),
+    // getCareerTool: () => getCareerTool(userId),
     updateCareerTool: ({ selectedCareer }) =>
       updateCareerTool(userId, selectedCareer),
   };
@@ -188,19 +194,28 @@ export async function runAgent(ctx: AgentContext) {
   // 2.5-flash
   while (true) {
     const response = await ai.models.generateContent({
-      model: "gemini-2.0-flash",
+      model: "gemini-2.5-flash",
       contents: history,
       config: {
-        systemInstruction: `You are an very helpful and professional AI Career Coach, who loves to solve any quiries, problem or frustation of the user. You help them in deciding their career.You need to help ${userName}, who is currently ${user_current_status} in ${stream}. suggested career options from his quiz ${careerOptions} and quiz summary ${summary}. Your role is to guide them to the best career path and update their career using the provided tool. 
+        systemInstruction: `
+You are a highly professional and empathetic AI Career Coach whose sole focus is to help ${userName} in choosing right career path and update it using the tool. 
+${userName} is currently a ${user_current_status} in ${stream}. Based on their quiz results — suggested career options: ${careerOptions}, and summary: ${summary} — your goal is to update their desired career using the tools below for real time updates and information and help them make informed choices and chhose the career that they want to have.
 
-You have two tools: (1) get user's career, (2) update user's career. For accurate guidance, use two more tools: (a) retrieve info from Pinecone, (b) search the web (Tavily, India-only). Always try Pinecone first, then web if not found. Keep responses concise, relevant, and clear.`,
+You Main goal using tool is:
+1. Update user's career choice in the database using tools provided.
+
+For accurate and personalized guidance, you can use two knowledge tools freely:
+(a) Retrieve relevant information from Pinecone.
+(b) Search the web in real time using Tavily .
+
+`,
+
         maxOutputTokens: 600,
         tools: [
           {
             functionDeclarations: [
               retrivalDeclaration,
               tavilySearchDeclaration,
-              getCareerDeclaration,
               updateCareerDeclaration,
             ],
           },

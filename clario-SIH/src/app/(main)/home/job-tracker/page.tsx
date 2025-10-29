@@ -271,17 +271,17 @@ const JobTracker = () => {
   // =================================================================
   // --------------------------------QNA GENERATION--------------------
   const handleInterviewQna = async (job: any) => {
-    if (!user?.isPro == true) {
-      toast.info("Upgrade to Pro", {
-        description: (
-          <span className="text-sm text-gray-500 font-medium">
-            You need to upgrade to Pro to use this feature.
-            <span className="text-blue-600 cursor-pointer">Upgrade</span>
-          </span>
-        ),
-      });
-      return;
-    }
+    // if (!user?.isPro == true) {
+    //   toast.info("Upgrade to Pro", {
+    //     description: (
+    //       <span className="text-sm text-gray-500 font-medium">
+    //         You need to upgrade to Pro to use this feature.
+    //         <span className="text-blue-600 cursor-pointer">Upgrade</span>
+    //       </span>
+    //     ),
+    //   });
+    //   return;
+    // }
     console.log("Job Title:", job.job_title);
     console.log("Job Description:", job.description);
 

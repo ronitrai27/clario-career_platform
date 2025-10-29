@@ -137,7 +137,7 @@ const CareerCoach = () => {
         userId: user?.id,
         userName: user?.userName,
         user_current_status: user?.current_status,
-        careerOptions: careerSkillOptions.join(", "), // Convert array to string
+        careerOptions: careerSkillOptions.join(", "),
         summary: quizSummary,
       };
 
@@ -146,7 +146,7 @@ const CareerCoach = () => {
       // console.log("Context passing to AI:", ctx);
 
       const aiReply = await runAgent(ctx);
-      // console.log("AI Reply:---------->", aiReply);
+      console.log("AI Reply:---------->", aiReply);
 
       const aiMessage: Message = {
         role: "ai",
@@ -154,6 +154,7 @@ const CareerCoach = () => {
       };
 
       setMessages((prev) => [...prev, aiMessage]);
+      // FOLLOW UP QUESTIONS=====================================
       (async () => {
         try {
           const { data } = await axios.post("/api/ai/follow-up", {

@@ -48,6 +48,7 @@ import {
 import { toast } from "sonner";
 import { createClient } from "@/lib/supabase/client";
 import { useUserData } from "@/context/UserDataProvider";
+import { useSidebar } from "@/components/ui/sidebar";
 
 interface Job {
   title: string;
@@ -194,6 +195,7 @@ export default function CareerTabsDemo() {
 
   const [visibleJobs, setVisibleJobs] = useState(6);
   const [loadingMore, setLoadingMore] = useState(false);
+  const { open: sidebarOpen, isMobile } = useSidebar();
 
   // colleges---------------------------->
   const [nearbyActive, setNearbyActive] = useState(false);
@@ -302,36 +304,64 @@ export default function CareerTabsDemo() {
   };
 
   return (
-    <div className="max-w-[1120px]  mx-auto p-6 mb-20">
-      <div className="w-full my-4 text-center">
+    <div
+      className={` ${
+        sidebarOpen ? "max-w-[1120px]" : "max-w-[1280px]"
+      } mx-auto p-6 mb-20`}
+    >
+      <div className="w-full my-4 text-center bg-gradient-to-br from-blue-300 to-pink-300 py-12 rounded-lg relative overflow-hidden">
         {activeTab === "jobs" && (
           <>
-            <h1 className="text-3xl font-sora font-semibold mb-2">
-              Recommended Jobs for you
+            <h1 className="text-4xl font-inter font-semibold mb-2">
+              Recommended Jobs for you{" "}
+              <LuBriefcase className="inline-block ml-3" />
             </h1>
-            <p className="text-muted-foreground font-inter text-lg ">
+            <p className="text-gray-700 font-inter text-lg ">
               Explore job opportunities tailored to your career choice.
             </p>
+            <Image
+              src="/ca1.png"
+              alt="ca1"
+              width={200}
+              height={200}
+              className="absolute top-10 right-0"
+            />
           </>
         )}
         {activeTab === "colleges" && (
           <>
-            <h1 className="text-3xl font-sora font-semibold mb-2">
-              Recommended Colleges for you
+            <h1 className="text-4xl font-inter font-semibold mb-2">
+              Recommended Colleges for you{" "}
+              <LuBuilding2 className="inline-block ml-3" />
             </h1>
-            <p className="text-muted-foreground font-inter text-lg">
+            <p className="text-gray-700 font-inter text-lg">
               Discover the best colleges for your career.
             </p>
+            <Image
+              src="/ca2.png"
+              alt="ca1"
+              width={200}
+              height={200}
+              className="absolute top-10 right-0"
+            />
           </>
         )}
         {activeTab === "courses" && (
           <>
-            <h1 className="text-3xl font-sora font-semibold mb-2">
-              Courses found just for you.
+            <h1 className="text-4xl font-inter font-semibold mb-2">
+              Courses found just for you.{" "}
+              <LucideActivity className="inline-block ml-3" />
             </h1>
-            <p className="text-muted-foreground font-inter text-lg">
+            <p className="text-gray-700 font-inter text-lg">
               Browse courses to skill up in your field.
             </p>
+            <Image
+              src="/ca2.png"
+              alt="ca1"
+              width={200}
+              height={200}
+              className="absolute top-10 right-0"
+            />
           </>
         )}
       </div>
