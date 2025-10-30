@@ -1,9 +1,11 @@
 "use client";
 import { Button } from "@/components/ui/button";
 import { useUserData } from "@/context/UserDataProvider";
+import { useSessionStore } from "@/lib/store/useSessionStore";
 import { createClient } from "@/lib/supabase/client";
 import { MentorSession } from "@/lib/types/allTypes";
 import Image from "next/image";
+import { useRouter } from "next/navigation";
 import React, { useEffect, useState } from "react";
 import { LuActivity } from "react-icons/lu";
 import { toast } from "sonner";
@@ -11,6 +13,8 @@ import { toast } from "sonner";
 const ConfirmTab = () => {
   const supabase = createClient();
   const { mentor } = useUserData();
+  const router = useRouter();
+  const { setActiveSession } = useSessionStore();
   const [acceptedSessions, setAcceptedSessions] = useState<
     (MentorSession & {
       userName: string;
@@ -143,19 +147,35 @@ const ConfirmTab = () => {
                   <p>{session.userEmail}</p>
                 </div>
               </div>
-                 <p className="text-sm font-inter">
-                  {session.scheduled_at
-                    ? new Date(session.requested_at).toLocaleDateString()
-                    : "Date of requested"}
-                </p>
+              <p className="text-sm font-inter">
+                {session.scheduled_at
+                  ? new Date(session.requested_at).toLocaleDateString()
+                  : "Date of requested"}
+              </p>
 
-                <p className="text-sm font-inter">
-                  {session.scheduled_at
-                    ? new Date(session.scheduled_at).toLocaleString()
-                    : ""}
-                </p>
+              <p className="text-sm font-inter">
+                {session.scheduled_at
+                  ? new Date(session.scheduled_at).toLocaleString()
+                  : ""}
+              </p>
+              <p>{session.session_type}</p>
 
-                <Button size="sm" variant="default" className="text-sm font-inter tracking-tight">Start Session <LuActivity className="ml-2" /></Button>
+              <Button
+                size="sm"
+                variant="default"
+                className="text-sm font-inter tracking-tight cursor-pointer"
+                onClick={() => {
+                  setActiveSession({
+                    userName: session.userName,
+                    userEmail: session.userEmail,
+                    avatar: session.avatar,
+                    session_type: session.session_type,
+                  });
+                  router.push("/dashboard/video-call-Home");
+                }}
+              >
+                Start Session <LuActivity className="ml-2" />
+              </Button>
             </div>
           ))}
         </div>

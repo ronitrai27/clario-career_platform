@@ -93,6 +93,8 @@ export type MentorSession = {
   notes?: string | null;
   vc_link?: string | null;
   reviews?: string ;
+  mentorName: string;
+  mentorAvatar: string | null;
 };
 
 export type JobTrackerCard = {

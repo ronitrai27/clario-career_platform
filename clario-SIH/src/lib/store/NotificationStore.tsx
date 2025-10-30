@@ -20,7 +20,6 @@ export const useNotificationStore = create<NotificationStore>((set) => ({
   notifications: [],
 
   addNotification: (notification) => {
-    // Update local state immediately
     set((state) => ({
       notifications: [notification, ...state.notifications],
     }));
@@ -32,18 +31,23 @@ export const useNotificationStore = create<NotificationStore>((set) => ({
     })();
   },
 
-  fetchNotifications: async (userId) => {
-    const { data, error } = await supabase
-      .from("notification")
-      .select("*")
-      .eq("userId", userId)
-      .order("created_at", { ascending: false });
+ fetchNotifications: async (userId) => {
+  // Calculate date 24 hours ago
+  const oneDayAgo = new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString();
 
-    if (error) {
-      console.error("Failed to fetch notifications:", error);
-      return;
-    }
+  const { data, error } = await supabase
+    .from("notification")
+    .select("*")
+    .eq("userId", userId)
+    .gte("created_at", oneDayAgo) 
+    .order("created_at", { ascending: false });
 
-    set({ notifications: data || [] });
-  },
+  if (error) {
+    console.error("Failed to fetch notifications:", error);
+    return;
+  }
+
+  set({ notifications: data || [] });
+},
+
 }));

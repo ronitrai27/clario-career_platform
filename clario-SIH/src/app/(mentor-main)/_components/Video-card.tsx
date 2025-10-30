@@ -2,25 +2,24 @@
 import { ArrowRight, Book, LucideArrowRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import Image from "next/image";
-import { useRouter } from "next/navigation";
-import { LuEye } from "react-icons/lu";
+import { useUserData } from "@/context/UserDataProvider";
 
-const SingleCard = () => {
-  const router = useRouter();
+const VideoCard = () => {
+  const {mentor} = useUserData();
   const card = {
     id: 2,
-    title: "Manage All Your Bookings Here",
+    title: "Start Video call Session",
     description:
-      "Manage all your bookings and get insights on your progress.",
+      "Welcome to Video Call Session. Kindly read all the guidelines before starting the session.",
     accent: "border-indigo-500",
-    gradient: "from-yellow-200 to-amber-300",
+    gradient: "from-blue-200 to-blue-400",
     textAccent: "text-blue-600",
-    buttonGradient: "from-yellow-400 to-amber-400",
+    buttonGradient: "from-blue-400 to-blue-500",
     image: "/element3.png",
   };
 
   return (
-    <div className="relative w-full max-w-[1000px] mx-auto p-4">
+    <div className="relative w-full max-w-[1020px] mx-auto p-3">
       <div className="relative h-52 overflow-hidden rounded-xl border border-gray-200 shadow-sm bg-white flex items-center">
         <div
           className={`absolute -top-14 -left-5 inset-0 bg-gradient-to-r ${card.gradient}/40 blur-2xl w-20 h-36 rounded-full `}
@@ -28,10 +27,10 @@ const SingleCard = () => {
         {/* Left Side - Content */}
         <div className="flex-1 px-12 py-10 relative z-20">
           <div className="max-w-lg">
-            <h2 className="text-[27px] font-semibold text-black mb-4 leading-tight font-sora">
-              {card.title}
+            <h2 className="text-[27px] font-semibold text-black mb-4 leading-tight font-inter capitalize ">
+              {card.title} 
             </h2>
-            <p className="text-base text-muted-foreground font-raleway mb-8 leading-snug">
+            <p className="text-lg text-black font-inter mb-8 leading-snug">
               {card.description}
             </p>
 
@@ -39,10 +38,9 @@ const SingleCard = () => {
             <div className="flex items-center gap-8">
               <Button
                 className={`bg-gradient-to-r ${card.buttonGradient} text-white rounded-lg font-medium transition-all duration-200 group cursor-pointer`}
-                onClick={()=>router.push("/home/mentor-connect")}
               >
-                View them
-                <LuEye
+               Start Now
+                <Book
                   size={18}
                   className="group-hover:translate-x-1 transition-transform"
                 />
@@ -63,19 +61,13 @@ const SingleCard = () => {
             alt={card.title}
             width={200}
             height={200}
-            className="absolute w-full h-full object-contain z-10 scale-150 -top-4"
+            className="absolute w-full h-full object-contain z-10 scale-125"
           />
-          <Image
-            src="/staic6.png"
-            alt="Decorative Element"
-            width={300}
-            height={300}
-            className=" absolute -left-0 -top-10 "
-          />
+
         </div>
       </div>
     </div>
   );
 };
 
-export default SingleCard;
+export default VideoCard;

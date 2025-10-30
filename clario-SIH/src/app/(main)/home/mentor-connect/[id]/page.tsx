@@ -149,6 +149,8 @@ export default function MentorConnectPage() {
       .insert([
         {
           mentor_id: mentorId,
+          mentorName: mentor?.full_name,
+          mentorAvatar: mentor?.avatar,
           student_id: user.id,
           session_type:
             sessionType === "10"
@@ -278,7 +280,7 @@ export default function MentorConnectPage() {
         <div className="w-[70%] h-full">
           <div className="flex items-center gap-5 mb-8 mt-8 h-[60px]">
             <div>
-              <h2 className="font-inter underline underline-offset-4 text-lg font-semibold ">
+              <h2 className="font-inter underline whitespace-nowrap underline-offset-4 text-lg font-semibold ">
                 Current Ocupation
               </h2>
               <p className="text-black text-lg font-inter font-medium capitalize mt-3 ">

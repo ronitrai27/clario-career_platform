@@ -94,6 +94,7 @@ export default function HomePage() {
     ensureUserInDB();
   }, []);
 
+  // ======================================================
   // ------------FETCHING NOTIFICATIONS---------------------
   const notifications = useNotificationStore((state) => state.notifications);
   const fetchNotifications = useNotificationStore(
@@ -427,7 +428,7 @@ export default function HomePage() {
                         alt="user"
                         height={100}
                         width={100}
-                        className="w-10 h-10 rounded-full object-cover"
+                        className="w-9 h-9 rounded-full object-cover"
                         />
 
                         <div className="w-full">
