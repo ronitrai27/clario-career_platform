@@ -51,7 +51,7 @@ import { createClient } from "@/lib/supabase/client";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { toast } from "sonner";
-import { clearMentorCache } from "@/lib/functions/dbActions";
+
 
 export default function Navbar() {
   const { mentor, loading } = useUserData();
