@@ -179,6 +179,7 @@ const CareerCoach = () => {
         ...prev,
         { role: "ai", text: "Something went wrong." },
       ]);
+      toast.error("Something went wrong.");
     } finally {
       setAiLoading(false);
     }
