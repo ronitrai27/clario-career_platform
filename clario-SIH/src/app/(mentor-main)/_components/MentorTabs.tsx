@@ -198,7 +198,10 @@ export default function MentorSessionsTabs() {
               <p className="text-center">Action</p>
             </div>
             {pendingSessions.map((session) => (
-              <div className=" border border-gray-200 rounded-md flex justify-between items-center p-2">
+              <div
+                key={session.id}
+                className=" border border-gray-200 rounded-md flex justify-between items-center p-2"
+              >
                 <div className="flex gap-4">
                   <Image
                     src={session.avatar || "/user.png"}
@@ -263,7 +266,7 @@ export default function MentorSessionsTabs() {
       </TabsContent>
 
       <TabsContent value="accepted-rejected" className="p-4 bg-white">
-       <ConfirmTab/>
+        <ConfirmTab />
       </TabsContent>
 
       <TabsContent value="completed" className="p-6 bg-white">
