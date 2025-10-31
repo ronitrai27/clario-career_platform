@@ -1,17 +1,10 @@
-// app/room/[roomid]/page.tsx
+
 "use client";
 
 import { useUserData } from "@/context/UserDataProvider";
 import React, { useEffect, useRef } from "react";
 import { v4 as uuid } from "uuid";
 
-/**
- * NOTE (important security):
- * This file *still contains client-side token generation code* (generateKitTokenForTest)
- * — that requires ZEGO server secret. Exposing server secret on client is insecure.
- * Long-term: move token generation to a server endpoint and fetch the token from the client.
- * For now this code will try to run only in the browser and will warn if credentials are missing.
- */
 
 const Room = ({ params }: { params: Promise<{ roomid: string }> | { roomid: string } }) => {
   // useUser is a client hook — ok to use since this is a client component.
@@ -134,7 +127,7 @@ const Room = ({ params }: { params: Promise<{ roomid: string }> | { roomid: stri
     <div
       className="myCallContainer"
       ref={containerRef}
-      style={{ width: "100%", height: "100%" }}
+      style={{ width: "100vw", height: "100vh" }}
     />
   );
   maxUsers: 2;
