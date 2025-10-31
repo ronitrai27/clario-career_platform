@@ -7,7 +7,7 @@ import { Type } from "@google/genai";
 import { getSelectedCareer, updateSelectedCareer } from "./dbActions";
 import { retrivalServer } from "./pineconeQuery";
 import { toast } from "sonner";
-import { tavilySearching } from "./tavily";
+// import { tavilySearching } from "./tavily";
 
 const ai = new GoogleGenAI({ apiKey: process.env.NEXT_PUBLIC_GEMINI_API_KEY! });
 
@@ -33,23 +33,6 @@ const history: Array<{
 
 // ----------------------TOOLS---------------------------
 //webSearch tool----------------------------------------
-// async function tavilySearch(query: string): Promise<string> {
-//   const resp = await fetch("https://api.tavily.com/search", {
-//     method: "POST",
-//     headers: {
-//       "Content-Type": "application/json",
-//       Authorization: `Bearer ${process.env.NEXT_PUBLIC_TAVILY_API_KEY!}`,
-//     },
-//     body: JSON.stringify({
-//       query,
-//       max_results: 3,
-//     }),
-//   });
-
-//   const data = await resp.json();
-//   console.log("===data from TAVILY====", data);
-//   return data.results.map((r: any) => r.content).join("\n\n---\n\n");
-// }
 
 // export async function tavilySearch(query: string): Promise<string> {
 //   try { 

@@ -18,6 +18,9 @@ import {
   DialogDescription,
   DialogFooter,
 } from "@/components/ui/dialog";
+import { toast } from "sonner";
+import { createClient } from "@/lib/supabase/client";
+import { useUserData } from "@/context/UserDataProvider";
 
 const notes = [
   "Maintain professionalism while interacting with students during the session.",
@@ -30,6 +33,8 @@ const notes = [
 const VideoCallHome = () => {
   const { activeSession } = useSessionStore();
   const router = useRouter();
+  const supabase = createClient();
+  const { mentor } = useUserData();
   const [confirmOpen, setConfirmOpen] = useState(false);
 
   const handleChat = () => {
@@ -39,6 +44,41 @@ const VideoCallHome = () => {
 
   const handleStartSession = () => {
     setConfirmOpen(true);
+  };
+
+  const [loading, setLoading] = useState(false);
+
+  const handleStartSession2 = async () => {
+    if (!activeSession?.session_id) {
+      toast.error("No session found!");
+      return;
+    }
+
+    setLoading(true);
+
+    try {
+      const vcLink = `${activeSession.session_id}`;
+
+      const { error } = await supabase
+        .from("mentor_sessions")
+        .update({ vc_link: vcLink })
+        .eq("id", activeSession.session_id);
+
+      if (error) {
+        console.error("Error updating VC link:", error);
+        toast.error("Failed to start session. Try again.");
+        setLoading(false);
+        return;
+      }
+
+      toast.success("Session starting...");
+      router.push(`/room/${vcLink}`);
+    } catch (err) {
+      console.error(err);
+      toast.error("Unexpected error occurred!");
+    } finally {
+      setLoading(false);
+    }
   };
 
   if (!activeSession) {
@@ -118,7 +158,9 @@ const VideoCallHome = () => {
       <Dialog open={confirmOpen} onOpenChange={setConfirmOpen}>
         <DialogContent className="max-w-sm">
           <DialogHeader>
-            <DialogTitle className="font-sora text-center tracking-tight">Confirm Session Start</DialogTitle>
+            <DialogTitle className="font-sora text-center tracking-tight">
+              Confirm Session Start
+            </DialogTitle>
             <DialogDescription className="text-sm text-gray-800 font-inter text-center mt-4">
               Are you sure you want to start the video call session with{" "}
               <span className="font-semibold text-blue-600">
@@ -136,9 +178,13 @@ const VideoCallHome = () => {
               Cancel <LuX className="ml-2" />
             </Button>
             <Button
-               onClick={() => router.push(`/dashboard/room/${activeSession.session_id}`)}
+              //  onClick={() => router.push(`/room/${activeSession.session_id}`)}
+              onClick={handleStartSession2}
+              disabled={loading}
+              className="cursor-pointer font-inter text-sm"
             >
-              Start session <LuVideo className="ml-2" />
+              {loading ? "Starting..." : "Start Session"}{" "}
+              {!loading && <LuVideo className="ml-2" />}
             </Button>
           </DialogFooter>
         </DialogContent>

@@ -53,7 +53,7 @@ import { createClient } from "@/lib/supabase/client";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { toast } from "sonner";
-import { clearMentorCache } from "@/lib/functions/dbActions";
+// import { clearMentorCache } from "@/lib/functions/dbActions";
 
 export default function Navbar() {
   const { user, loading } = useUserData();
@@ -65,9 +65,9 @@ export default function Navbar() {
   async function signOut() {
     setSignoutLoading(true);
     try {
-      if (user?.mainFocus) {
-        await clearMentorCache(user.mainFocus);
-      }
+      // if (user?.mainFocus) {
+      //   await clearMentorCache(user.mainFocus);
+      // }
 
       await supabase.auth.signOut();
       toast.success("Signed out successfully");

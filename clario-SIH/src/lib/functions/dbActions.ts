@@ -12,7 +12,6 @@ import {
 import { redis } from "@/lib/redis";
 import { useNotificationStore } from "../store/NotificationStore";
 
-export const runtime = "nodejs";
 
 
 // Interface for the response structure
@@ -161,15 +160,15 @@ export async function getUserQuizData(userId: any): Promise<UserQuizData[]> {
   }
 }
 
-export async function clearMentorCache(focus: string) {
-  const cacheKey = `mentors:${focus.toLowerCase().trim()}`;
-  try {
-    await redis.del(cacheKey);
-    console.log(`✅ Redis cache cleared for key: ${cacheKey}`);
-  } catch (error) {
-    console.error(`❌ Failed to clear Redis cache for key: ${cacheKey}`, error);
-  }
-}
+// export async function clearMentorCache(focus: string) {
+//   const cacheKey = `mentors:${focus.toLowerCase().trim()}`;
+//   try {
+//     await redis.del(cacheKey);
+//     console.log(`✅ Redis cache cleared for key: ${cacheKey}`);
+//   } catch (error) {
+//     console.error(`❌ Failed to clear Redis cache for key: ${cacheKey}`, error);
+//   }
+// }
 
 export async function getRandomMentorVideos(): Promise<MentorVideo[]> {
   const supabase = createClient();

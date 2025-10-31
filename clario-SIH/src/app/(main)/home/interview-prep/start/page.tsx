@@ -126,15 +126,15 @@ const InterviewStart = () => {
   };
  
   // ----------------------------VAPI SETUP--------------------------------
-  // useEffect(() => {
-  //   if (!interviewData) return;
+  useEffect(() => {
+    if (!interviewData) return;
 
-  //   if (!interviewData.jobTitle) {
-  //     toast.error("Job title is missing for this interview.");
-  //     return;
-  //   }
-  //   startCall();
-  // }, [interviewData]);
+    if (!interviewData.jobTitle) {
+      toast.error("Job title is missing for this interview.");
+      return;
+    }
+    startCall();
+  }, [interviewData]);
 
   const startCall = async () => {
     const questionList = interviewData?.questions

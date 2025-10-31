@@ -3,10 +3,11 @@ import SingleCard from "@/app/(main)/_components/Mentor-card";
 import { Separator } from "@/components/ui/separator";
 import { createClient } from "@/lib/supabase/client";
 import React, { useEffect, useMemo, useState } from "react";
-import { LuChevronLeft, LuGhost } from "react-icons/lu";
+import { LuChevronLeft, LuGhost, LuVideo } from "react-icons/lu";
 import { MentorSession } from "@/lib/types/allTypes";
 import { Filter, FilterIcon, Loader } from "lucide-react";
 import Image from "next/image";
+import { useRouter } from "next/navigation";
 
 const TABLE = "mentor_sessions";
 
@@ -22,6 +23,7 @@ const Bookings = () => {
   const [sessions, setSessions] = useState<MentorSession[]>([]);
   const [loading, setLoading] = useState(true);
   const [selectedFilter, setSelectedFilter] = useState<string>("all");
+  const router = useRouter();
 
   // ================================================
   const fetchInitial = async () => {
@@ -92,6 +94,12 @@ const Bookings = () => {
     return d.toLocaleString();
   }
 
+  // =====================================================
+  // const handleJoinVC = () => {
+  //   if (!s.vc_link) return;
+  //   router.push(`/room/${s.vc_link}`);
+  // };
+
   // ==========================================
   return (
     <div className="w-full h-full bg-gray-50 px-3 py-2 overflow-hidden">
@@ -109,14 +117,18 @@ const Bookings = () => {
       <div className="flex h-full gap-4 mt-4">
         {/* LEFT SIDE FILTERS lik Pending , Comfirmed , Completed , Rejected */}
         <div className="w-48 p-2">
-          <h3 className="text-lg font-semibold mb-3 font-sora">Filters <FilterIcon  className="inline ml-3 " size={20}/></h3>
+          <h3 className="text-lg font-semibold mb-3 font-sora">
+            Filters <FilterIcon className="inline ml-3 " size={20} />
+          </h3>
           <div className="flex flex-col gap-5">
             {FILTERS.map((f) => (
               <button
                 key={f.key}
                 onClick={() => setSelectedFilter(f.key)}
                 className={`text-left px-3 py-2 font-inter text-base capitalize bg-blue-100 rounded-md cursor-pointer hover:bg-blue-300 transition-colors ${
-                  selectedFilter === f.key ? "bg-blue-200 border border-blue-300 font-inter font-medium" : ""
+                  selectedFilter === f.key
+                    ? "bg-blue-300 border border-blue-600 text-white font-inter font-medium"
+                    : ""
                 }`}
               >
                 {f.label}
@@ -131,17 +143,16 @@ const Bookings = () => {
         <div className="flex-1 p-4 overflow-auto">
           <div className="flex items-center justify-between mb-4">
             <h2 className="text-xl font-semibold font-inter whitespace-nowrap">
-             Total  Sessions Found :  {filtered.length}
+              Total Sessions Found : {filtered.length}
             </h2>
           </div>
 
-            {loading && (
-              <div className="w-full h-full mt-20 -ml-20 flex justify-center">
-                <Loader className="animate-spin mr-5" size={24} />
-                <p className="font-inter text-lg">Loading....</p>
-              </div>
-            )}
-
+          {loading && (
+            <div className="w-full h-full mt-20 -ml-20 flex justify-center">
+              <Loader className="animate-spin mr-5" size={24} />
+              <p className="font-inter text-lg">Loading....</p>
+            </div>
+          )}
 
           <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
             {filtered.map((s) => (
@@ -155,7 +166,9 @@ const Bookings = () => {
                     className="w-12 h-12 rounded-full object-cover"
                   />
                   <div>
-                    <div className="font-medium font-inter capitalize">{s.mentorName}</div>
+                    <div className="font-medium font-inter capitalize">
+                      {s.mentorName}
+                    </div>
                     <div className="text-sm text-muted-foreground font-inter">
                       {s.session_type}
                     </div>
@@ -183,21 +196,18 @@ const Bookings = () => {
                     {formatDate(s.scheduled_at || s.requested_at)}
                   </div>
                   {s.vc_link && (
-                    <div className="mt-2">
-                      <a
-                        href={s.vc_link}
-                        target="_blank"
-                        rel="noreferrer"
-                        className="underline text-sm"
-                      >
-                        Join VC
-                      </a>
+                    <div className="mt-2 font-inter text-sm text-blue-600 cursor-pointer"
+                    onClick={()=>router.push(`/room/${s.vc_link}`)}>
+                      <LuVideo className="inline mr-2" />
+                      Join Video Call
                     </div>
                   )}
                 </div>
 
                 {s.notes && (
-                  <div className="mt-3 text-sm font-inter">Notes: {s.notes}</div>
+                  <div className="mt-3 text-sm font-inter">
+                    Notes: {s.notes}
+                  </div>
                 )}
               </div>
             ))}
