@@ -17,7 +17,7 @@ export async function GET(req: NextRequest) {
 
   try {
     const response = await getJson({
-      // api_key: process.env.SERPAPI_KEY,
+      api_key: process.env.SERPAPI_KEY,
       engine: "google_jobs",
       google_domain: "google.co.in",
       q: query,

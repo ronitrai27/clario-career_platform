@@ -2,12 +2,13 @@
 import SingleCard from "@/app/(main)/_components/Mentor-card";
 import { Separator } from "@/components/ui/separator";
 import { createClient } from "@/lib/supabase/client";
-import React, { useEffect, useMemo, useState } from "react";
+import React, { use, useEffect, useMemo, useState } from "react";
 import { LuChevronLeft, LuGhost, LuVideo } from "react-icons/lu";
 import { MentorSession } from "@/lib/types/allTypes";
 import { Filter, FilterIcon, Loader } from "lucide-react";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
+import { useUserData } from "@/context/UserDataProvider";
 
 const TABLE = "mentor_sessions";
 
@@ -24,6 +25,7 @@ const Bookings = () => {
   const [loading, setLoading] = useState(true);
   const [selectedFilter, setSelectedFilter] = useState<string>("all");
   const router = useRouter();
+  const { user } = useUserData();
 
   // ================================================
   const fetchInitial = async () => {
@@ -31,6 +33,7 @@ const Bookings = () => {
     const { data, error } = await supabase
       .from(TABLE)
       .select("*")
+      .eq("student_id", user?.id)
       .order("requested_at", { ascending: false })
       .limit(500);
 
@@ -127,7 +130,7 @@ const Bookings = () => {
                 onClick={() => setSelectedFilter(f.key)}
                 className={`text-left px-3 py-2 font-inter text-base capitalize bg-blue-100 rounded-md cursor-pointer hover:bg-blue-300 transition-colors ${
                   selectedFilter === f.key
-                    ? "bg-blue-300 border border-blue-600 text-white font-inter font-medium"
+                    ? "bg-blue-400 text-white font-inter font-medium"
                     : ""
                 }`}
               >
@@ -196,8 +199,10 @@ const Bookings = () => {
                     {formatDate(s.scheduled_at || s.requested_at)}
                   </div>
                   {s.vc_link && (
-                    <div className="mt-2 font-inter text-sm text-blue-600 cursor-pointer"
-                    onClick={()=>router.push(`/room/${s.vc_link}`)}>
+                    <div
+                      className="mt-2 font-inter text-sm text-blue-600 cursor-pointer"
+                      onClick={() => router.push(`/room/${s.vc_link}`)}
+                    >
                       <LuVideo className="inline mr-2" />
                       Join Video Call
                     </div>
