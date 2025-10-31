@@ -328,7 +328,7 @@ export default function HomePage() {
             <AiSuggestedBoxHome />
           </div>
           {/* --------------Right side--------------- */}
-          <div className="w-[24%]  flex flex-col gap-14  items-center h-full ">
+          <div className="w-[24%]  flex flex-col gap-12  items-center h-full ">
             <HomeCalendar />
             {/* Messages Container */}
             <div className="w-full h-[466px] bg-white rounded-xl shadow px-2 py-4">
@@ -406,7 +406,7 @@ export default function HomePage() {
             </div>
 
             {/* INBOX */}
-            <div className="w-full h-[340px] bg-white rounded-xl shadow p-4">
+            <div className="w-full h-[370px] bg-white rounded-xl shadow p-4">
               <div className="flex items-center justify-between px-4">
                 <h2 className="text-base font-inter font-semibold">Inbox</h2>
                 <LuMailbox className="text-gray-600 text-2xl" />

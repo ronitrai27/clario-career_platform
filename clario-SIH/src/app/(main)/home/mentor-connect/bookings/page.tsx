@@ -3,8 +3,10 @@ import SingleCard from "@/app/(main)/_components/Mentor-card";
 import { Separator } from "@/components/ui/separator";
 import { createClient } from "@/lib/supabase/client";
 import React, { useEffect, useMemo, useState } from "react";
-import { LuChevronLeft } from "react-icons/lu";
+import { LuChevronLeft, LuGhost } from "react-icons/lu";
 import { MentorSession } from "@/lib/types/allTypes";
+import { Filter, FilterIcon, Loader } from "lucide-react";
+import Image from "next/image";
 
 const TABLE = "mentor_sessions";
 
@@ -92,7 +94,7 @@ const Bookings = () => {
 
   // ==========================================
   return (
-    <div className="w-full h-full bg-gray-50 p-3 overflow-hidden">
+    <div className="w-full h-full bg-gray-50 px-3 py-2 overflow-hidden">
       <SingleCard />
 
       <div className="mt-4 flex items-center  w-full">
@@ -104,17 +106,17 @@ const Bookings = () => {
           My Bookings
         </h2>
       </div>
-      <div className="flex h-full gap-4">
+      <div className="flex h-full gap-4 mt-4">
         {/* LEFT SIDE FILTERS lik Pending , Comfirmed , Completed , Rejected */}
         <div className="w-48 p-2">
-          <h3 className="text-lg font-semibold mb-3 font-sora">Filters</h3>
-          <div className="flex flex-col gap-4">
+          <h3 className="text-lg font-semibold mb-3 font-sora">Filters <FilterIcon  className="inline ml-3 " size={20}/></h3>
+          <div className="flex flex-col gap-5">
             {FILTERS.map((f) => (
               <button
                 key={f.key}
                 onClick={() => setSelectedFilter(f.key)}
                 className={`text-left px-3 py-2 font-inter text-base capitalize bg-blue-100 rounded-md cursor-pointer hover:bg-blue-300 transition-colors ${
-                  selectedFilter === f.key ? "bg-white/10 font-medium" : ""
+                  selectedFilter === f.key ? "bg-blue-200 border border-blue-300 font-inter font-medium" : ""
                 }`}
               >
                 {f.label}
@@ -128,30 +130,39 @@ const Bookings = () => {
         {/* RIGHT SIDE CARDS */}
         <div className="flex-1 p-4 overflow-auto">
           <div className="flex items-center justify-between mb-4">
-            <h2 className="text-xl font-semibold">
-              Sessions ({filtered.length})
+            <h2 className="text-xl font-semibold font-inter whitespace-nowrap">
+             Total  Sessions Found :  {filtered.length}
             </h2>
-            {loading && <span className="text-sm">Loading…</span>}
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+            {loading && (
+              <div className="w-full h-full mt-20 -ml-20 flex justify-center">
+                <Loader className="animate-spin mr-5" size={24} />
+                <p className="font-inter text-lg">Loading....</p>
+              </div>
+            )}
+
+
+          <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
             {filtered.map((s) => (
-              <div key={s.id} className="p-4 bg-white/5 rounded-lg shadow-sm">
+              <div key={s.id} className="p-4 bg-white rounded-lg shadow-sm">
                 <div className="flex items-center gap-3">
-                  <img
+                  <Image
                     src={s.mentorAvatar || `/default-avatar.png`}
                     alt={s.mentorName}
+                    width={100}
+                    height={100}
                     className="w-12 h-12 rounded-full object-cover"
                   />
                   <div>
-                    <div className="font-medium">{s.mentorName}</div>
-                    <div className="text-sm text-muted-foreground">
+                    <div className="font-medium font-inter capitalize">{s.mentorName}</div>
+                    <div className="text-sm text-muted-foreground font-inter">
                       {s.session_type}
                     </div>
                   </div>
                   <div className="ml-auto text-sm">
                     <span
-                      className={`px-2 py-1 rounded-full text-xs font-medium capitalize ${
+                      className={`px-2 py-1 rounded-full text-xs font-inter font-medium capitalize ${
                         s.status === "pending"
                           ? "bg-yellow-600/20"
                           : s.status === "accepted"
@@ -166,7 +177,7 @@ const Bookings = () => {
                   </div>
                 </div>
 
-                <div className="mt-3 text-sm text-muted-foreground">
+                <div className="mt-3 text-sm font-inter text-muted-foreground">
                   <div>
                     <strong>Date:</strong>{" "}
                     {formatDate(s.scheduled_at || s.requested_at)}
@@ -186,14 +197,14 @@ const Bookings = () => {
                 </div>
 
                 {s.notes && (
-                  <div className="mt-3 text-sm">Notes: {s.notes}</div>
+                  <div className="mt-3 text-sm font-inter">Notes: {s.notes}</div>
                 )}
               </div>
             ))}
 
             {filtered.length === 0 && !loading && (
-              <div className="col-span-full text-center text-muted-foreground">
-                No sessions
+              <div className="col-span-full text-center text-muted-foreground font-inter text-lg">
+                No sessions Found <LuGhost className="inline ml-2" />
               </div>
             )}
           </div>

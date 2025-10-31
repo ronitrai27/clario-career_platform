@@ -13,9 +13,9 @@ const SingleCard = () => {
     description:
       "Manage all your bookings and get insights on your progress.",
     accent: "border-indigo-500",
-    gradient: "from-yellow-200 to-amber-300",
+    gradient: "from-blue-200 to-blue-400",
     textAccent: "text-blue-600",
-    buttonGradient: "from-yellow-400 to-amber-400",
+    buttonGradient: "from-blue-400 to-sky-400",
     image: "/element3.png",
   };
 
