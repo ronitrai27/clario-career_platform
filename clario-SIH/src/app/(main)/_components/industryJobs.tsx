@@ -355,12 +355,19 @@ export default function CareerTabsDemo() {
         )}
         {activeTab === "courses" && (
           <>
+           <Image
+              src="/ca1.png"
+              alt="ca1"
+              width={200}
+              height={200}
+              className="absolute top-10 left-0"
+            />
             <h1 className="text-4xl font-inter font-semibold mb-2">
-              Courses found just for you.{" "}
+              Right Resources found just for you.{" "}
               <LucideActivity className="inline-block ml-3" />
             </h1>
             <p className="text-gray-700 font-inter text-lg">
-              Browse courses to skill up in your field.
+              Browse Courses and Top rated Yt videos for your career.
             </p>
             <Image
               src="/ca2.png"
@@ -422,7 +429,7 @@ export default function CareerTabsDemo() {
           </div>
         )}
 
-        {activeTab === "courses" && (
+        {/* {activeTab === "courses" && (
           <div className="mb-8 flex items-center justify-between px-8">
             <h2 className="font-inter text-xl font-medium tracking-tight">
               Courses found for{" "}
@@ -430,7 +437,7 @@ export default function CareerTabsDemo() {
               <LuBriefcase className="inline-block ml-3 text-blue-500" />
             </h2>
           </div>
-        )}
+        )} */}
 
         <TabsContent value="jobs">
           <div className="">
@@ -544,7 +551,7 @@ export default function CareerTabsDemo() {
         </TabsContent>
 
         <TabsContent value="courses">
-          <div className="p-6  ">
+          <div className="p-4  ">
             <CareerCourses />
           </div>
         </TabsContent>

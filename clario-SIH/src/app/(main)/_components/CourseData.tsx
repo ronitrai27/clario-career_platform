@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import { useQuizData } from "@/context/userQuizProvider";
 import { Button } from "@/components/ui/button";
 import { ExternalLink } from "lucide-react";
+import YtVideo from "../home/test/yt/page";
 
 type Course = {
   title: string;
@@ -113,63 +114,107 @@ export default function CareerCourses() {
   //   }
   // }, [quizData?.selectedCareer]);
 
+  // ===================================================================
+    const [activeTab, setActiveTab] = useState<"courses" | "videos">("courses");
+
   if (loading) return <p className="text-center mt-6">Loading...</p>;
   if (!courses.length)
     return <p className="text-center mt-6">No courses found.</p>;
 
   return (
-    <div className="max-w-7xl mx-auto  px-4">
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-        {courses.map((course, idx) => (
-          <div
-            key={idx}
-            className="border rounded-lg p-4 shadow-sm hover:shadow-md transition bg-white h-[300px] flex flex-col"
-          >
-            <a
-              href={course.link}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="text-lg font-semibold text-black font-inter text-center hover:underline"
-            >
-              {course.title}
-            </a>
+    <div className="max-w-[1300px] mx-auto  px-4">
 
-            {course.snippet && (
-              <p className="text-base line-clamp-3 font-sora text-muted-foreground  mt-2 ">
-                {course.snippet}
-              </p>
-            )}
+       {/* ======= Header Text ======= */}
+      <h2 className="text-2xl font-semibold text-center mb-6 -mt-3 font-inter">
+        {activeTab === "courses"
+          ? "Top courses found  for you"
+          : "Top rated YouTube videos for you"}
+      </h2>
 
-         <div className="flex items-center justify-between gap-10 px-4 mt-4">
-             {course.favicon && (
-              <img
-                src={course.favicon}
-                alt={course.title}
-                className="w-8 h-8 mt-2"
-              />
-            )}
 
-            {course.source && (
-              <p className="text-sm tracking-tight font-raleway text-blue-600  mt-2">
-                 {course.source}
-              </p>
-            )}
-         </div>
+        {/* ======= Toggle Buttons ======= */}
+      <div className="flex justify-center gap-10 mb-10">
+        <Button
+          variant={activeTab === "courses" ? "default" : "outline"}
+          onClick={() => setActiveTab("courses")}
+          className="font-inter"
+        >
+          📘 Courses
+        </Button>
+        <Button
+          variant={activeTab === "videos" ? "default" : "outline"}
+          onClick={() => setActiveTab("videos")}
+          className="font-inter"
+        >
+          🎥 YouTube Videos
+        </Button>
+      </div>
 
-           <Button className="font-inter text-sm mt-auto w-full" variant="outline" >
-             {course.redirect_link && (
-              <a
-                href={course.redirect_link}
-                target="_blank"
-                rel="noopener noreferrer"
-                className=""
+     
+      {/* ======= Conditional Display ======= */}
+      <div
+        key={activeTab}
+        className="transition-all duration-300 ease-in-out animate-fadeIn"
+      >
+        {activeTab === "courses" ? (
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-10">
+            {courses.map((course, idx) => (
+              <div
+                key={idx}
+                className="border rounded-lg p-4 shadow-sm hover:shadow-md transition bg-white h-[300px] flex flex-col"
               >
-                Redirect Link <ExternalLink className="inline-block ml-2 -mt-1 h-4 w-4" />
-              </a>
-            )}
-           </Button>
+                <a
+                  href={course.link}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-lg font-semibold text-black font-inter text-center hover:underline"
+                >
+                  {course.title}
+                </a>
+
+                {course.snippet && (
+                  <p className="text-base line-clamp-3 font-sora text-muted-foreground mt-2">
+                    {course.snippet}
+                  </p>
+                )}
+
+                <div className="flex items-center justify-between gap-10 px-4 mt-4">
+                  {course.favicon && (
+                    <img
+                      src={course.favicon}
+                      alt={course.title}
+                      className="w-8 h-8 mt-2"
+                    />
+                  )}
+
+                  {course.source && (
+                    <p className="text-sm tracking-tight font-raleway text-blue-600 mt-2">
+                      {course.source}
+                    </p>
+                  )}
+                </div>
+
+                <Button
+                  className="font-inter text-sm mt-auto w-full"
+                  variant="outline"
+                >
+                  {course.redirect_link && (
+                    <a
+                      href={course.redirect_link}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                    >
+                      Redirect Link{" "}
+                      <ExternalLink className="inline-block ml-2 -mt-1 h-4 w-4" />
+                    </a>
+                  )}
+                </Button>
+              </div>
+            ))}
           </div>
-        ))}
+        ) : (
+          <YtVideo />
+        )}
       </div>
     </div>
   );
