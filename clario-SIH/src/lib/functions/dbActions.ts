@@ -12,6 +12,9 @@ import {
 import { redis } from "@/lib/redis";
 import { useNotificationStore } from "../store/NotificationStore";
 
+export const runtime = "nodejs";
+
+
 // Interface for the response structure
 interface PaginatedMentors {
   mentors: DBMentor[];

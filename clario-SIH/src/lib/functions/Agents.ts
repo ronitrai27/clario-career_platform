@@ -51,21 +51,44 @@ const history: Array<{
 //   return data.results.map((r: any) => r.content).join("\n\n---\n\n");
 // }
 
+// export async function tavilySearch(query: string): Promise<string> {
+//   try { 
+
+//     const result = await tavilySearching(query);
+
+//     if (!result || result.includes("Error")) {
+//       throw new Error("No results from Tavily");
+//     }
+
+//     return result;
+//   } catch (error) {
+//     console.error("Error fetching Tavily results:", error);
+//     return "Tavily search failed. Please try again later.";
+//   }
+// }
+
+
 export async function tavilySearch(query: string): Promise<string> {
-  try { 
+  try {
+    const res = await fetch("/api/tavily", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ query }),
+    });
 
-    const result = await tavilySearching(query);
+    const data = await res.json();
 
-    if (!result || result.includes("Error")) {
-      throw new Error("No results from Tavily");
+    if (!res.ok || !data.result) {
+      throw new Error(data.error || "No results from Tavily");
     }
 
-    return result;
+    return data.result;
   } catch (error) {
     console.error("Error fetching Tavily results:", error);
     return "Tavily search failed. Please try again later.";
   }
 }
+
 
 // ==========================================================
 // Pinecone query tool----------------------------------------
