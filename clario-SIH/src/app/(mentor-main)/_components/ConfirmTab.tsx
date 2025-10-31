@@ -158,7 +158,8 @@ const ConfirmTab = () => {
                   ? new Date(session.scheduled_at).toLocaleString()
                   : ""}
               </p>
-              <p>{session.session_type}</p>
+              {/* <p>{session.session_type}</p> */}
+             
 
               <Button
                 size="sm"
@@ -167,6 +168,8 @@ const ConfirmTab = () => {
                 onClick={() => {
                   setActiveSession({
                     userName: session.userName,
+                    id: session.student_id,
+                    session_id: session.id,
                     userEmail: session.userEmail,
                     avatar: session.avatar,
                     session_type: session.session_type,

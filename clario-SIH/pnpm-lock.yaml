@@ -143,6 +143,9 @@ importers:
       '@xyflow/react':
         specifier: ^12.8.4
         version: 12.8.4(@types/react@19.1.12)(immer@10.1.3)(react-dom@19.1.0(react@19.1.0))(react@19.1.0)
+      '@zegocloud/zego-uikit-prebuilt':
+        specifier: ^2.17.0
+        version: 2.17.0
       axios:
         specifier: ^1.11.0
         version: 1.11.0(debug@4.4.1)
@@ -3002,6 +3005,9 @@ packages:
 
   '@xyflow/system@0.0.68':
     resolution: {integrity: sha512-QDG2wxIG4qX+uF8yzm1ULVZrcXX3MxPBoxv7O52FWsX87qIImOqifUhfa/TwsvLdzn7ic2DDBH1uI8TKbdNTYA==}
+
+  '@zegocloud/zego-uikit-prebuilt@2.17.0':
+    resolution: {integrity: sha512-yWeMfjKAxNni6hrIP6yVOY5c/TOLizjgGEA+7Lgg/so7WEkdNH2woBx4hV0fx47r2V2puHpKMQrCvk0C4L7+5Q==}
 
   abort-controller-x@0.4.3:
     resolution: {integrity: sha512-VtUwTNU8fpMwvWGn4xE93ywbogTYsuT+AUxAXOeelbXuQVIwNmC5YLeho9sH4vZ4ITW8414TTAOG1nW6uIVHCA==}
@@ -8854,6 +8860,8 @@ snapshots:
       d3-interpolate: 3.0.1
       d3-selection: 3.0.0
       d3-zoom: 3.0.0
+
+  '@zegocloud/zego-uikit-prebuilt@2.17.0': {}
 
   abort-controller-x@0.4.3: {}
 

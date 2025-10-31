@@ -1,10 +1,12 @@
 import { create } from "zustand";
 
 interface ActiveSession {
+  id:any,
   userName: string;
   userEmail: string;
   avatar: string | null;
   session_type: string;
+  session_id: string;
 }
 
 interface SessionState {
