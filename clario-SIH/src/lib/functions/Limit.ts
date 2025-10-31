@@ -1,3 +1,4 @@
+"use server";
 import { redis } from "@/lib/redis"; 
 
 const DAILY_LIMIT = 5;

@@ -1,6 +1,8 @@
 "use server";
 
 import { tavily } from "@tavily/core";
+// export const runtime = "nodejs"; 
+
 
 const tvly = tavily({
   apiKey: process.env.NEXT_PUBLIC_TAVILY_API_KEY!,
