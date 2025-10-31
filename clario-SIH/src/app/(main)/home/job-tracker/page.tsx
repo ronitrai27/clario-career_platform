@@ -762,12 +762,12 @@ const JobTracker = () => {
                       connection for stability.
                     </p>
                     <p className="flex items-center gap-2">
-                      <InfoIcon className="w-4 h-4 mr-2" /> Don't switch tabs or
+                      <InfoIcon className="w-4 h-4 mr-2" /> Don&apos;t switch tabs or
                       refresh during the interview.
                     </p>
                     <p className="flex items-center gap-2">
                       <InfoIcon className="w-4 h-4 mr-2" /> Relax and be
-                      yourself — you've got this!
+                      yourself — you&apos;ve got this!
                     </p>
                   </div>
                 </div>
