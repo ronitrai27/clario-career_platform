@@ -201,32 +201,32 @@ export default function CareerTabsDemo() {
   const [nearbyActive, setNearbyActive] = useState(false);
   const [collegeType, setCollegeType] = useState<string | null>(null);
 
-  // useEffect(() => {
-  //   if (!quizData?.selectedCareer) return;
+  useEffect(() => {
+    if (!quizData?.selectedCareer) return;
 
-  //   const fetchJobs = async () => {
-  //     try {
-  //       setLoading(true);
-  //       const res = await axios.get<Job[]>(
-  //         `/api/jobs?q=${encodeURIComponent(quizData.selectedCareer)}`
-  //       );
-  //       setJobs(res.data);
-  //     } catch (error) {
-  //       console.error("Error fetching jobs:", error);
-  //     } finally {
-  //       setLoading(false);
-  //     }
-  //   };
+    const fetchJobs = async () => {
+      try {
+        setLoading(true);
+        const res = await axios.get<Job[]>(
+          `/api/jobs?q=${encodeURIComponent(quizData.selectedCareer)}`
+        );
+        setJobs(res.data);
+      } catch (error) {
+        console.error("Error fetching jobs:", error);
+      } finally {
+        setLoading(false);
+      }
+    };
 
-  //   fetchJobs();
-  // }, [quizData?.selectedCareer]);
+    fetchJobs();
+  }, [quizData?.selectedCareer]);
 
   // DEMO DATA-------------------------
-  useEffect(() => {
-    if (quizData?.selectedCareer) {
-      setJobs(demoJobs);
-    }
-  }, [quizData?.selectedCareer]);
+  // useEffect(() => {
+  //   if (quizData?.selectedCareer) {
+  //     setJobs(demoJobs);
+  //   }
+  // }, [quizData?.selectedCareer]);
 
   // -----------------------------------DIALOG AND JOB TRACKING------------------------->
   const [open, setOpen] = useState(false);
@@ -544,7 +544,7 @@ export default function CareerTabsDemo() {
         </TabsContent>
 
         <TabsContent value="courses">
-          <div className="p-6  bg-white">
+          <div className="p-6  ">
             <CareerCourses />
           </div>
         </TabsContent>

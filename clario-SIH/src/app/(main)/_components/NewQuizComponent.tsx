@@ -53,7 +53,16 @@ export default function Quiz() {
     return <p>Loading user data...</p>;
   }
 
-  const gradeKey = current_status as keyof QuizData;
+  const statusToKeyMap: Record<string, keyof QuizData> = {
+    "12th student": "12",
+    "diploma student": "diploma",
+    graduate: "graduate",
+    "working professional": "working professional",
+  };
+
+  const gradeKey = statusToKeyMap[current_status];
+
+  // const gradeKey = current_status as keyof QuizData;
 
   function getQuizSet(
     gradeKey: keyof QuizData,

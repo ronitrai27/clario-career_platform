@@ -11,7 +11,9 @@ export default function Layout({ children }: { children: React.ReactNode }) {
       <AppSidebar />
       <main className="flex-1">
         <Navbar />
-        <RoleGuard allowedRoles={["mentor"]}>{children}</RoleGuard>
+        {/* <RoleGuard allowedRoles={["mentor"]}> */}
+          {children}
+          {/* </RoleGuard> */}
       </main>
       <Toaster />
     </SidebarProvider>
