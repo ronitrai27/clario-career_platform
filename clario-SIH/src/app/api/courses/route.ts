@@ -21,7 +21,7 @@ export async function GET(req: NextRequest) {
 
   try {
     const response: any = await getJson({
-      api_key: process.env.SERPAPI_KEY,
+      // api_key: process.env.SERPAPI_KEY,
       q: query,
       hl: "en",
       gl: "us",

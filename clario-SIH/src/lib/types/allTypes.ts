@@ -81,6 +81,15 @@ export type College = {
   type: string;
 };
 
+export type QuizCollegeQues = {
+  id: string;
+  question: string;
+  key: string;
+  options: string[];
+  type: "single" | "multiple";
+};
+
+
 export type MentorSession = {
   id: string;
   mentor_id: string;

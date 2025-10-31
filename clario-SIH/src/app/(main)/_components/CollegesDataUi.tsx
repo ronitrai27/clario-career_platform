@@ -4,8 +4,14 @@ import { useEffect, useState } from "react";
 import { paginatedColleges } from "@/lib/functions/dbActions";
 import type { College } from "@/lib/types/allTypes";
 import Image from "next/image";
-import { LuChevronRight, LuPi, LuPin } from "react-icons/lu";
+import { LuActivity, LuChevronRight, LuPi, LuPin } from "react-icons/lu";
 import { Input } from "@/components/ui/input";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
 
 import {
   Popover,
@@ -15,6 +21,67 @@ import {
 import { Building2, LucideActivity, Search } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useQuizData } from "@/context/userQuizProvider";
+import { QuizCollegeQues } from "@/lib/types/allTypes";
+
+const quizDataCollege: QuizCollegeQues[] = [
+  {
+    id: "q1",
+    question: "What the main moto of yours joining a college?",
+    key: "moto",
+    options: ["Academics", "Placement", "Good Environment"],
+    type: "single",
+  },
+  {
+    id: "q2",
+    question: "What type of college would you prefer?",
+    key: "type",
+    options: ["Private", "Government", "Any"],
+    type: "single",
+  },
+  {
+    id: "q3",
+    question: "Which location preference suits you best?",
+    key: "location",
+    options: ["Nearby cities", "Far away cities", "Flexible with any location"],
+    type: "single",
+  },
+  {
+    id: "q4",
+    question: "Do you have any budget constraints? Your typical budget.",
+    key: "fees",
+    options: [
+      "Below ₹50,000",
+      "₹50,000 - ₹1,00,000",
+      "₹1,00,000 - ₹2,00,000",
+      "Above ₹2,00,000",
+    ],
+    type: "single",
+  },
+  {
+    id: "q5",
+    question: "How important is campus placement to you?",
+    key: "placement",
+    options: [
+      "Very important (Top recruiters & high packages)",
+      "Moderately important (Good average package)",
+      "Not a priority (Focus on academics/research)",
+    ],
+    type: "single",
+  },
+  {
+    id: "q6",
+    question:
+      "Would you like your college recommendations to prioritize any of these?",
+    key: "priority",
+    options: [
+      "Low Fees",
+      "High Placement Rate",
+      "Top Ranking",
+      "Best Fit for My Course",
+    ],
+    type: "multiple",
+  },
+];
 
 export default function CollegesList() {
   const [colleges, setColleges] = useState<College[]>([]);
@@ -27,6 +94,44 @@ export default function CollegesList() {
   // colleges---------------------------->
   const [nearbyActive, setNearbyActive] = useState(false);
   const [collegeType, setCollegeType] = useState<string | null>(null);
+
+  // ===================================
+  // COLLEGE QUIZ
+  const [started, setStarted] = useState(false);
+  const [open, setOpen] = useState(false);
+  const [currentIndex, setCurrentIndex] = useState(0);
+  const [answers, setAnswers] = useState<Record<string, string | string[]>>({});
+
+  const currentQuestion = quizDataCollege[currentIndex];
+
+  const handleOptionSelect = (option: string) => {
+    if (!currentQuestion) return;
+
+    setAnswers((prev) => {
+      if (currentQuestion.type === "multiple") {
+        const prevSelected = (prev[currentQuestion.key] as string[]) || [];
+        const updated = prevSelected.includes(option)
+          ? prevSelected.filter((o) => o !== option)
+          : [...prevSelected, option];
+        return { ...prev, [currentQuestion.key]: updated };
+      } else {
+        return { ...prev, [currentQuestion.key]: option };
+      }
+    });
+  };
+
+  const handleNext = () => {
+    if (currentIndex < quizDataCollege.length - 1) {
+      setCurrentIndex((prev) => prev + 1);
+    } else {
+      console.log("✅ User Quiz Result:", answers);
+      setOpen(false);
+      setCurrentIndex(0);
+      setStarted(false);
+    }
+  };
+
+  // ==================================
 
   useEffect(() => {
     loadMoreColleges(1, true);
@@ -71,7 +176,8 @@ export default function CollegesList() {
           <Button
             size="sm"
             variant="outline"
-            className="text-sm font-inter w-fit mt-auto ml-auto"
+            onClick={() => setOpen(true)}
+            className="text-sm font-inter w-fit mt-auto ml-auto cursor-pointer"
           >
             Check out <LuChevronRight />
           </Button>
@@ -230,6 +336,89 @@ export default function CollegesList() {
           {loading ? "Loading..." : "Load More"}
         </Button>
       </div>
+
+      {/* ========================== */}
+      <Dialog open={open} onOpenChange={setOpen}>
+        <DialogContent className="min-w-[880px] h-[600px] p-0 overflow-hidden">
+          {!started ? (
+            <div className="flex">
+              {/* LEFT SIDE */}
+              <div className="h-full bg-gradient-to-br from-blue-200 to-rose-300 w-[35%] relative">
+                <Image
+                  src="/static1.png"
+                  width={200}
+                  height={200}
+                  alt="jobs"
+                  className="absolute -bottom-5 h-[90%] w-full object-cover "
+                />
+              </div>
+              {/* RIGHT SIDE */}
+              <div className="flex-1 flex flex-col h-full p-4">
+                <DialogHeader>
+                  <DialogTitle className="text-2xl font-semibold font-sora text-center mt-5">
+                    🎓 Welcome to College Preference Quiz
+                  </DialogTitle>
+                </DialogHeader>
+                <p className="text-gray-800 font-inter text-center mt-20 text-base">
+                  Answer a few quick questions to help us match you with the
+                  best colleges for your preferences.
+                </p>
+                <Button
+                  className="font-inter text-base mt-20 mx-auto flex items-center justify-center"
+                  onClick={() => setStarted(true)}
+                >
+                  Start Quiz <LuActivity className="ml-2" />
+                </Button>
+
+                <div className="bg-blue-50 border border-blue-400 px-3 py-6 rounded-md mt-auto">
+                  <p className="text-gray-800 font-inter text-center text-base">
+                   Make sure you answer the right questions so to get the most accurate results.
+                  </p>
+                </div>
+              </div>
+            </div>
+          ) : (
+            <div className="space-y-4">
+              <DialogHeader>
+                <DialogTitle>
+                  Question {currentIndex + 1} of {quizDataCollege.length}
+                </DialogTitle>
+              </DialogHeader>
+
+              <p className="text-lg font-medium">{currentQuestion.question}</p>
+
+              <div className="space-y-2">
+                {currentQuestion.options.map((opt) => {
+                  const selected = answers[currentQuestion.key];
+                  const isSelected =
+                    currentQuestion.type === "multiple"
+                      ? (selected as string[])?.includes(opt)
+                      : selected === opt;
+
+                  return (
+                    <Button
+                      key={opt}
+                      variant={isSelected ? "default" : "outline"}
+                      className="w-full justify-start"
+                      onClick={() => handleOptionSelect(opt)}
+                    >
+                      {opt}
+                    </Button>
+                  );
+                })}
+              </div>
+
+              <div className="flex justify-end">
+                <Button onClick={handleNext}>
+                  {currentIndex === quizDataCollege.length - 1
+                    ? "Finish"
+                    : "Next"}
+                </Button>
+              </div>
+            </div>
+          )}
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }
