@@ -402,7 +402,7 @@ export default function CareerTabsDemo() {
             value="courses"
             className="data-[state=active]:bg-slate-800 data-[state=active]:text-white"
           >
-            Courses
+            Resources
           </TabsTrigger>
         </TabsList>
 
