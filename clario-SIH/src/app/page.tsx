@@ -48,7 +48,7 @@ export default function HomePage() {
       } else {
         console.log("❌ No session, redirecting to /web");
         // web----
-        setTimeout(() => router.replace("/web"), 3000);
+        setTimeout(() => router.replace("/auth"), 3000);
       }
     };
 

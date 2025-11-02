@@ -490,11 +490,11 @@ export const quizData = {
       "career/ path guidance": {
         focus_specific: [
           {
-            question: "In Which Stream are you most interested in?",
-            options: ["Medical", "Commerce", "Arts", "Science"],
+            question: "In Which Stream you are currently enrolled in?",
+            options: ["Medical", "Commerce & Finance", "Non-Engineering", "Engineering"],
           },
           {
-            question: "How confident are you in your chosen subjects?",
+            question: "How confident are you in your chosen Stream?",
             options: ["Very confident", "Somewhat confident", "Not confident"],
           },
           {
@@ -678,8 +678,8 @@ export const quizData = {
       "career/ path guidance": {
         focus_specific: [
           {
-            question: "In Which Stream are you most interested in?",
-            options: ["Medical", "Commerce", "Arts", "Science"],
+           question: "In Which Stream you are currently enrolled in?",
+            options: ["Medical", "Commerce & Finance", "Non-Engineering", "Engineering"],
           },
           {
             question: "How confident are you in your chosen subjects?",
@@ -866,8 +866,8 @@ export const quizData = {
       "career/ path guidance": {
         focus_specific: [
           {
-            question: "In Which Stream are you most interested in?",
-            options: ["Medical", "Commerce", "Arts", "Science"],
+          question: "In Which Stream you are currently enrolled in?",
+            options: ["Medical", "Commerce & Finance", "Non-Engineering", "Engineering"],
           },
           {
             question: "How confident are you in your chosen subjects?",

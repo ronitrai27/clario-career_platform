@@ -13,7 +13,7 @@ interface QuizRequest {
 }
 
 function getSchemaAndPrompt(userStatus: string, mainFocus: string) {
-  if (userStatus === "12th student" && mainFocus === "choose career paths") {
+  if (userStatus === "12th student") {
     const schema = z.object({
       insights: z.object({
         stream: z.string().optional(),
@@ -46,12 +46,15 @@ function getSchemaAndPrompt(userStatus: string, mainFocus: string) {
     return { schema, prompt };
   }
 
-  if (userStatus === "10th student" && mainFocus === "career/ path guidance") {
+  //  && mainFocus === "career/ path guidance"
+  if (userStatus !== "12th student") {
     const schema = z.object({
       insights: z.object({
         stream: z.string().optional(),
         confidence: z.string().optional(),
-        reason: z.string().optional(),
+        Interest: z.string().optional(),
+        // reason: z.string().optional(),
+        degree: z.array(z.string()).optional(),
         summary: z.string().optional(),
         careerOptions: z.array(z.string()).optional(),
       }),
@@ -61,12 +64,13 @@ function getSchemaAndPrompt(userStatus: string, mainFocus: string) {
     Student Quiz Data:
     {quizData}
 
-    Based on the above, extract structured guidance for a 10th class student.
+    Based on the above, extract structured guidance for a User.
 
     Your task:
-    - stream (main stream of interest)
-    - confidence (student's confidence level in that stream)
-    - reason (why student chose these subjects)
+    - stream (Current stream of the student)
+    - confidence (User's confidence level in that stream)
+    - Interest (User's all interests he mentioned)
+    - degree (list of 2-3 relevant degrees for this student according to their stream and careerOptions both. for example: BCA/MBA, B.TECH/M.TECH etc.)
     - summary (4-line profile summary of the student)
     - careerOptions (5 long-term career paths suitable for them according to their chosen stream)
 
@@ -79,7 +83,6 @@ function getSchemaAndPrompt(userStatus: string, mainFocus: string) {
 
   throw new Error("Unsupported userStatus + mainFocus combination");
 }
-
 
 const llm = new ChatGroq({
   model: "meta-llama/llama-4-scout-17b-16e-instruct",

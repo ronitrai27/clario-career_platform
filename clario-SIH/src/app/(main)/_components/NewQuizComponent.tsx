@@ -62,7 +62,25 @@ export default function Quiz() {
 
   const gradeKey = statusToKeyMap[current_status];
 
+  const adjustedFocus =
+    current_status === "12th student"
+      ? "choose career paths"
+      : "career/ path guidance";
+
   // const gradeKey = current_status as keyof QuizData;
+
+  // function getQuizSet(
+  //   gradeKey: keyof QuizData,
+  //   current_status: string,
+  //   mainFocus: string
+  // ): QuizSection | undefined {
+  //   const block = (
+  //     quizData[gradeKey] as Record<string, Record<string, QuizSection>>
+  //   )[current_status];
+  //   return block?.[mainFocus];
+  // }
+
+  // const quizSet = getQuizSet(gradeKey, current_status, mainFocus);
 
   function getQuizSet(
     gradeKey: keyof QuizData,
@@ -75,7 +93,7 @@ export default function Quiz() {
     return block?.[mainFocus];
   }
 
-  const quizSet = getQuizSet(gradeKey, current_status, mainFocus);
+  const quizSet = getQuizSet(gradeKey, current_status, adjustedFocus);
 
   if (!quizSet) {
     return <p>No quiz available for this selection.</p>;
