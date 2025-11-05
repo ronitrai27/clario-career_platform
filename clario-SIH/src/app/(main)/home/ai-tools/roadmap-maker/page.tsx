@@ -30,6 +30,13 @@ import { Separator } from "@/components/ui/separator";
 import Image from "next/image";
 import { useQuizData } from "@/context/userQuizProvider";
 import { toast } from "sonner";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 
 const steps = [
   "Getting tools ready...",
@@ -54,8 +61,10 @@ const RoadmapMaker = () => {
 
   const [histRoadmap, setHistRoadmap] = useState<any[]>([]);
 
-  const userCareerFocuses =
-    focus === "career/ path guidance" || focus === "choose career paths";
+  // ===============TOOLS================
+  const [openTools, setOpenTools] = useState(false);
+  const [timeline, setTimeline] = useState("3 months");
+  const [mode, setMode] = useState("Beginner");
 
   // to show loading text-----------------------------
   const [stepIndex, setStepIndex] = useState(0);
@@ -105,8 +114,7 @@ const RoadmapMaker = () => {
       const data = await getUserQuizData(user.id);
       // setQuizData(data);
 
-      //careerOptions--------------
-      if (data.length > 0 && userCareerFocuses) {
+      if (data.length > 0) {
         const firstQuiz = data[0];
         const options = firstQuiz.quizInfo?.careerOptions;
 
@@ -120,6 +128,8 @@ const RoadmapMaker = () => {
     fetchData();
   }, [user?.id]);
 
+  // =====================================
+
   const fetchRoadmap = async () => {
     if (!field.trim()) return;
     setLoadingRoadmap(true);
@@ -127,7 +137,13 @@ const RoadmapMaker = () => {
     setRoadmap(null);
 
     try {
-      const res = await axios.post("/api/ai/roadmap-gen", { field });
+      // const res = await axios.post("/api/ai/roadmap-gen", { field });
+      // console.log("=========Fetching roadmap for========= :", field, timeline, mode);
+      const res = await axios.post("/api/ai/roadmap-gen", {
+        field,
+        timeline,
+        mode,
+      });
       const roadmapJson = res.data;
       setRoadmap(roadmapJson);
 
@@ -137,6 +153,8 @@ const RoadmapMaker = () => {
           {
             user_id: user?.id,
             roadmap_data: roadmapJson,
+            mode: mode,
+            timeline: timeline,
           },
         ]);
 
@@ -170,17 +188,16 @@ const RoadmapMaker = () => {
       <div className="flex w-full h-full gap-5">
         {/* LEFT SIDE */}
         <div className="flex flex-col w-[32%] relative border border-slate-300 px-2 pt-3 pb-0 rounded-xl bg-white ">
-          <h2 className="text-2xl font-semibold font-sora text-center">
+          <h2 className="text-3xl font-semibold font-sora text-center">
             AI Roadmap Maker{" "}
             <LuWorkflow className="inline ml-2 text-blue-500" />
           </h2>
-          <p className="mt-3 font-inter text-base text-center">
-            Level up your career with AI-powered roadmaps. Personalised guidance
-            for your path.
+          <p className="mt-3 font-inter text-base tracking-tight text-center">
+            Level up your career with AI-powered 3D Roadmaps.
           </p>
           <Tabs
             defaultValue="suggestions"
-            className="w-full flex flex-col items-center mt-6"
+            className="w-full flex flex-col items-center mt-3"
           >
             {/* Tabs header */}
             <TabsList className="grid grid-cols-2 w-full  bg-gray-100 rounded-md">
@@ -264,32 +281,73 @@ const RoadmapMaker = () => {
             </TabsContent>
           </Tabs>
 
-          <div className="absolute bottom-4 left-1/2 transform -translate-x-1/2 w-full max-w-[480px] mx-auto">
+          {/* ====================TEXTAREA BOX======================== */}
+
+          <div className="mt-auto pb-2 w-full max-w-[480px] mx-auto">
+            <div
+              className={`overflow-hidden transition-[height,opacity] duration-300 ease-in-out bg-white rounded-lg border border-t-4 border-t-slate-800
+  ${openTools ? "h-[68px] opacity-100" : "h-0 opacity-0"}
+`}
+            >
+              <div className="flex items-center justify-center gap-6 py-3">
+                <Select value={timeline} onValueChange={setTimeline}>
+                  <SelectTrigger className="w-[140px] bg-blue-50 font-inter text-xs">
+                    <SelectValue placeholder="Timeline" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="3 months">3 months</SelectItem>
+                    <SelectItem value="6 months">6 months</SelectItem>
+                    <SelectItem value="1 year">1 year</SelectItem>
+                  </SelectContent>
+                </Select>
+
+                <Select value={mode} onValueChange={setMode}>
+                  <SelectTrigger className="w-[140px] bg-blue-50 font-inter text-xs">
+                    <SelectValue placeholder="Mode" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="Beginner">Beginner</SelectItem>
+                    <SelectItem value="Intermediate">Intermediate</SelectItem>
+                    <SelectItem value="Advance">Advance</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+            </div>
+
+            {/* =================TEXTAREA================= */}
+
             <div className="bg-slate-800 rounded-md pb-2 pt-3 px-2">
               <div className="flex items-center justify-between px-6 mb-2">
                 <p className="font-inter text-sm text-white tracking-tight">
                   Roadmap Maker
                 </p>
-                <p className="text-gray-200 font-sora text-sm">15 coins-</p>
+                <p className="text-gray-200 font-sora text-sm">15 coins</p>
               </div>
+
               <div className="relative">
                 <Textarea
                   placeholder="Devops Engineer"
                   rows={60}
                   value={field}
                   onChange={(e) => setField(e.target.value)}
-                  className="resize-none h-[105px] bg-gray-50 placeholder:text-gray-400 text-black font-sora text-sm"
+                  className={`resize-none transition-[height] duration-300 ease-in-out ${
+                    openTools ? "h-[85px]" : "h-[110px]"
+                  } bg-gray-50 placeholder:text-gray-400 text-black font-sora text-sm`}
                 />
 
                 <div className="absolute bottom-2 left-4">
-                  <div className="flex items-center gap-2 bg-blue-50 px-3 py-1 rounded-full border border-blue-500 text-blue-500">
+                  <div
+                    className="flex items-center gap-2 bg-blue-50 px-3 py-1 rounded-full border border-blue-500 text-blue-500 cursor-pointer"
+                    onClick={() => setOpenTools(!openTools)}
+                  >
                     <LuCombine size={18} />
-                    <p className="text-sm tracking-tight">Tool</p>
+                    <p className="text-sm tracking-tight">Filters</p>
                   </div>
                 </div>
+
                 <div className="absolute bottom-2 right-4">
                   <Button
-                    className="flex items-center gap-2 bg-blue-100 p-2 rounded  text-gray-600 hover:text-white cursor-pointer"
+                    className="flex items-center gap-2 bg-blue-100 p-2 rounded text-gray-600 hover:text-white cursor-pointer"
                     onClick={fetchRoadmap}
                     disabled={loading}
                   >

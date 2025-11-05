@@ -54,6 +54,8 @@ export async function POST(req: Request) {
   try {
     const body = await req.json();
     const field = body.field || "Software Developer";
+    const timeline = body.timeline || "3 months";
+    const mode = body.mode || "Beginner";
     const formatInstructions = parser.getFormatInstructions();
 
     const firstPrompt = `
@@ -65,11 +67,12 @@ Requirements:
 1. Roadmap must include:
    - roadmapTitle (short title of the roadmap)
    - description (1-2 lines summary)
-   - duration (overall learning time estimate, e.g. "3 months")
+   -  duration: "${timeline}"
 
 2. initialNodes (5-8 topics):
-   - Split into levels: Basics (2-3), Intermediate (2-3), Advanced (1-2)
-   - Each node must have:
+    - Divide topics aligned to "${mode}" difficulty
+    - Split into: Basics (2-3), Intermediate (2-3), Advanced (1-2)
+    - Each node must have:
      • id: unique string (e.g. "node-1")
      • type: "default"
      • position: { x, y } → numeric values
@@ -105,13 +108,14 @@ ${formatInstructions}
 
     // Second LLM to check and complete if necessary
     const secondPrompt = `
-Here is the generated roadmap JSON for "${field}":
+Here is the generated roadmap JSON for "${field}" for "${timeline}" in "${mode}" mode:
 ${repairedJSON}
 
 Validate and repair the roadmap if needed. The JSON must satisfy ALL these conditions:
 
 1. Has a meaningful roadmapTitle, description, and duration.
 2. initialNodes:
+   - topics aligned to "${mode}" difficulty
    - Contains 5-8 topics (2-3 basics, 2-3 intermediate, 1-2 advanced).
    - Each node must have:
      • id (unique string)
