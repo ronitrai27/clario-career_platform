@@ -5,6 +5,8 @@ import { useQuizData } from "@/context/userQuizProvider";
 import { Button } from "@/components/ui/button";
 import { ExternalLink } from "lucide-react";
 import YtVideo from "../home/test/yt/page";
+import { LuLoader } from "react-icons/lu";
+import { Skeleton } from "@/components/ui/skeleton";
 
 const API_KEY = process.env.NEXT_PUBLIC_YOUTUBE_API_KEY;
 
@@ -214,7 +216,27 @@ export default function CareerCourses() {
       : `${m}:${s.toString().padStart(2, "0")}`;
   };
 
-  if (loading) return <p className="text-center mt-6">Loading...</p>;
+  if (loading)
+    return (
+      <>
+        <div className="flex items-center justify-center">
+          <div className="flex items-center gap-3">
+            <LuLoader className="animate-spin text-4xl text-blue-600" />
+            <p className="font-inter text-base tracking-tight ">
+              Getting Resources Ready...
+            </p>
+          </div>
+        </div>
+
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-10 mt-10">
+          {[...Array(6)].map((_, i) => (
+            <div key={i} className="flex flex-col gap-4">
+              <Skeleton className="h-[280px] w-[280px] rounded-lg" />
+            </div>
+          ))}
+        </div>
+      </>
+    );
   if (!courses.length)
     return <p className="text-center mt-6">No courses found.</p>;
 
@@ -308,19 +330,19 @@ export default function CareerCourses() {
           </div>
         ) : (
           // <YtVideo />
-          <div className="p-4">
+          <div className="">
             <h2 className="text-xl font-semibold font-inter mb-5">
               Top YouTube Videos about {quizData?.selectedCareer}
             </h2>
 
-            {loading && <p>Loading top videos...</p>}
+            {loading && <p className="font-inter text-lg my-4">Loading top videos...</p>}
             {!loading && videos.length === 0 && (
               <p className="text-gray-500">No videos match the criteria.</p>
             )}
 
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
               {videos.map((video) => (
-                <div key={video.id} className="border rounded-lg p-2">
+                <div key={video.id} className="border rounded-lg p-2 bg-white shadow ">
                   <iframe
                     width="100%"
                     height="200"
