@@ -213,10 +213,12 @@ export function AppSidebar() {
                   </SidebarMenuSubItem>
 
                   <SidebarMenuSubItem className="font-inter font-medium text-gray-200 cursor-pointer text-base hover:text-white hover:translate-x-2 duration-200 flex items-center whitespace-nowrap">
-                    AI Resume Maker{" "}
-                    <span className="font-inter text-xs text-pink-500 ml-3">
-                      Pro
-                    </span>
+                    <Link href="/home/ai-tools/resume-maker">
+                      AI Resume Maker
+                      <span className="font-inter text-xs text-pink-500 ml-3">
+                        Pro
+                      </span>
+                    </Link>
                   </SidebarMenuSubItem>
 
                   <SidebarMenuSubItem className="font-inter font-medium text-gray-200 cursor-pointer text-base hover:text-white hover:translate-x-2 duration-200 whitespace-nowrap">
