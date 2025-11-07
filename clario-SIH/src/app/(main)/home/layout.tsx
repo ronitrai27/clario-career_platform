@@ -13,9 +13,11 @@ export default function Layout({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
   const hideNavbar =
     (pathname.startsWith("/home/mentor-connect/") &&
-      pathname !== "/home/mentor-connect" && pathname !== "/home/mentor-connect/bookings") ||
+      pathname !== "/home/mentor-connect" &&
+      pathname !== "/home/mentor-connect/bookings") ||
     pathname === "/home/profile" ||
     pathname === "/home/settings/billing" ||
+    pathname === "/home/ai-tools/resume-maker/start" ||
     pathname === "/home/interview-prep/start";
 
   return (

@@ -5,7 +5,13 @@ import { Separator } from "@/components/ui/separator";
 import React, { useState } from "react";
 import { FaPaperPlane } from "react-icons/fa6";
 import { GrResume } from "react-icons/gr";
-import { LuActivity, LuChevronRight, LuCircleFadingPlus, LuPackageOpen } from "react-icons/lu";
+import {
+  LuActivity,
+  LuBrain,
+  LuChevronRight,
+  LuCircleFadingPlus,
+  LuPackageOpen,
+} from "react-icons/lu";
 import {
   Dialog,
   DialogContent,
@@ -51,6 +57,18 @@ const ResumeMaker = () => {
           >
             Get Started <LuCircleFadingPlus />
           </Button>
+
+          <h1 className="mt-6 font-inter text-lg font-semibold tracking-tight">
+            Generate From AI <LuBrain className="inline ml-2" />
+          </h1>
+
+           <Button
+            className="font-inter text-sm tracking-tight mt-5 flex items-center justify-center w-full"
+            variant="outline"
+            onClick={() => setOpen(true)}
+          >
+            Generate <LuCircleFadingPlus />
+          </Button>
         </div>
         <Separator orientation="vertical" className="mx-4 bg-gray-300" />
         {/* =====RIGHT SIDE==== */}
@@ -66,7 +84,9 @@ const ResumeMaker = () => {
       <Dialog open={open} onOpenChange={setOpen}>
         <DialogContent className="w-[400px]">
           <DialogHeader>
-            <DialogTitle className="font-inter font-semibold text-xl text-center">Give your resume a title</DialogTitle>
+            <DialogTitle className="font-inter font-semibold text-xl text-center">
+              Give your resume a title
+            </DialogTitle>
           </DialogHeader>
 
           <Input
@@ -82,7 +102,7 @@ const ResumeMaker = () => {
               onClick={handleContinue}
               disabled={!resumeTitle.trim()}
             >
-              Continue <LuChevronRight className="ml-2 "/>
+              Continue <LuChevronRight className="ml-2 " />
             </Button>
           </DialogFooter>
         </DialogContent>
