@@ -70,11 +70,11 @@ export type Section =
       title: string;
       data: ProjectItem[];
     }
-    // achievements/certifications OR patents/publications OR hobbies OR languages
+  // achievements/certifications OR patents/publications OR hobbies OR languages
   | {
       id: "custom";
       type: "custom";
-      title: string; 
+      title: string;
       data: CustomItem[];
     };
 
@@ -82,6 +82,7 @@ export interface ResumeState {
   title: string;
   bio: Bio;
   sections: Section[];
+  themeColor: any;
 }
 
 interface ResumeStore {
@@ -90,6 +91,7 @@ interface ResumeStore {
   setTitle: (title: string) => void;
   updateSection: (id: string, data: Partial<Section>) => void;
   reorderSections: (fromIndex: number, toIndex: number) => void;
+  setThemeColor: (color: any) => void;
 }
 
 export const useResumeStore = create<ResumeStore>((set) => ({
@@ -100,8 +102,8 @@ export const useResumeStore = create<ResumeStore>((set) => ({
       email: "",
       phone: "",
       linkedin: "",
-      github: undefined, 
-      website: undefined, 
+      github: undefined,
+      website: undefined,
     },
     sections: [
       {
@@ -167,6 +169,7 @@ export const useResumeStore = create<ResumeStore>((set) => ({
         ],
       },
     ],
+    themeColor: "#000",
   },
 
   // =============================
@@ -184,6 +187,16 @@ export const useResumeStore = create<ResumeStore>((set) => ({
   setTitle: (title) =>
     set((state) => ({
       resume: { ...state.resume, title },
+    })),
+
+  // ==========================
+  // theme color
+  setThemeColor: (color: any) =>
+    set((state) => ({
+      resume: {
+        ...state.resume,
+        themeColor: color,
+      },
     })),
 
   // ===============================

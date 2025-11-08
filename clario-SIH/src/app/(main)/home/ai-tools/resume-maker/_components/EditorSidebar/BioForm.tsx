@@ -11,7 +11,7 @@ export default function BioForm() {
   const setBio = useResumeStore(s => s.setBio);
 
   return (
-    <div className="space-y-4">
+    <div className="space-y-4 font-inter text-sm">
       <div>
         <Label>Name</Label>
         <Input value={bio.name} onChange={(e) => setBio({ name: e.target.value })} />

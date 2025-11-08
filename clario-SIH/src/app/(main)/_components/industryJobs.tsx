@@ -593,7 +593,7 @@ export default function CareerTabsDemo() {
               onChange={handleChange}
               placeholder="Description"
               rows={3}
-              className="font-inter -mt-2"
+              className="font-inter -mt-2 line-clamp-6"
             />
             <div className="flex w-full justify-evenly">
               <div>
