@@ -31,12 +31,15 @@ interface RoadmapProps {
 // 🔹 Custom Node Component
 function CustomNode({ data }: any) {
   return (
-    <div className="bg-blue-50 border rounded-lg shadow-md p-3 w-64">
+    <div className="bg-blue-50 border rounded-lg shadow-md p-3 w-64 relative">
+      <div className="absolute -top-3 -left-3 w-6 h-6 bg-blue-600 text-white text-xs rounded-full flex items-center justify-center font-bold">
+        {data.step}
+      </div>
       <Handle type="target" position={Position.Top} className="" />
-      <h3 className="font-semibold text-blue-500 text-sm font-inter">
+      <h3 className="font-semibold text-blue-500 text-sm font-sora capitalize">
         {data.title}
       </h3>
-      <p className="text-gray-600 text-sm">{data.description}</p>
+      <p className="text-gray-600 font-inter text-sm">{data.description}</p>
       {data.link && (
         <a
           href={data.link}
@@ -61,7 +64,7 @@ export default function Roadmap({ roadmap }: RoadmapProps) {
     if (!roadmap) return;
 
     const newNodes =
-      roadmap.initialNodes?.map((n: any) => ({
+      roadmap.initialNodes?.map((n: any, index: number) => ({
         id: n.id,
         type: "custom", // use custom node
         position: n.position || {
@@ -69,6 +72,7 @@ export default function Roadmap({ roadmap }: RoadmapProps) {
           y: Math.random() * 400,
         },
         data: {
+          step: index + 1,
           title: n.data?.title || "Untitled",
           description: n.data?.description || "",
           link: n.data?.link || "",
@@ -108,8 +112,8 @@ export default function Roadmap({ roadmap }: RoadmapProps) {
 
       const dataUrl = await toPng(target as HTMLElement, {
         cacheBust: true,
-        pixelRatio: 2, 
-        backgroundColor: "#ffffff", 
+        pixelRatio: 2,
+        backgroundColor: "#ffffff",
       });
 
       toast.success("Image downloaded successfully!");

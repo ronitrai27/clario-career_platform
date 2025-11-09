@@ -37,6 +37,9 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { time } from "console";
+import { useRouter } from "next/navigation";
+import { se } from "date-fns/locale";
 
 const steps = [
   "Getting tools ready...",
@@ -48,6 +51,7 @@ const steps = [
 const RoadmapMaker = () => {
   const { user, loading } = useUserData();
   const focus = user?.mainFocus?.toLowerCase();
+  const router = useRouter();
   const [careerSkillOptions, setCareerSkillOptions] = useState<string[]>([]);
   const [quizDataLoading, setQuizDataLoading] = useState(false);
   const supabase = createClient();
@@ -56,15 +60,18 @@ const RoadmapMaker = () => {
 
   const [field, setField] = useState("");
   const [loadingRoadmap, setLoadingRoadmap] = useState(false);
-  const [roadmap, setRoadmap] = useState<any>(null);
   const [error, setError] = useState<string | null>(null);
 
+  // =============================================
+  const [roadmap, setRoadmap] = useState<any>(null);
   const [histRoadmap, setHistRoadmap] = useState<any[]>([]);
+  const [roadmapId, setRoadmapId] = useState<any | null>(null);
+  const [isstarted, setIsstarted] = useState<boolean>(false);
 
   // ===============TOOLS================
   const [openTools, setOpenTools] = useState(false);
-  const [timeline, setTimeline] = useState("3 months");
-  const [mode, setMode] = useState("Beginner");
+  const [timeline, setTimeline] = useState("");
+  const [mode, setMode] = useState("");
 
   // to show loading text-----------------------------
   const [stepIndex, setStepIndex] = useState(0);
@@ -85,24 +92,6 @@ const RoadmapMaker = () => {
       if (interval) clearInterval(interval);
     };
   }, [loadingRoadmap, steps.length]);
-
-  // ==================================
-  // HISTORY ROADMAP
-  useEffect(() => {
-    const fetchRoadmaps = async () => {
-      if (!user?.id) return;
-      const { data, error } = await supabase
-        .from("roadmapUsers")
-        .select("*")
-        .eq("user_id", user?.id)
-        .order("created_at", { ascending: false });
-
-      if (error) console.error(error);
-      else setHistRoadmap(data || []);
-    };
-
-    fetchRoadmaps();
-  }, [user?.id]);
 
   // ====================================
 
@@ -130,8 +119,10 @@ const RoadmapMaker = () => {
 
   // =====================================
 
+  // Maker roadmap From AI and Insert to supabase
   const fetchRoadmap = async () => {
     if (!field.trim()) return;
+    setRoadmapId(null);
     setLoadingRoadmap(true);
     setError(null);
     setRoadmap(null);
@@ -139,6 +130,11 @@ const RoadmapMaker = () => {
     try {
       // const res = await axios.post("/api/ai/roadmap-gen", { field });
       // console.log("=========Fetching roadmap for========= :", field, timeline, mode);
+      if (!timeline || !mode) {
+        toast.error("Please select timeline and mode from filters");
+        setLoadingRoadmap(false);
+        return;
+      }
       const res = await axios.post("/api/ai/roadmap-gen", {
         field,
         timeline,
@@ -147,7 +143,7 @@ const RoadmapMaker = () => {
       const roadmapJson = res.data;
       setRoadmap(roadmapJson);
 
-      const { error: insertError } = await supabase
+      const { data: insertedRows, error: insertError } = await supabase
         .from("roadmapUsers")
         .insert([
           {
@@ -156,9 +152,11 @@ const RoadmapMaker = () => {
             mode: mode,
             timeline: timeline,
           },
-        ]);
+        ])
+        .select();
 
       if (insertError) throw insertError;
+      setRoadmapId(insertedRows?.[0]?.id);
     } catch (err: any) {
       setError(err.response?.data?.error || "Something went wrong");
     } finally {
@@ -166,9 +164,56 @@ const RoadmapMaker = () => {
     }
   };
   // ======================================
+  // HISTORY ROADMAP
+  useEffect(() => {
+    const fetchRoadmaps = async () => {
+      if (!user?.id) return;
+      const { data, error } = await supabase
+        .from("roadmapUsers")
+        .select("*")
+        .eq("user_id", user?.id)
+        .order("created_at", { ascending: false });
+
+      if (error) console.error(error);
+      else setHistRoadmap(data || []);
+    };
+
+    fetchRoadmaps();
+  }, [user?.id]);
+  // ======================================
   const SetHistoryRoadmap = async (item: any) => {
     toast.success("Roadmap loaded successfully!");
     setRoadmap(item.roadmap_data);
+    setRoadmapId(item.id);
+    setIsstarted(item.isStarted);
+  };
+
+  // ===================================
+  // ===================START THE ROADMAP===============
+  const handleStart = async () => {
+    if (!roadmapId) {
+      toast.error("No roadmap selected.");
+      return;
+    }
+
+    const { error } = await supabase
+      .from("roadmapUsers")
+      .update({ isStarted: true })
+      .eq("id", roadmapId);
+
+    if (error) {
+      toast.error("Failed to start roadmap");
+    } else {
+      setIsstarted(true);
+      toast("Roadmap has been started", {
+        description: " You can track your progress in the my tracks",
+        style: { borderRadius: "8px", background: "#000", color: "#fff" },
+        action: {
+          label: "Undo",
+          onClick: () => console.log("Undo"),
+        },
+      });
+    }
   };
 
   if (loading) {
@@ -226,7 +271,11 @@ const RoadmapMaker = () => {
                     <div
                       key={item.id}
                       onClick={() => SetHistoryRoadmap(item)}
-                      className="border rounded-lg p-2 hover:bg-gray-50 bg-white cursor-pointer flex justify-between items-center transition-all"
+                      className={`border rounded-lg p-2 cursor-pointer flex justify-between items-center transition-all ${
+                        item.isStarted
+                          ? "bg-green-100 border-green-400"
+                          : "bg-white hover:bg-gray-50"
+                      }`}
                     >
                       <div>
                         <h3 className="text-sm capitalize font-inter tracking-tight">
@@ -236,6 +285,9 @@ const RoadmapMaker = () => {
                         <p className="text-xs text-gray-600 font-sora">
                           {new Date(item.created_at).toLocaleDateString()}
                         </p>
+                        <span className="font-inter text-sm">
+                          {item.isStarted && "Active"}
+                        </span>
                       </div>
                     </div>
                   ))}
@@ -318,10 +370,33 @@ const RoadmapMaker = () => {
 
             <div className="bg-slate-800 rounded-md pb-2 pt-3 px-2">
               <div className="flex items-center justify-between px-6 mb-2">
-                <p className="font-inter text-sm text-white tracking-tight">
-                  Roadmap Maker
-                </p>
-                <p className="text-gray-200 font-sora text-sm">15 coins</p>
+                {roadmapId && !isstarted && (
+                  <Button
+                    onClick={handleStart}
+                    size="sm"
+                    variant="outline"
+                    className="text-xs font-inter cursor-pointer"
+                  >
+                    Start Roadmap <LuChevronRight size={16} />
+                  </Button>
+                )}
+
+                {roadmapId && isstarted && (
+                  <Button
+                    onClick={() => router.push("/home/my-tracks")}
+                    size="sm"
+                    variant="outline"
+                    className="text-xs font-inter cursor-pointer"
+                  >
+                    Continue <LuChevronRight size={16} />
+                  </Button>
+                )}
+
+                {!roadmapId && (
+                  <p className="font-inter text-sm text-white">Roadmap Maker</p>
+                )}
+
+                <p className="text-gray-200 font-sora text-sm">10 coins</p>
               </div>
 
               <div className="relative">

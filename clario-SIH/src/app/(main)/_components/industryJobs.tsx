@@ -49,6 +49,7 @@ import { toast } from "sonner";
 import { createClient } from "@/lib/supabase/client";
 import { useUserData } from "@/context/UserDataProvider";
 import { useSidebar } from "@/components/ui/sidebar";
+import { ScrollArea } from "@/components/ui/scroll-area";
 
 interface Job {
   title: string;
@@ -587,14 +588,17 @@ export default function CareerTabsDemo() {
             <Label className="font-inter text-sm tracking-tight">
               Description
             </Label>
-            <Textarea
+            {/* <Textarea
               name="description"
               value={form.description}
               onChange={handleChange}
               placeholder="Description"
               rows={3}
               className="font-inter -mt-2 line-clamp-6"
-            />
+            /> */}
+            <ScrollArea className="font-inter h-[140px] -mt-2 text-sm border rounded-md p-2">
+              {form.description}
+            </ScrollArea>
             <div className="flex w-full justify-evenly">
               <div>
                 <label className="text-sm font-medium mb-1 block font-inter">

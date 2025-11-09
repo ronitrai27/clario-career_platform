@@ -30,6 +30,7 @@ import {
   LuSettings,
   LuShapes,
   LuSun,
+  LuTelescope,
   LuUsers,
   LuWallet,
 } from "react-icons/lu";
@@ -154,6 +155,25 @@ export function AppSidebar() {
                 <p className="flex items-center gap-3 font-medium font-inter text-base text-white tracking-wide">
                   <LuChartNoAxesColumn className="text-xl" />
                   Career Board
+                </p>
+              </Link>
+            </SidebarMenuItem>
+            {/* MY TRACKS */}
+            <SidebarMenuItem
+              className={`flex cursor-pointer duration-200 ease-in-out rounded py-1 px-3
+            ${
+              pathname === "/home/my-tracks"
+                ? "bg-blue-400 scale-105 hover:bg-white/10"
+                : "hover:bg-white/10 hover:scale-105"
+            }`}
+            >
+              <Link href="/home/my-tracks" className="w-full">
+                <p className="flex items-center gap-3 font-medium font-inter text-base text-white tracking-wide">
+                  <LuTelescope className="text-xl" />
+                  My Tracks
+                  <span className="font-inter text-sm text-pink-500 ml-auto">
+                    Pro
+                  </span>
                 </p>
               </Link>
             </SidebarMenuItem>
@@ -336,7 +356,7 @@ export function AppSidebar() {
 
                 <Button
                   variant="ghost"
-                  onClick={()=>router.push('/home/settings/billing')}
+                  onClick={() => router.push("/home/settings/billing")}
                   className="justify-start gap-2 w-full font-roboto hover:bg-gray-50 rounded-none cursor-pointer"
                 >
                   <LuCreditCard className="text-[18px]" />
