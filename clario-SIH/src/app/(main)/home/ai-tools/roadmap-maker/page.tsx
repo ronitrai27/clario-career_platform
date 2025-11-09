@@ -272,8 +272,8 @@ const RoadmapMaker = () => {
                       key={item.id}
                       onClick={() => SetHistoryRoadmap(item)}
                       className={`border rounded-lg p-2 cursor-pointer flex justify-between items-center transition-all ${
-                        item.isStarted
-                          ? "bg-green-100 border-green-400"
+                        item.isStarted || isstarted
+                          ? "bg-blue-50 border-blue-400"
                           : "bg-white hover:bg-gray-50"
                       }`}
                     >
@@ -285,7 +285,7 @@ const RoadmapMaker = () => {
                         <p className="text-xs text-gray-600 font-sora">
                           {new Date(item.created_at).toLocaleDateString()}
                         </p>
-                        <span className="font-inter text-sm">
+                        <span className="font-inter text-blue-600 text-sm">
                           {item.isStarted && "Active"}
                         </span>
                       </div>
