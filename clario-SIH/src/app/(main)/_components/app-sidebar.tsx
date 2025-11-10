@@ -162,7 +162,7 @@ export function AppSidebar() {
             <SidebarMenuItem
               className={`flex cursor-pointer duration-200 ease-in-out rounded py-1 px-3
             ${
-              pathname === "/home/my-tracks"
+              pathname.startsWith("/home/my-tracks")
                 ? "bg-blue-400 scale-105 hover:bg-white/10"
                 : "hover:bg-white/10 hover:scale-105"
             }`}

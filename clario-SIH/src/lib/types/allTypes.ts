@@ -146,4 +146,64 @@ export type Notification = {
   message: string; 
   created_at: string; 
 };
+// ====================
+// ROAMAP==============
+interface myRoadmap {
+  id: number;
+  user_id: any;
+  roadmap_data: any;
+  created_at: string;
+  isStarted: boolean;
+  timeline: string;
+  mode: string;
+  status: string;   // STATUS - going_on / completed / paused / not_started
+}
+
+// ====================
+// TRACKS==============
+export interface SubTopic {
+  subtopic_order: number;
+  title: string;
+  overview: string;
+  resources: string[];  // learning resouce links by AI
+  youtube_videos: string[]; // this will be by YT 
+}
+
+export interface Checkpoint {
+  checkpoint_order: number;
+  title: string;
+  description?: string;
+  skills: string[];          // 3-4 skills for checkpoint
+  topics_covered: string[];  // 4 bullet points
+  isMockDone: boolean;       // unlock next checkpoint
+  subtopics: SubTopic[];     // ← subtopics  here
+}
+
+export interface RoadmapTrack {
+  id?: number;
+  roadmap_id: number; //FK to roadmap table
+  user_id: any; // FK to user table
+  checkpoints: Checkpoint[];   // ALL checkpoints here
+}
+
+// ===========================
+// [
+//   {
+//     "checkpoint_order": 1,
+//     "title": "Python Programming",
+//     "description": "Learn the basics of Python programming",
+//     "skills": ["Syntax", "Variables", "Problem solving"],
+//     "topics_covered": ["", "", "", ""],
+//     "isMockDone": false,
+//     "subtopics": [
+//       {
+//         "subtopic_order": 1,
+//         "title": "Variables and Data Types",
+//         "overview": "Variables store data...",
+//         "resources": ["", ""],
+//         "youtube_videos": ["", ""]
+//       },
+//     ]
+//   }
+// ]
 

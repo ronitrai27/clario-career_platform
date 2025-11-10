@@ -5,17 +5,35 @@ import { createClient } from "@/lib/supabase/client";
 import Image from "next/image";
 import React, { useEffect, useState } from "react";
 import {
+  LuAward,
   LuChevronRight,
   LuGhost,
   LuSignpost,
   LuTelescope,
 } from "react-icons/lu";
+import { getOrCreateRoadmapTrack } from "@/lib/functions/Track";
+import { useRouter } from "next/navigation";
+import { toast } from "sonner";
+
+interface myRoadmap {
+  id: number;
+  user_id: any;
+  roadmap_data: any;
+  created_at: string;
+  isStarted: boolean;
+  timeline: string;
+  mode: string;
+  status: string;
+  // STATUS - going_on / completed / paused / not_started
+}
 
 const MyTracks = () => {
   const { user } = useUserData();
   const supabase = createClient();
+  const router = useRouter();
   const [activeTrack, setActiveTrack] = useState<any>(null);
-  const [startedTracks, setStartedTracks] = useState<any[]>([]);
+  const [startedTracks, setStartedTracks] = useState<myRoadmap[]>([]);
+  const [startingId, setStartingId] = useState<number | null>(null);
 
   //   =================================================
   // ====================GETCH ALL STARTED TRACKS=================
@@ -39,7 +57,7 @@ const MyTracks = () => {
   }, [user?.id]);
 
   // ===========================================
-  // =========================FETCH  1 ACTIVE TRACK========================
+  // =========================FETCH Only  1 ACTIVE TRACK========================
   useEffect(() => {
     const fetchActiveTrack = async () => {
       if (!user?.id) return;
@@ -56,12 +74,49 @@ const MyTracks = () => {
       if (!error && data) {
         setActiveTrack(data);
       }
-
-      //   setLoading(false);
     };
 
     fetchActiveTrack();
   }, [user?.id]);
+
+  // ===========================================
+  // ==============FETCH ROADMAP_DATA TITLES==================
+  const handleStartLearning = async (track: myRoadmap) => {
+    try {
+      setStartingId(track.id);
+      // console.log("Preparing track:", track.id);
+      // console.log("Track data:", track);
+      toast.info("Preparing your track...");
+
+      if (track.status === "not_started") {
+        const { firstCheckpoint } = await getOrCreateRoadmapTrack({
+          id: track.id,
+          user_id: track.user_id,
+          roadmap_data: track.roadmap_data,
+        });
+
+        //  flip roadmapUsers.status → going_on now
+        await supabase
+          .from("roadmapUsers")
+          .update({ status: "going_on" })
+          .eq("id", track.id);
+
+        // 3) You’ll call your AI API for the first checkpoint on the next page.
+
+        const firstTitle = encodeURIComponent(firstCheckpoint?.title ?? "");
+        console.log("Navigating to first checkpoint:", firstTitle);
+        router.push(`/home/my-tracks/${track.id}/start`);
+        return;
+      }
+
+      // Already started? Just go.
+      router.push(`/home/my-tracks/${track.id}/start`);
+    } catch (e: any) {
+      console.error(e);
+      toast.error("Failed to prepare your track. Please try again.");
+    }
+  };
+
   return (
     <div className="bg-gray-50 h-full w-full p-4">
       {/* ======STARTER SINGLE CARD====== */}
@@ -74,7 +129,7 @@ const MyTracks = () => {
           className=" absolute -right-10 -bottom-20"
         />
 
-        <div className="flex gap-10 pr-5">
+        <div className="flex gap-10 pr-5 justify-between w-full ">
           <div className="w-[500px] mt-5">
             <h2 className="font-extrabold font-inter text-4xl text-white ml-2">
               Your Active Track To Success
@@ -182,15 +237,39 @@ const MyTracks = () => {
                   33% completed
                 </p>
 
-                <Button
-                  onClick={() =>
-                    (window.location.href = `/home/my-tracks/${track.id}/start`)
-                  }
-                  className="font-inter text-sm w-full cursor-pointer mt-4 bg-gradient-to-br from-indigo-400 to-sky-500 text-white"
-                  size="sm"
-                >
-                  Start Learning <LuChevronRight size={16} />
-                </Button>
+                {track.status === "not_started" ? (
+                  <Button
+                    onClick={() => handleStartLearning(track)}
+                    className="font-inter text-sm w-full cursor-pointer mt-4 bg-gradient-to-br from-indigo-400 to-sky-500 text-white"
+                    size="sm"
+                  >
+                    Start Learning <LuChevronRight size={16} />
+                  </Button>
+                ) : track.status === "going_on" ? (
+                  <Button
+                    className="font-inter text-sm w-full cursor-pointer mt-4 bg-gradient-to-br from-indigo-400 to-sky-500 text-white"
+                    size="sm"
+                    onClick={() =>
+                      router.push(`/home/my-tracks/${track.id}/start`)
+                    }
+                  >
+                    Continue Learning <LuChevronRight size={16} />
+                  </Button>
+                ) : track.status === "completed" ? (
+                  <Button
+                    className="font-inter text-sm w-full cursor-pointer mt-4 bg-gradient-to-br from-green-400 to-green-600 text-white"
+                    size="sm"
+                  >
+                    Completed <LuAward size={16} />
+                  </Button>
+                ) : (
+                  <Button
+                    className="font-inter text-sm w-full cursor-pointer mt-4 bg-gradient-to-br from-indigo-400 to-sky-500 text-white"
+                    size="sm"
+                  >
+                    Resume Learning <LuChevronRight size={16} />
+                  </Button>
+                )}
               </div>
             );
           })}
