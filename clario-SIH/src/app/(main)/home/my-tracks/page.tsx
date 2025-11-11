@@ -8,6 +8,7 @@ import {
   LuAward,
   LuChevronRight,
   LuGhost,
+  LuOctagonMinus,
   LuSignpost,
   LuTelescope,
 } from "react-icons/lu";
@@ -24,6 +25,7 @@ interface myRoadmap {
   timeline: string;
   mode: string;
   status: string;
+  progress: number;
   // STATUS - going_on / completed / paused / not_started
 }
 
@@ -95,7 +97,6 @@ const MyTracks = () => {
           roadmap_data: track.roadmap_data,
         });
 
-        //  flip roadmapUsers.status → going_on now
         await supabase
           .from("roadmapUsers")
           .update({ status: "going_on" })
@@ -109,12 +110,22 @@ const MyTracks = () => {
         return;
       }
 
-      // Already started? Just go.
       router.push(`/home/my-tracks/${track.id}/start`);
     } catch (e: any) {
       console.error(e);
       toast.error("Failed to prepare your track. Please try again.");
     }
+  };
+
+  // ==========================
+  // ==========UPDATE STATUS TO pause=============
+
+  const updatePause = async (track: myRoadmap) => {
+    await supabase
+      .from("roadmapUsers")
+      .update({ status: "paused" })
+      .eq("id", track.id);
+    toast.success("Track paused successfully!");
   };
 
   return (
@@ -198,7 +209,7 @@ const MyTracks = () => {
             return (
               <div
                 key={track.id}
-                className="bg-white rounded-xl shadow-md p-4 border hover:shadow-lg transition cursor-pointer"
+                className="bg-white rounded-xl shadow-md p-4 border hover:shadow-lg transition cursor-pointer w-[320px] h-[330px]"
               >
                 {/* Thumbnail Image */}
                 <div className="h-36 w-full rounded-lg overflow-hidden mb-3">
@@ -217,7 +228,7 @@ const MyTracks = () => {
                 </h2>
 
                 {/* Stage */}
-                <p className="text-sm text-gray-500 font-inter mt-1">
+                <p className="text-sm text-gray-500 font-inter mt-2">
                   <span className="font-semibold text-black">
                     <LuSignpost className="inline mr-1 -mt-1 text-[16px]" />{" "}
                     Checkpoint-1
@@ -228,48 +239,59 @@ const MyTracks = () => {
                 {/* Progress Bar */}
                 <div className="mt-3 w-full bg-gray-200 rounded-full h-2 overflow-hidden">
                   <div
-                    className="h-full bg-blue-600 rounded-full"
-                    style={{ width: "33%" }}
-                  ></div>
+                    className="h-full bg-blue-600 rounded-full transition-all duration-500"
+                    style={{ width: `${track?.progress || 0}%` }}
+                  />
                 </div>
 
                 <p className="text-xs font-inter text-muted-foreground mt-1">
-                  33% completed
+                  {track.progress || 0}% completed
                 </p>
 
-                {track.status === "not_started" ? (
-                  <Button
-                    onClick={() => handleStartLearning(track)}
-                    className="font-inter text-sm w-full cursor-pointer mt-4 bg-gradient-to-br from-indigo-400 to-sky-500 text-white"
-                    size="sm"
+                <div className="flex w-full items-center mt-4 justify-between">
+                  <div>
+                    {track.status === "not_started" ? (
+                      <Button
+                        onClick={() => handleStartLearning(track)}
+                        className="font-inter text-sm w-full cursor-pointer bg-gradient-to-br from-indigo-400 to-sky-500 text-white"
+                        size="sm"
+                      >
+                        Start Learning <LuChevronRight size={16} />
+                      </Button>
+                    ) : track.status === "going_on" ? (
+                      <Button
+                        className="font-inter text-sm w-full cursor-pointer bg-gradient-to-br from-indigo-400 to-sky-500 text-white"
+                        size="sm"
+                        onClick={() =>
+                          router.push(`/home/my-tracks/${track.id}/start`)
+                        }
+                      >
+                        Continue Learning <LuChevronRight size={16} />
+                      </Button>
+                    ) : track.status === "completed" ? (
+                      <Button
+                        className="font-inter text-sm w-full cursor-pointer bg-gradient-to-br from-green-400 to-green-600 text-white"
+                        size="sm"
+                      >
+                        Completed <LuAward size={16} />
+                      </Button>
+                    ) : (
+                      <Button
+                        className="font-inter text-sm w-full cursor-pointer bg-gradient-to-br from-indigo-400 to-sky-500 text-white"
+                        size="sm"
+                      >
+                        Resume Learning <LuChevronRight size={16} />
+                      </Button>
+                    )}
+                  </div>
+                  {/* ===TO PAUSE THE TRACK=== */}
+                  <div
+                    onClick={() => updatePause(track)}
+                    className="w-9 h-9 bg-orange-400 text-white border rounded-full flex items-center justify-center cursor-pointer"
                   >
-                    Start Learning <LuChevronRight size={16} />
-                  </Button>
-                ) : track.status === "going_on" ? (
-                  <Button
-                    className="font-inter text-sm w-full cursor-pointer mt-4 bg-gradient-to-br from-indigo-400 to-sky-500 text-white"
-                    size="sm"
-                    onClick={() =>
-                      router.push(`/home/my-tracks/${track.id}/start`)
-                    }
-                  >
-                    Continue Learning <LuChevronRight size={16} />
-                  </Button>
-                ) : track.status === "completed" ? (
-                  <Button
-                    className="font-inter text-sm w-full cursor-pointer mt-4 bg-gradient-to-br from-green-400 to-green-600 text-white"
-                    size="sm"
-                  >
-                    Completed <LuAward size={16} />
-                  </Button>
-                ) : (
-                  <Button
-                    className="font-inter text-sm w-full cursor-pointer mt-4 bg-gradient-to-br from-indigo-400 to-sky-500 text-white"
-                    size="sm"
-                  >
-                    Resume Learning <LuChevronRight size={16} />
-                  </Button>
-                )}
+                    <LuOctagonMinus size={20} />
+                  </div>
+                </div>
               </div>
             );
           })}

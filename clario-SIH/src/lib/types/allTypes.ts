@@ -157,6 +157,7 @@ interface myRoadmap {
   timeline: string;
   mode: string;
   status: string;   // STATUS - going_on / completed / paused / not_started
+  progress: number; 
 }
 
 // ====================
