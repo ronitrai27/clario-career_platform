@@ -15,11 +15,14 @@ import { LuBrain, LuChevronLeft, LuGrip } from "react-icons/lu";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Button } from "@/components/ui/button";
 import { useResumeStore } from "@/lib/store/useResumeStore";
+import { LuArrowUp, LuArrowDown } from "react-icons/lu";
 
 export default function ResumeStart() {
   const [styleSidebarOpen, setStyleSidebarOpen] = useState(false);
   const { open: sidebarOpen, isMobile } = useSidebar();
   const setThemeColor = useResumeStore((state) => state.setThemeColor);
+  const sections = useResumeStore((s) => s.resume.sections);
+  const reorderSections = useResumeStore((s) => s.reorderSections);
 
   return (
     <div className="bg-gray-50 pt-2 ">
@@ -81,7 +84,45 @@ export default function ResumeStart() {
                   ))}
                 </div>
               </div>
-              {/* =========REORDER SECTIONS =============== */}
+              {/* ========= REORDER SECTIONS =============== */}
+              <div className="space-y-2 mt-6">
+                <p className="text-base font-sora font-medium mb-4">
+                  Reorder Sections
+                </p>
+
+                <div className="space-y-3">
+                  {sections.map((section, index) => (
+                    <div
+                      key={section.id}
+                      className="flex items-center justify-between bg-gray-50 hover:bg-gray-100 transition p-2 rounded-md border"
+                    >
+                      <span className="text-sm font-inter capitalize">
+                        {section.title}
+                      </span>
+
+                      <div className="flex items-center gap-1">
+                        <button
+                          onClick={() => reorderSections(index, index - 1)}
+                          disabled={index === 0}
+                          className="p-1 rounded hover:bg-gray-200 disabled:opacity-40"
+                          title="Move up"
+                        >
+                          <LuArrowUp className="w-4 h-4" />
+                        </button>
+
+                        <button
+                          onClick={() => reorderSections(index, index + 1)}
+                          disabled={index === sections.length - 1}
+                          className="p-1 rounded hover:bg-gray-200 disabled:opacity-40"
+                          title="Move down"
+                        >
+                          <LuArrowDown className="w-4 h-4" />
+                        </button>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
             </div>
           )}
         </div>

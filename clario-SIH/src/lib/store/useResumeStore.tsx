@@ -160,7 +160,7 @@ export const useResumeStore = create<ResumeStore>((set) => ({
       {
         id: "custom",
         type: "custom",
-        title: "Achievements & Certifications",
+        title: "Others",
         data: [
           {
             title: "",

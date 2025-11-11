@@ -1,12 +1,38 @@
-Static links -  const link = `${window.location.origin}/invite/${user.invite_link}` (onboardingCard.tsx), in email verified page 
-2 localstorage - onbaording and loginProvider ! , different for mentor
+GOOGLE_CLIENT_ID=
+GOOGLE_SECRET=
+DISCORD_SECRET=
 
 
-// to protect the user and mentor portal by role
-if (user.user_metadata.role !== "mentor") {
-  router.push("/unauthorized");
-}
+NEXT_PUBLIC_SUPABASE_URL=
+NEXT_PUBLIC_SUPABASE_ANON_KEY=
+
+NEXT_PUBLIC_HCAPTCHA_SITE_KEY=
+GROQ_API_KEY=
+
+UPSTASH_REDIS_REST_URL
+UPSTASH_REDIS_REST_TOKEN=
+SERPAPI_KEY=
+PINECONE_API_KEY=
+PINECONE_INDEX_NAME=
+PINECONE_REGION=
 
 
-## Cached -
-recomeneded 6 mentors in home , user quiz career/skill suggestion.
+NEXT_PUBLIC_IMAGEKIT_PUBLIC_KEY=
+IMAGEKIT_PRIVATE_KEY=
+NEXT_PUBLIC_IMAGEKIT_URL_ENDPOINT=
+
+GEMINI_API_KEY=
+NEXT_PUBLIC_GEMINI_API_KEY=
+TAVILY_API_KEY=
+NEXT_PUBLIC_TAVILY_API_KEY=
+
+
+NEXT_PUBLIC_VAPI_PUBLIC_KEY=
+VAPI_PUBLIC_KEY=
+
+
+
+NEXT_PUBLIC_ZEGO_APP_ID=
+NEXT_PUBLIC_ZEGO_SERVER_SECRET=
+
+NEXT_PUBLIC_YOUTUBE_API_KEY=

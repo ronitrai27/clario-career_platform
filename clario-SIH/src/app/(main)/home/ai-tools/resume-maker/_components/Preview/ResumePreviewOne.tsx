@@ -6,7 +6,7 @@ import TemplateOne from "./templates/TemplateOne";
 import { useSidebar } from "@/components/ui/sidebar";
 import { AirplayIcon } from "lucide-react";
 import { GrResume } from "react-icons/gr";
-import { LuActivity, LuChevronRight, LuCircleFadingPlus, LuDownload, LuFileBadge } from "react-icons/lu";
+import { LuActivity, LuBadgeCheck, LuChevronRight, LuCircleFadingPlus, LuDownload, LuFileBadge } from "react-icons/lu";
 import { Button } from "@/components/ui/button";
 
 export function ResumePreview() {
@@ -19,10 +19,10 @@ export function ResumePreview() {
         Live Resume Preview <LuFileBadge  className="w-7 h-7 inline-block ml-2" />
       </h1>
       <div className="flex items-center justify-evenly mt-6">
-        <div className="bg-gradient-to-br from-indigo-200 to-blue-300 py-[6px] px-3 rounded-lg w-fit cursor-pointer">
+        <div className="bg-gradient-to-br from-indigo-300 to-blue-400 text-white py-[6px] px-3 rounded-lg w-fit cursor-pointer">
           <h2 className="font-inter text-sm tracking-tight">
-            Check Resume Score{" "}
-            <LuCircleFadingPlus className="w-5 h-5 inline-block ml-2" />
+           Enhance Resume
+            <LuBadgeCheck  className="w-5 h-5 inline-block ml-2" />
           </h2>
         </div>
 
