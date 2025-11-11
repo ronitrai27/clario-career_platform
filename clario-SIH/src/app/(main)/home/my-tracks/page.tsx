@@ -125,7 +125,24 @@ const MyTracks = () => {
       .from("roadmapUsers")
       .update({ status: "paused" })
       .eq("id", track.id);
+    setStartedTracks((prev) =>
+      prev.map((t) => (t.id === track.id ? { ...t, status: "paused" } : t))
+    );
     toast.success("Track paused successfully!");
+  };
+
+  // ========================================
+  // ==============continue the PAUSED TRACK==================
+
+  const updateContinue = async (track: myRoadmap) => {
+    await supabase
+      .from("roadmapUsers")
+      .update({ status: "going_on" })
+      .eq("id", track.id);
+    setStartedTracks((prev) =>
+      prev.map((t) => (t.id === track.id ? { ...t, status: "going_on" } : t))
+    );
+    toast.success("Track successfully continued!");
   };
 
   return (
@@ -279,6 +296,7 @@ const MyTracks = () => {
                       <Button
                         className="font-inter text-sm w-full cursor-pointer bg-gradient-to-br from-indigo-400 to-sky-500 text-white"
                         size="sm"
+                        onClick={() => updateContinue(track)}
                       >
                         Resume Learning <LuChevronRight size={16} />
                       </Button>

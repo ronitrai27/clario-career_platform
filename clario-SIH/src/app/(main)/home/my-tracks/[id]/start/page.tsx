@@ -111,7 +111,23 @@ const MyTrackStart = () => {
           height={280}
           className=" object-cover absolute -top-6 right-0"
         />
+        <div className="absolute top-0 right-[40%] w-16 h-16">
+          <div className="w-full h-full bg-white/25 rounded-tr-2xl rotate-45 transform origin-top-right"></div>
+        </div>
+
+        <div className="absolute bottom-20 left-[40%] w-16 h-16">
+          <div className="w-full h-full bg-white/30 rounded-tr-2xl rotate-6 transform origin-top-right"></div>
+        </div>
+
+        <div className="absolute bottom-0 right-[60%] w-16 h-16">
+          <div className="w-full h-full bg-white/25 rounded-tr-2xl rotate-45 transform origin-top-right"></div>
+        </div>
+
+        <div className="absolute -bottom-5 left-20 w-16 h-16">
+          <div className="w-full h-full bg-white/30 rounded-tr-2xl rotate-6 transform origin-top-right"></div>
+        </div>
       </div>
+
       <div className="flex items-center justify-between relative mt-8">
         <h2 className="font-inter absolute left-10">
           <LuChevronLeft className="inline mr-2" />
@@ -206,7 +222,7 @@ const MyTrackStart = () => {
                     ? "bg-green-50 border border-green-300"
                     : isUnlocked
                     ? "bg-white border shadow-sm"
-                    : "bg-gray-200 opacity-60 pointer-events-none shadow" 
+                    : "bg-gray-200 opacity-60 pointer-events-none shadow"
                 }`}
               >
                 <div className="flex items-center justify-between mb-3">
