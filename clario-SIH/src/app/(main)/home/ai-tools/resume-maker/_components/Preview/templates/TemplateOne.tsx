@@ -1,7 +1,11 @@
 // components/resume/Preview/templates/TemplateOne.tsx
 
 import { Separator } from "@/components/ui/separator";
-import { ResumeState } from "@/lib/store/useResumeStore";
+import {
+  EducationItem,
+  ExperienceItem,
+  ResumeState,
+} from "@/lib/store/useResumeStore";
 import { Linkedin, Phone, Mail, Github, Globe } from "lucide-react";
 
 export default function TemplateOne({ resume }: { resume: ResumeState }) {
@@ -83,6 +87,105 @@ export default function TemplateOne({ resume }: { resume: ResumeState }) {
               <p className="mt-1 text-[12px] leading-relaxed capitalize">
                 {section.data.join(" • ")}
               </p>
+            </section>
+          );
+        }
+
+        // =============== EDUCATION ==================
+        if (
+          section.id === "education" &&
+          Array.isArray(section.data) &&
+          section.data.some(
+            (edu: EducationItem) =>
+              edu.institution.trim() ||
+              edu.description.trim() ||
+              edu.startDate.trim() ||
+              edu.endDate.trim() ||
+              edu.location.trim()
+          )
+        ) {
+          return (
+            <section key={section.id} className="mb-4 font-inter">
+              <h2
+                className="font-semibold text-base border-b pb-1"
+                style={{ borderColor: themeColor, color: themeColor }}
+              >
+                {section.title}
+              </h2>
+
+              {section.data.map((edu, idx) => (
+                <div key={idx} className="mt-2">
+                  <div className="flex justify-between">
+                    <div className="font-semibold capitalize text-[12px]">
+                      {edu.institution}
+                      {edu.description && (
+                        <p className="  text-[12px] text-neutral-700">
+                          {edu.description}
+                        </p>
+                      )}
+                    </div>
+                    <div className="text-xs text-neutral-500 text-right">
+                      {edu.location && <div>{edu.location}</div>}
+                      {edu.startDate && edu.endDate && (
+                        <div>
+                          {edu.startDate} - {edu.endDate}
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </section>
+          );
+        }
+
+        // =============== EXPERIENCE ==================
+        if (
+          section.id === "experience" &&
+          Array.isArray(section.data) &&
+          section.data.some(
+            (exp: ExperienceItem) =>
+              exp.role.trim() ||
+              exp.company.trim() ||
+              exp.description.trim() ||
+              exp.startDate.trim() ||
+              exp.endDate.trim() ||
+              exp.location.trim()
+          )
+        ) {
+          return (
+            <section key={section.id} className="mb-4">
+              <h2
+                className="font-semibold text-base border-b pb-1"
+                style={{ borderColor: themeColor, color: themeColor }}
+              >
+                {section.title}
+              </h2>
+
+              {section.data.map((exp, idx) => (
+                <div key={idx} className="mt-2">
+                  <div className="flex justify-between">
+                    <div className="font-semibold capitalize">
+                      {exp.role}
+                      {exp.company && ` — ${exp.company}`}
+
+                      {exp.description && (
+                        <p className="mt-1 text-[11px] text-neutral-700 whitespace-pre-line">
+                          {exp.description}
+                        </p>
+                      )}
+                    </div>
+                    <div className="text-xs text-neutral-500 text-right">
+                      {exp.location && <div>{exp.location}</div>}
+                      {exp.startDate && exp.endDate && (
+                        <div>
+                          {exp.startDate} - {exp.endDate}
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                </div>
+              ))}
             </section>
           );
         }

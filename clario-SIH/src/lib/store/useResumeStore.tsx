@@ -28,6 +28,7 @@ export type EducationItem = {
   description: string;
   startDate: string;
   endDate: string;
+  location: string;
 };
 
 export type ExperienceItem = {
@@ -36,6 +37,7 @@ export type ExperienceItem = {
   description: string;
   startDate: string;
   endDate: string;
+  location: string;
 };
 
 export type ProjectItem = {
@@ -128,6 +130,7 @@ export const useResumeStore = create<ResumeStore>((set) => ({
             description: "",
             startDate: "",
             endDate: "",
+            location: "",
           },
         ],
       },
@@ -142,6 +145,7 @@ export const useResumeStore = create<ResumeStore>((set) => ({
             description: "",
             startDate: "",
             endDate: "",
+            location: "",
           },
         ],
       },

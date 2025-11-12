@@ -7,11 +7,15 @@ import { LuBrain, LuChevronLeft, LuChevronRight, LuInfo } from "react-icons/lu";
 import { Separator } from "@/components/ui/separator";
 import { Button } from "@/components/ui/button";
 import SkillsForm from "./SkillForm";
+import EducationForm from "./EducationForm";
+import ExperienceForm from "./ExpForm";
 
 const steps = [
   { id: "bio", label: "Basic Information", component: BioForm },
   { id: "summary", label: "Summary", component: SummaryForm },
-    { id: "skills", label: "Skills", component: SkillsForm }
+  { id: "skills", label: "Skills", component: SkillsForm },
+  { id: "education", label: "Education", component: EducationForm },
+  { id: "experience", label: "Experience", component: ExperienceForm },
 ];
 
 export default function EditorStepper() {
@@ -44,8 +48,16 @@ export default function EditorStepper() {
       </div>
 
       <div className="flex items-center justify-between mt-4">
-        <p className="text-center text-lg font-inter line-clamp-1">{current.label}</p>
-        <Button className="font-inter text-sm tracking-tight" variant="outline" size="sm">Info <LuInfo/></Button>
+        <p className="text-center text-lg font-inter line-clamp-1">
+          {current.label}
+        </p>
+        <Button
+          className="font-inter text-sm tracking-tight"
+          variant="outline"
+          size="sm"
+        >
+          Info <LuInfo />
+        </Button>
       </div>
 
       <Separator className="my-3" />
@@ -62,21 +74,19 @@ export default function EditorStepper() {
           disabled={stepIndex === 0}
           size="sm"
           variant="outline"
-
           onClick={prev}
         >
-         <LuChevronLeft className="w-4 h-4 inline-block mr-2"/> Previous
+          <LuChevronLeft className="w-4 h-4 inline-block mr-2" /> Previous
         </Button>
 
         <Button
           className="px-4  font-inter bg-blue-600 text-white rounded-lg text-sm"
           onClick={next}
           size="sm"
-          
           disabled={stepIndex === totalSteps - 1}
         >
           Next
-            <LuChevronRight className="w-4 h-4 inline-block ml-2"/>
+          <LuChevronRight className="w-4 h-4 inline-block ml-2" />
         </Button>
       </div>
     </div>
