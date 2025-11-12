@@ -2,8 +2,10 @@
 
 import { Separator } from "@/components/ui/separator";
 import {
+  CustomItem,
   EducationItem,
   ExperienceItem,
+  ProjectItem,
   ResumeState,
 } from "@/lib/store/useResumeStore";
 import { Linkedin, Phone, Mail, Github, Globe } from "lucide-react";
@@ -186,6 +188,103 @@ export default function TemplateOne({ resume }: { resume: ResumeState }) {
                   </div>
                 </div>
               ))}
+            </section>
+          );
+        }
+
+        // ========================PROJECTS==================
+        if (
+          section.id === "projects" &&
+          Array.isArray(section.data) &&
+          section.data.some(
+            (proj: ProjectItem) =>
+              proj.title.trim() || proj.description.trim() || proj.date.trim()
+          )
+        ) {
+          return (
+            <section key={section.id} className="mb-4 font-inter">
+              <h2
+                className="font-semibold text-base border-b pb-1"
+                style={{ borderColor: themeColor, color: themeColor }}
+              >
+                {section.title}
+              </h2>
+
+              {section.data.map((proj: ProjectItem, idx: number) => {
+                const hasData =
+                  proj.title.trim() ||
+                  proj.description.trim() ||
+                  proj.date.trim();
+                if (!hasData) return null;
+
+                return (
+                  <div key={idx} className="mt-2">
+                    <div className="flex justify-between">
+                      <div className="font-semibold capitalize">
+                        {proj.title}
+                      </div>
+                      <div className="text-xs text-neutral-500 text-right">
+                        {proj.date}
+                      </div>
+                    </div>
+
+                    {proj.description && (
+                      <p className="mt-1 text-[11px] text-neutral-700 whitespace-pre-line">
+                        {proj.description}
+                      </p>
+                    )}
+                  </div>
+                );
+              })}
+            </section>
+          );
+        }
+
+        // =============== CUSTOM SECTION (DYNAMIC) ==================
+        if (
+          section.id === "custom" &&
+          Array.isArray(section.data) &&
+          section.data.some(
+            (item: CustomItem) =>
+              (item.title && item.title.trim()) ||
+              (item.description && item.description.trim()) ||
+              (item.date && item.date.trim())
+          )
+        ) {
+          return (
+            <section key={section.id} className="mb-4 font-inter">
+              <h2
+                className="font-semibold text-base border-b pb-1"
+                style={{ borderColor: themeColor, color: themeColor }}
+              >
+                {section.title}
+              </h2>
+
+              {section.data.map((item: CustomItem, idx: number) => {
+                const hasData =
+                  (item.title && item.title.trim()) ||
+                  (item.description && item.description.trim()) ||
+                  (item.date && item.date.trim());
+                if (!hasData) return null;
+
+                return (
+                  <div key={idx} className="mt-2">
+                    <div className="flex justify-between items-start">
+                      <div className="font-semibold capitalize text-[12px]">
+                        {item.title}
+                      </div>
+                      <div className="text-xs text-neutral-500 text-right">
+                        {item.date}
+                      </div>
+                    </div>
+                    {item.description && (
+                      <p className="mt-1 text-[11px] text-neutral-700 whitespace-pre-line">
+                        {item.description}
+                      </p>
+                    )}
+                  </div>
+                );
+              })}
             </section>
           );
         }

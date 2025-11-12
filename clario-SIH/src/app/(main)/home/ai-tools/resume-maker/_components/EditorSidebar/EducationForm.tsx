@@ -6,6 +6,7 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { LuPlus, LuTrash } from "react-icons/lu";
+import { Label } from "@/components/ui/label";
 
 export default function EducationForm() {
   const section = useResumeStore((s) =>
@@ -13,7 +14,9 @@ export default function EducationForm() {
   );
   const updateSection = useResumeStore((s) => s.updateSection);
 
-  const education = (section?.type === "education" ? section.data : []) as any[];
+  const education = (
+    section?.type === "education" ? section.data : []
+  ) as any[];
 
   const addEducation = () => {
     const newItem = {
@@ -39,7 +42,7 @@ export default function EducationForm() {
   };
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-6 font-inter">
       {education.map((edu, i) => (
         <div key={i} className="p-3 border rounded-md space-y-3">
           <div className="flex justify-between items-center">
@@ -52,17 +55,23 @@ export default function EducationForm() {
               <LuTrash className="w-4 h-4" />
             </Button>
           </div>
-
+          <Label className="text-sm font-semibold tracking-tight">
+            Institution
+          </Label>
           <Input
             placeholder="Institution Name"
             value={edu.institution}
             onChange={(e) => updateField(i, "institution", e.target.value)}
           />
+          <Label className="text-sm font-semibold tracking-tight">
+            Location
+          </Label>
           <Input
             placeholder="Location (e.g., Delhi, India)"
             value={edu.location || ""}
             onChange={(e) => updateField(i, "location", e.target.value)}
           />
+          <Label className="text-sm font-semibold tracking-tight">Dates</Label>
           <div className="flex gap-2">
             <Input
               placeholder="Start Date"
@@ -75,6 +84,9 @@ export default function EducationForm() {
               onChange={(e) => updateField(i, "endDate", e.target.value)}
             />
           </div>
+          <Label className="text-sm font-semibold tracking-tight">
+            Description
+          </Label>
           <Textarea
             placeholder="Description (e.g., Class 12 in Commerce)"
             value={edu.description}

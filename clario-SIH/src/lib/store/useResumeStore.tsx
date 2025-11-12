@@ -49,6 +49,7 @@ export type ProjectItem = {
 export type CustomItem = {
   title: string;
   description: string;
+  date: string;
 };
 
 export type Section =
@@ -169,6 +170,7 @@ export const useResumeStore = create<ResumeStore>((set) => ({
           {
             title: "",
             description: "",
+            date: "",
           },
         ],
       },

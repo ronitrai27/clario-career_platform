@@ -9,6 +9,8 @@ import { Button } from "@/components/ui/button";
 import SkillsForm from "./SkillForm";
 import EducationForm from "./EducationForm";
 import ExperienceForm from "./ExpForm";
+import ProjectsForm from "./ProjectForm";
+import CustomSectionForm from "./CustomSectionForm";
 
 const steps = [
   { id: "bio", label: "Basic Information", component: BioForm },
@@ -16,6 +18,8 @@ const steps = [
   { id: "skills", label: "Skills", component: SkillsForm },
   { id: "education", label: "Education", component: EducationForm },
   { id: "experience", label: "Experience", component: ExperienceForm },
+  { id: "projects", label: "Projects", component: ProjectsForm },
+  { id: "custom", label: "Custom Section", component: CustomSectionForm },
 ];
 
 export default function EditorStepper() {
