@@ -206,6 +206,7 @@ const MyTracks = () => {
       if (roadmapError) throw roadmapError;
 
       setStartedTracks((prev) => prev.filter((t) => t.id !== track.id));
+      setActiveTracks((prev) => prev.filter((t) => t.id !== track.id));
 
       toast.success("Track deleted successfully!");
     } catch (err: any) {

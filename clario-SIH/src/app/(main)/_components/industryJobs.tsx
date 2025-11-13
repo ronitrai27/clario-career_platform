@@ -21,6 +21,7 @@ import {
   LuBuilding2,
   LuChartColumnDecreasing,
   LuChevronRight,
+  LuLoader,
   LuTreePine,
 } from "react-icons/lu";
 import { Button } from "@/components/ui/button";
@@ -50,6 +51,7 @@ import { createClient } from "@/lib/supabase/client";
 import { useUserData } from "@/context/UserDataProvider";
 import { useSidebar } from "@/components/ui/sidebar";
 import { ScrollArea } from "@/components/ui/scroll-area";
+import { Skeleton } from "@/components/ui/skeleton";
 
 interface Job {
   title: string;
@@ -313,7 +315,7 @@ export default function CareerTabsDemo() {
       <div className="w-full my-4 text-center bg-gradient-to-br from-blue-300 to-pink-300 py-12 rounded-lg relative overflow-hidden">
         {activeTab === "jobs" && (
           <>
-           <Image
+            <Image
               src="/ca2.png"
               alt="ca1"
               width={150}
@@ -356,7 +358,7 @@ export default function CareerTabsDemo() {
         )}
         {activeTab === "courses" && (
           <>
-           <Image
+            <Image
               src="/ca1.png"
               alt="ca1"
               width={200}
@@ -443,9 +445,24 @@ export default function CareerTabsDemo() {
         <TabsContent value="jobs">
           <div className="">
             {loading ? (
-              <p className="text-muted-foreground flex items-center justify-center text-center font-inter text-xl">
-                Loading jobs...
-              </p>
+              <>
+                <div className="flex items-center justify-center">
+                  <div className="flex items-center gap-3">
+                    <LuLoader className="animate-spin text-2xl text-blue-600" />
+                    <p className="font-inter text-base tracking-tight ">
+                      Fetching Jobs...
+                    </p>
+                  </div>
+                </div>
+
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-10 mt-10">
+                  {[...Array(6)].map((_, i) => (
+                    <div key={i} className="flex flex-col gap-4">
+                      <Skeleton className="h-[280px] w-[280px] rounded-lg" />
+                    </div>
+                  ))}
+                </div>
+              </>
             ) : jobs.length === 0 ? (
               <p className="text-muted-foreground">
                 No jobs found for {quizData?.selectedCareer}
