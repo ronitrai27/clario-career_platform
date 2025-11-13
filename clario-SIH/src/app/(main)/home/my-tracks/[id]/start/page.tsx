@@ -1,7 +1,7 @@
 "use client";
 import React, { useEffect, useState } from "react";
 import { createClient } from "@/lib/supabase/client";
-import { useParams } from "next/navigation";
+import { useParams, useRouter } from "next/navigation";
 
 import type { RoadmapTrack, Checkpoint } from "@/lib/types/allTypes";
 import {
@@ -20,6 +20,7 @@ import Image from "next/image";
 const MyTrackStart = () => {
   const supabase = createClient();
   const params = useParams();
+  const router = useRouter();
 
   const [track, setTrack] = useState<RoadmapTrack | null>(null);
   const [currentCheckpoint, setCurrentCheckpoint] = useState<Checkpoint | null>(
@@ -53,7 +54,6 @@ const MyTrackStart = () => {
 
       setCurrentCheckpoint(checkpoint || null);
 
-      //  Calculate Progress Percentage
       const completedCheckpoints = data.checkpoints.filter(
         (cp: Checkpoint) => cp.isMockDone
       ).length;
@@ -64,7 +64,7 @@ const MyTrackStart = () => {
       );
 
       setProgress(calculatedProgress);
-      // Update in roadmapUsers table
+
       await supabase
         .from("roadmapUsers")
         .update({ progress: calculatedProgress })
@@ -129,7 +129,10 @@ const MyTrackStart = () => {
       </div>
 
       <div className="flex items-center justify-between relative mt-8">
-        <h2 className="font-inter absolute left-10">
+        <h2
+          onClick={() => router.push("/home/my-tracks")}
+          className="font-inter absolute left-10 cursor-pointer"
+        >
           <LuChevronLeft className="inline mr-2" />
           Back
         </h2>

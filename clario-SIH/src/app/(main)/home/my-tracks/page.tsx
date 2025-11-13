@@ -4,17 +4,35 @@ import { useUserData } from "@/context/UserDataProvider";
 import { createClient } from "@/lib/supabase/client";
 import Image from "next/image";
 import React, { useEffect, useState } from "react";
+import { VisuallyHidden } from "@radix-ui/react-visually-hidden";
+import { IoSettingsOutline } from "react-icons/io5";
 import {
+  LuArrowUpRight,
   LuAward,
   LuChevronRight,
   LuGhost,
   LuOctagonMinus,
+  LuPlus,
   LuSignpost,
   LuTelescope,
+  LuTrash2,
 } from "react-icons/lu";
 import { getOrCreateRoadmapTrack } from "@/lib/functions/Track";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
+import { Ghost } from "lucide-react";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
+import {
+  Popover,
+  PopoverTrigger,
+  PopoverContent,
+} from "@/components/ui/popover";
 
 interface myRoadmap {
   id: number;
@@ -33,9 +51,14 @@ const MyTracks = () => {
   const { user } = useUserData();
   const supabase = createClient();
   const router = useRouter();
-  const [activeTrack, setActiveTrack] = useState<any>(null);
   const [startedTracks, setStartedTracks] = useState<myRoadmap[]>([]);
   const [startingId, setStartingId] = useState<number | null>(null);
+
+  const [showDialog, setShowDialog] = useState(false);
+  const [loadingStep, setLoadingStep] = useState(0);
+
+  const [activeTracks, setActiveTracks] = useState<any[]>([]);
+  const [activeLoading, setActiveLoading] = useState(false);
 
   //   =================================================
   // ====================GETCH ALL STARTED TRACKS=================
@@ -59,37 +82,53 @@ const MyTracks = () => {
   }, [user?.id]);
 
   // ===========================================
-  // =========================FETCH Only  1 ACTIVE TRACK========================
   useEffect(() => {
-    const fetchActiveTrack = async () => {
+    const fetchActiveTracks = async () => {
       if (!user?.id) return;
+      try {
+        setActiveLoading(true);
+        const { data, error } = await supabase
+          .from("roadmapUsers")
+          .select("*")
+          .eq("user_id", user.id)
+          .eq("isStarted", true)
+          .order("created_at", { ascending: false });
 
-      const { data, error } = await supabase
-        .from("roadmapUsers")
-        .select("*")
-        .eq("user_id", user.id)
-        .eq("isStarted", true)
-        .order("created_at", { ascending: false })
-        .limit(1)
-        .single();
-
-      if (!error && data) {
-        setActiveTrack(data);
+        if (error) throw error;
+        setActiveTracks(Array.isArray(data) ? data : []);
+      } catch (err) {
+        console.error("Failed to fetch active tracks", err);
+        setActiveTracks([]);
+      } finally {
+        setActiveLoading(false);
       }
     };
 
-    fetchActiveTrack();
+    fetchActiveTracks();
   }, [user?.id]);
-
   // ===========================================
   // ==============FETCH ROADMAP_DATA TITLES==================
   const handleStartLearning = async (track: myRoadmap) => {
     try {
+      setShowDialog(true);
+      setLoadingStep(0);
       setStartingId(track.id);
-      // console.log("Preparing track:", track.id);
-      // console.log("Track data:", track);
       toast.info("Preparing your track...");
 
+      const loadingMessages = [
+        "Clario is generating your personalized learning path...",
+        "Analyzing roadmap data...",
+        "Looking for external resources...",
+        "Fetching YouTube tutorials...",
+        "Connecting to the database...",
+        "Finalizing your setup...",
+      ];
+
+      loadingMessages.forEach((_, index) => {
+        setTimeout(() => setLoadingStep(index), index * 1200); // 1.2s gap per step
+      });
+
+      // === BACKEND LOGIC RUNS HERE ===
       if (track.status === "not_started") {
         const { firstCheckpoint } = await getOrCreateRoadmapTrack({
           id: track.id,
@@ -102,11 +141,13 @@ const MyTracks = () => {
           .update({ status: "going_on" })
           .eq("id", track.id);
 
-        // 3) You’ll call your AI API for the first checkpoint on the next page.
-
         const firstTitle = encodeURIComponent(firstCheckpoint?.title ?? "");
-        console.log("Navigating to first checkpoint:", firstTitle);
-        router.push(`/home/my-tracks/${track.id}/start`);
+
+        // Wait for full dialog duration (7s)
+        setTimeout(() => {
+          setShowDialog(false);
+          router.push(`/home/my-tracks/${track.id}/start`);
+        }, 7500);
         return;
       }
 
@@ -114,6 +155,7 @@ const MyTracks = () => {
     } catch (e: any) {
       console.error(e);
       toast.error("Failed to prepare your track. Please try again.");
+      setShowDialog(false);
     }
   };
 
@@ -145,6 +187,33 @@ const MyTracks = () => {
     toast.success("Track successfully continued!");
   };
 
+  // ================================================
+  // =====================DELETE THE TRACK===================
+  const deleteTrack = async (track: myRoadmap) => {
+    try {
+      const { error: tracksError } = await supabase
+        .from("tracks")
+        .delete()
+        .eq("roadmap_id", track.id);
+
+      if (tracksError) throw tracksError;
+
+      const { error: roadmapError } = await supabase
+        .from("roadmapUsers")
+        .delete()
+        .eq("id", track.id);
+
+      if (roadmapError) throw roadmapError;
+
+      setStartedTracks((prev) => prev.filter((t) => t.id !== track.id));
+
+      toast.success("Track deleted successfully!");
+    } catch (err: any) {
+      console.error(err);
+      toast.error("Failed to delete track.");
+    }
+  };
+
   return (
     <div className="bg-gray-50 h-full w-full p-4">
       {/* ======STARTER SINGLE CARD====== */}
@@ -154,10 +223,10 @@ const MyTracks = () => {
           alt="tr"
           width={200}
           height={200}
-          className=" absolute -right-10 -bottom-20"
+          className="absolute -right-10 -bottom-20"
         />
 
-        <div className="flex gap-10 pr-5 justify-between w-full ">
+        <div className="flex gap-10 pr-5 justify-between w-full h-full">
           <div className="w-[500px] mt-5">
             <h2 className="font-extrabold font-inter text-4xl text-white ml-2">
               Your Active Track To Success
@@ -167,48 +236,67 @@ const MyTracks = () => {
               dream job
             </p>
           </div>
-          {/* RIGHT SIDE ACTIVE TRACK */}
-          <div>
-            <div className="bg-white/50 rounded-lg w-[370px] h-[180px] p-2 ml-20 relative z-20">
-              {activeTrack ? (
-                <>
-                  <div>
-                    <span className="bg-green-500 text-white text-[10px] px-3 py-[4px] rounded-full font-inter">
-                      Active Track
-                    </span>
 
-                    <h3 className="font-semibold text-black font-inter capitalize mt-4">
-                      {activeTrack.roadmap_data?.roadmapTitle ||
-                        "Untitled Roadmap"}
-                    </h3>
-
-                    <p className="text-sm text-gray-600 font-inter mt-2">
-                      Duration: {activeTrack.roadmap_data?.duration}
-                    </p>
-
-                    <p className="text-sm tracking-tight text-gray-600 font-inter mt-1">
-                      Started on:{" "}
-                      {new Date(activeTrack.created_at).toLocaleDateString()}
+          {/* RIGHT SIDE ACTIVE TRACKS (horizontal scroll) */}
+          <div className="flex-1 flex items-center justify-end">
+            <div
+              className="w-[370px] h-[200px] p-2 relative z-20 overflow-x-auto"
+              aria-label="Active tracks carousel"
+            >
+              {/* container for horizontal cards */}
+              <div className="flex gap-4 px-1 py-2 items-stretch snap-x snap-mandatory">
+                {activeLoading ? (
+                  <div className="min-w-[340px] bg-white/50 rounded-lg p-4 flex items-center justify-center">
+                    <p className="text-sm text-gray-700 font-inter">
+                      Loading...
                     </p>
                   </div>
+                ) : activeTracks.length > 0 ? (
+                  activeTracks.map((t) => (
+                    <div
+                      key={t.id}
+                      className="min-w-[340px] bg-white/50 rounded-lg p-3 flex flex-col justify-between snap-center"
+                    >
+                      <div>
+                        <span className="bg-green-500 text-white text-[10px] px-3 py-[4px] rounded-full font-inter">
+                          Active Track
+                        </span>
 
-                  <Button
-                    onClick={() => (window.location.href = "/home/my-tracks")}
-                    size="sm"
-                    className="w-full font-inter text-sm mt-3 bg-gradient-to-br from-indigo-400 to-sky-500 text-white"
-                  >
-                    Continue Learning <LuChevronRight size={16} />
-                  </Button>
-                </>
-              ) : (
-                <>
-                  <div className="h-full flex flex-col items-center justify-center">
+                        <h3 className="font-semibold text-black font-inter capitalize mt-3 truncate">
+                          {t.roadmap_data?.roadmapTitle ?? "Untitled Roadmap"}
+                        </h3>
+
+                        <p className="text-sm text-gray-600 font-inter mt-2 truncate">
+                          Duration: {t.roadmap_data?.duration ?? "—"}
+                        </p>
+
+                        <p className="text-sm tracking-tight text-gray-600 font-inter mt-1">
+                          Started on:{" "}
+                          {t.created_at
+                            ? new Date(t.created_at).toLocaleDateString()
+                            : "—"}
+                        </p>
+                      </div>
+
+                      <div className="mt-2 flex gap-2">
+                        <Button
+                          onClick={() => router.push(`/home/my-tracks`)}
+                          size="sm"
+                          className="w-full font-inter text-sm bg-gradient-to-br from-indigo-400 to-sky-500 text-white"
+                        >
+                          Continue Learning <LuChevronRight size={16} />
+                        </Button>
+                      </div>
+                    </div>
+                  ))
+                ) : (
+                  <div className="min-w-[340px] bg-white/50 rounded-lg p-4 flex items-center justify-center">
                     <h1 className="font-inter font-semibold text-2xl text-black tracking-tight">
                       No track Created Yet <LuGhost className="inline ml-2" />
                     </h1>
                   </div>
-                </>
-              )}
+                )}
+              </div>
             </div>
           </div>
         </div>
@@ -216,105 +304,214 @@ const MyTracks = () => {
 
       {/* =========ALL TRACKS WITHT HE PROGRESS========= */}
       <div className="mt-8 p-6">
-        <h1 className="font-semibold text-2xl font-inter">
-          My Tracks <LuTelescope className="inline ml-2" />
-        </h1>
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 mt-4">
-          {startedTracks.map((track) => {
-            const randomImage = `/${Math.floor(Math.random() * 5) + 1}.png`;
+        <div className="flex items-center gap-10">
+          <h1 className="font-semibold text-2xl font-inter">
+            My Tracks <LuTelescope className="inline ml-2" />
+          </h1>
 
-            return (
-              <div
-                key={track.id}
-                className="bg-white rounded-xl shadow-md p-4 border hover:shadow-lg transition cursor-pointer w-[320px] h-[330px]"
-              >
-                {/* Thumbnail Image */}
-                <div className="h-36 w-full rounded-lg overflow-hidden mb-3">
-                  <Image
-                    src={randomImage}
-                    alt="Roadmap"
-                    width={400}
-                    height={200}
-                    className="w-full h-full object-cover"
-                  />
-                </div>
-
-                {/* Title */}
-                <h2 className="font-semibold text-lg font-inter text-black">
-                  {track.roadmap_data?.roadmapTitle || "Untitled Roadmap"}
-                </h2>
-
-                {/* Stage */}
-                <p className="text-sm text-gray-500 font-inter mt-2">
-                  <span className="font-semibold text-black">
-                    <LuSignpost className="inline mr-1 -mt-1 text-[16px]" />{" "}
-                    Checkpoint-1
-                  </span>{" "}
-                  : Python Basics
-                </p>
-
-                {/* Progress Bar */}
-                <div className="mt-3 w-full bg-gray-200 rounded-full h-2 overflow-hidden">
-                  <div
-                    className="h-full bg-blue-600 rounded-full transition-all duration-500"
-                    style={{ width: `${track?.progress || 0}%` }}
-                  />
-                </div>
-
-                <p className="text-xs font-inter text-muted-foreground mt-1">
-                  {track.progress || 0}% completed
-                </p>
-
-                <div className="flex w-full items-center mt-4 justify-between">
-                  <div>
-                    {track.status === "not_started" ? (
-                      <Button
-                        onClick={() => handleStartLearning(track)}
-                        className="font-inter text-sm w-full cursor-pointer bg-gradient-to-br from-indigo-400 to-sky-500 text-white"
-                        size="sm"
-                      >
-                        Start Learning <LuChevronRight size={16} />
-                      </Button>
-                    ) : track.status === "going_on" ? (
-                      <Button
-                        className="font-inter text-sm w-full cursor-pointer bg-gradient-to-br from-indigo-400 to-sky-500 text-white"
-                        size="sm"
-                        onClick={() =>
-                          router.push(`/home/my-tracks/${track.id}/start`)
-                        }
-                      >
-                        Continue Learning <LuChevronRight size={16} />
-                      </Button>
-                    ) : track.status === "completed" ? (
-                      <Button
-                        className="font-inter text-sm w-full cursor-pointer bg-gradient-to-br from-green-400 to-green-600 text-white"
-                        size="sm"
-                      >
-                        Completed <LuAward size={16} />
-                      </Button>
-                    ) : (
-                      <Button
-                        className="font-inter text-sm w-full cursor-pointer bg-gradient-to-br from-indigo-400 to-sky-500 text-white"
-                        size="sm"
-                        onClick={() => updateContinue(track)}
-                      >
-                        Resume Learning <LuChevronRight size={16} />
-                      </Button>
-                    )}
-                  </div>
-                  {/* ===TO PAUSE THE TRACK=== */}
-                  <div
-                    onClick={() => updatePause(track)}
-                    className="w-9 h-9 bg-orange-400 text-white border rounded-full flex items-center justify-center cursor-pointer"
-                  >
-                    <LuOctagonMinus size={20} />
-                  </div>
-                </div>
-              </div>
-            );
-          })}
+          <Button
+            className="font-inter text-sm tracking-tight bg-gradient-to-br from-indigo-400 to-blue-400 text-white cursor-pointer"
+            size="sm"
+            onClick={() => router.push("/home/ai-tools/roadmap-maker")}
+          >
+            Generate New Track <LuArrowUpRight size={16} />{" "}
+          </Button>
         </div>
+
+        {startedTracks.length === 0 ? (
+          <div className="flex flex-col items-center justify-center text-center p-10 mt-6 w-full sm:w-[400px] mx-auto">
+            <Ghost className="w-14 h-14 mb-2 text-gray-400" />
+            <h2 className="text-xl font-semibold text-gray-800 font-inter mb-2">
+              No Tracks Found
+            </h2>
+            <p className="text-gray-500 font-inter text-sm mb-6">
+              You haven’t started any learning track yet.
+            </p>
+            <Button
+              onClick={() => router.push("/home/ai-tools/roadmap-maker")}
+              className="font-inter bg-gradient-to-br from-indigo-500 to-sky-500 text-white px-5 py-2 text-sm"
+            >
+              Create New Roadmap <LuPlus className="ml-2" size={16} />
+            </Button>
+          </div>
+        ) : (
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 mt-4">
+            {startedTracks.map((track) => {
+              const randomImage = `/${Math.floor(Math.random() * 5) + 1}.png`;
+
+              return (
+                <div
+                  key={track.id}
+                  className="bg-white rounded-xl shadow-md p-4 border hover:shadow-lg transition cursor-pointer w-[320px] h-[330px]"
+                >
+                  {/* Thumbnail Image */}
+                  <div className="h-36 w-full rounded-lg overflow-hidden mb-3">
+                    <Image
+                      src={randomImage}
+                      alt="Roadmap"
+                      width={400}
+                      height={200}
+                      className="w-full h-full object-cover"
+                    />
+                  </div>
+
+                  {/* Title */}
+                  <h2 className="font-semibold text-lg font-inter text-black whitespace-nowrap max-w-[300px] truncate">
+                    {track.roadmap_data?.roadmapTitle || "Untitled Roadmap"}
+                  </h2>
+
+                  {/* Stage */}
+                  <p className="text-sm text-gray-500 font-inter mt-2">
+                    <span className="font-semibold text-black">
+                      <LuSignpost className="inline mr-1 -mt-1 text-[16px]" />{" "}
+                      Checkpoint-1
+                    </span>{" "}
+                    : Python Basics
+                  </p>
+
+                  {/* Progress Bar */}
+                  <div className="mt-3 w-full bg-gray-200 rounded-full h-2 overflow-hidden">
+                    <div
+                      className="h-full bg-blue-600 rounded-full transition-all duration-500"
+                      style={{ width: `${track?.progress || 0}%` }}
+                    />
+                  </div>
+
+                  <p className="text-xs font-inter text-muted-foreground mt-1">
+                    {track.progress || 0}% completed
+                  </p>
+
+                  <div className="flex w-full items-center mt-4 justify-between">
+                    <div>
+                      {track.status === "not_started" ? (
+                        <Button
+                          onClick={() => handleStartLearning(track)}
+                          className="font-inter text-sm w-full cursor-pointer bg-gradient-to-br from-indigo-400 to-sky-500 text-white"
+                          size="sm"
+                        >
+                          Start Learning <LuChevronRight size={16} />
+                        </Button>
+                      ) : track.status === "going_on" ? (
+                        <Button
+                          className="font-inter text-sm w-full cursor-pointer bg-gradient-to-br from-indigo-400 to-sky-500 text-white"
+                          size="sm"
+                          onClick={() =>
+                            router.push(`/home/my-tracks/${track.id}/start`)
+                          }
+                        >
+                          Continue Learning <LuChevronRight size={16} />
+                        </Button>
+                      ) : track.status === "completed" ? (
+                        <Button
+                          className="font-inter text-sm w-full cursor-pointer bg-gradient-to-br from-green-400 to-green-600 text-white"
+                          size="sm"
+                        >
+                          Completed <LuAward size={16} />
+                        </Button>
+                      ) : (
+                        <Button
+                          className="font-inter text-sm w-full cursor-pointer bg-gradient-to-br from-indigo-400 to-sky-500 text-white"
+                          size="sm"
+                          onClick={() => updateContinue(track)}
+                        >
+                          Resume Learning <LuChevronRight size={16} />
+                        </Button>
+                      )}
+                    </div>
+
+                    {/* === TO EDIT THE TRACK (pause or delete) === */}
+                    <Popover>
+                      <PopoverTrigger asChild>
+                        <div className="w-9 h-9 bg-gray-100 text-black border rounded-md flex items-center justify-center cursor-pointer hover:bg-gray-200 transition">
+                          <IoSettingsOutline size={18} />
+                        </div>
+                      </PopoverTrigger>
+
+                      <PopoverContent className="w-40 p-2 font-inter text-sm">
+                        <button
+                          onClick={() => updatePause(track)}
+                          className="w-full text-left px-3 py-2 hover:bg-gray-100 rounded-md transition"
+                        >
+                          ⏸ Pause Track
+                        </button>
+
+                        <button
+                          onClick={() => deleteTrack(track)}
+                          className="w-full text-left px-3 py-2 hover:bg-red-100 text-red-600 rounded-md transition"
+                        >
+                          <LuTrash2 size={16} className="inline mr-2 -mt-1" />{" "}
+                          Delete Track
+                        </button>
+                      </PopoverContent>
+                    </Popover>
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        )}
       </div>
+
+      <Dialog open={showDialog} onOpenChange={setShowDialog}>
+        <VisuallyHidden>
+          <DialogTitle>
+            Clario is Creating Your Personalized Learning Path
+          </DialogTitle>
+        </VisuallyHidden>
+
+        <DialogContent className="sm:max-w-[800px] bg-white text-center font-inter p-0 h-[520px] overflow-hidden">
+          <div className="flex">
+            {/* LEFT SIDE */}
+
+            <div className="w-[40%] flex flex-col bg-gradient-to-br from-indigo-400 to-rose-400 h-full relative py-8 px-4">
+              <h2 className="font-inter text-white font-semibold text-3xl text-pretty">
+                A Well Defined Roadmap may Help You Learn Faster
+              </h2>
+              <Image
+                src="/9.png"
+                alt="Clario"
+                width={800}
+                height={800}
+                className=" absolute object-contain -bottom-5 left-0 scale-125"
+              />
+            </div>
+            {/* RIGHT SIDE */}
+            <div className="p-4 flex flex-col">
+              <h1 className="text-center font-semibold font-inter text-2xl">
+                Clario is Creating Your Personalized Learning Path
+              </h1>
+              <div className="mt-14 space-y-3 px-8">
+                {[
+                  "generating your personalized learning path...",
+                  "Analyzing roadmap data...",
+                  "Looking for external resources...",
+                  "Fetching YouTube tutorials...",
+                  "Connecting to the database...",
+                  "Finalizing your setup...",
+                ].map((msg, index) => (
+                  <div
+                    key={index}
+                    className={`text-sm  font-inter gap-2 transition-opacity duration-500 capitalize ${
+                      index <= loadingStep ? "opacity-100" : "opacity-30"
+                    }`}
+                  >
+                    <span className="animate-pulse text-indigo-500">•</span>
+                    {msg}
+                  </div>
+                ))}
+              </div>
+
+              <div className="mt-auto flex justify-center">
+                <div className="w-10 h-10 border-4 border-indigo-500 border-t-transparent rounded-full animate-spin" />
+              </div>
+
+              <p className="text-xs text-gray-400 font-inter mb-8 mt-2 ">
+                This may take a few seconds...
+              </p>
+            </div>
+          </div>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 };

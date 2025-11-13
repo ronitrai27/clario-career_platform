@@ -52,7 +52,7 @@ export const getOrCreateRoadmapTrack = async (
       roadmap_id: roadmapRow.id,
       user_id: roadmapRow.user_id,
       checkpoints,                 // JSONB array
-      status: "not_started",       // initial status for the track row
+      // status: "not_started",     
     })
     .select()
     .single();

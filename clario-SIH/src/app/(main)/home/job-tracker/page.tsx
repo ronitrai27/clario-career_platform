@@ -3,6 +3,7 @@ import { Button } from "@/components/ui/button";
 import { useSidebar } from "@/components/ui/sidebar";
 import { Separator } from "@/components/ui/separator";
 import { JobTrackerCard } from "@/lib/types/allTypes";
+import { VisuallyHidden } from "@radix-ui/react-visually-hidden";
 import {
   Delete,
   Edit,
@@ -644,6 +645,11 @@ const JobTracker = () => {
 
       {/* Prep DIALOG */}
       <Dialog open={prepOpen} onOpenChange={setPrepOpen}>
+        <VisuallyHidden>
+          <DialogTitle>
+            Clario is Creating Environment for Interview.
+          </DialogTitle>
+        </VisuallyHidden>
         <DialogContent className="sm:max-w-[750px] h-[500px] p-0 border-0 shadow-2xl rounded-lg overflow-hidden bg-transparent">
           <div className="flex h-full w-full">
             {/* LEFT SIDE */}
@@ -762,8 +768,8 @@ const JobTracker = () => {
                       connection for stability.
                     </p>
                     <p className="flex items-center gap-2">
-                      <InfoIcon className="w-4 h-4 mr-2" /> Don&apos;t switch tabs or
-                      refresh during the interview.
+                      <InfoIcon className="w-4 h-4 mr-2" /> Don&apos;t switch
+                      tabs or refresh during the interview.
                     </p>
                     <p className="flex items-center gap-2">
                       <InfoIcon className="w-4 h-4 mr-2" /> Relax and be
