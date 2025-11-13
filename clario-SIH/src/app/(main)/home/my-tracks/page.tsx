@@ -21,18 +21,15 @@ import { getOrCreateRoadmapTrack } from "@/lib/functions/Track";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
 import { Ghost } from "lucide-react";
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogHeader,
-  DialogTitle,
-} from "@/components/ui/dialog";
+
 import {
   Popover,
   PopoverTrigger,
   PopoverContent,
 } from "@/components/ui/popover";
+import axios from "axios";
+import { LearningPathDialog } from "../../_components/LearningPathDialog";
+import { SubTopic } from "@/lib/types/allTypes";
 
 interface myRoadmap {
   id: number;
@@ -108,6 +105,7 @@ const MyTracks = () => {
   }, [user?.id]);
   // ===========================================
   // ==============FETCH ROADMAP_DATA TITLES==================
+
   const handleStartLearning = async (track: myRoadmap) => {
     try {
       setShowDialog(true);
@@ -137,23 +135,73 @@ const MyTracks = () => {
           roadmap_data: track.roadmap_data,
         });
 
-        // GETTING FIRST DATA---
         const checkpointTitle = firstCheckpoint?.title ?? "";
         const checkpointDescription = firstCheckpoint?.description ?? "";
 
         console.log("FIRST checkpointTitle", checkpointTitle);
         console.log("FIRST checkpointDescription", checkpointDescription);
 
+        // -------------------------------
+        //AI ROUTE HERE
+        // -------------------------------
+        try {
+          const aiRes = await axios.post("/api/ai/generate-checkpoint", {
+            title: checkpointTitle,
+            description: checkpointDescription,
+          });
+
+          const aiData = aiRes.data?.data;
+          if (!aiData) throw new Error("Invalid AI data");
+
+          // Getting exisiting Track
+          const { data: trackRow, error: trackErr } = await supabase
+            .from("tracks")
+            .select("checkpoints")
+            .eq("roadmap_id", track.id)
+            .single();
+
+          if (trackErr || !trackRow) throw trackErr;
+
+          // Clone current checkpoints
+          const updatedCheckpoints = [...trackRow.checkpoints];
+
+          // Update only FIRST checkpoint
+          updatedCheckpoints[0] = {
+            ...updatedCheckpoints[0],
+            skills: aiData.skills,
+            topics_covered: aiData.topics_covered,
+            subtopics: aiData.subtopics.map((st: SubTopic) => ({
+              ...st,
+              youtube_videos: [],
+            })),
+          };
+
+          // Save back to DB----
+          const { error: updateErr } = await supabase
+            .from("tracks")
+            .update({ checkpoints: updatedCheckpoints })
+            .eq("roadmap_id", track.id);
+
+          if (updateErr) throw updateErr;
+
+          console.log("🔥 Checkpoint updated successfully!");
+          toast.success("AI learning path generated successfully!");
+        } catch (err) {
+          console.error("AI generation error:", err);
+          toast.error("AI failed to generate details");
+        }
+
+        // UPDATE STATUS----
         await supabase
           .from("roadmapUsers")
           .update({ status: "going_on" })
           .eq("id", track.id);
 
-        // Wait for full dialog duration (7s)
         setTimeout(() => {
           setShowDialog(false);
           router.push(`/home/my-tracks/${track.id}/start`);
         }, 7500);
+
         return;
       }
 
@@ -459,66 +507,11 @@ const MyTracks = () => {
         )}
       </div>
 
-      <Dialog open={showDialog} onOpenChange={setShowDialog}>
-        <VisuallyHidden>
-          <DialogTitle>
-            Clario is Creating Your Personalized Learning Path
-          </DialogTitle>
-        </VisuallyHidden>
-
-        <DialogContent className="sm:max-w-[800px] bg-white text-center font-inter p-0 h-[520px] overflow-hidden">
-          <div className="flex">
-            {/* LEFT SIDE */}
-
-            <div className="w-[40%] flex flex-col bg-gradient-to-br from-indigo-400 to-rose-400 h-full relative py-8 px-4">
-              <h2 className="font-inter text-white font-semibold text-3xl text-pretty">
-                A Well Defined Roadmap may Help You Learn Faster
-              </h2>
-              <Image
-                src="/9.png"
-                alt="Clario"
-                width={800}
-                height={800}
-                className=" absolute object-contain -bottom-5 left-0 scale-125"
-              />
-            </div>
-            {/* RIGHT SIDE */}
-            <div className="p-4 flex flex-col">
-              <h1 className="text-center font-semibold font-inter text-2xl">
-                Clario is Creating Your Personalized Learning Path
-              </h1>
-              <div className="mt-14 space-y-3 px-8">
-                {[
-                  "generating your personalized learning path...",
-                  "Analyzing roadmap data...",
-                  "Looking for external resources...",
-                  "Fetching YouTube tutorials...",
-                  "Connecting to the database...",
-                  "Finalizing your setup...",
-                ].map((msg, index) => (
-                  <div
-                    key={index}
-                    className={`text-sm  font-inter gap-2 transition-opacity duration-500 capitalize ${
-                      index <= loadingStep ? "opacity-100" : "opacity-30"
-                    }`}
-                  >
-                    <span className="animate-pulse text-indigo-500">•</span>
-                    {msg}
-                  </div>
-                ))}
-              </div>
-
-              <div className="mt-auto flex justify-center">
-                <div className="w-10 h-10 border-4 border-indigo-500 border-t-transparent rounded-full animate-spin" />
-              </div>
-
-              <p className="text-xs text-gray-400 font-inter mb-8 mt-2 ">
-                This may take a few seconds...
-              </p>
-            </div>
-          </div>
-        </DialogContent>
-      </Dialog>
+      <LearningPathDialog
+        showDialog={showDialog}
+        setShowDialog={setShowDialog}
+        loadingStep={loadingStep}
+      />
     </div>
   );
 };
