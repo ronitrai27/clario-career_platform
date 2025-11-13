@@ -5,17 +5,23 @@ import { useParams, useRouter } from "next/navigation";
 
 import type { RoadmapTrack, Checkpoint } from "@/lib/types/allTypes";
 import {
+  LuAward,
+  LuCheck,
+  LuCheckCheck,
   LuChevronDown,
   LuChevronLast,
   LuChevronLeft,
   LuChevronRight,
+  LuClipboardCheck,
   LuFlagTriangleRight,
+  LuGalleryVerticalEnd,
   LuLockKeyhole,
   LuLockKeyholeOpen,
   LuMapPinned,
 } from "react-icons/lu";
 import { Separator } from "@/components/ui/separator";
 import Image from "next/image";
+import axios from "axios";
 
 const MyTrackStart = () => {
   const supabase = createClient();
@@ -28,6 +34,12 @@ const MyTrackStart = () => {
   );
   const [loading, setLoading] = useState(true);
   const [progress, setProgress] = useState(0);
+  const [expandedIndex, setExpandedIndex] = useState<number | null>(null);
+  const [expandedSubtopics, setExpandedSubtopics] = useState<{
+    [key: string]: boolean;
+  }>({});
+
+  const [youtubeData, setYoutubeData] = useState<Record<string, string[]>>({});
 
   useEffect(() => {
     const fetchTrack = async () => {
@@ -76,7 +88,53 @@ const MyTrackStart = () => {
   }, [params.id]);
 
   // ==================================
-  // ==========Progress View============
+  const toggleSubtopic = async (checkpointIndex: number, subIndex: number) => {
+    const key = `${checkpointIndex}-${subIndex}`;
+    setExpandedSubtopics((prev) => ({
+      ...prev,
+      [key]: !prev[key],
+    }));
+    if (youtubeData[key]) return;
+
+    const query = track?.checkpoints[checkpointIndex].subtopics[subIndex].title;
+
+    // Fetching videos
+    const videos = await fetchYouTubeVideos(query!);
+
+    // Saving only 2 in state...
+    setYoutubeData((prev) => ({
+      ...prev,
+      [key]: videos,
+    }));
+  };
+  // ================================
+  // FETCH YT VIDEO=======================
+  const fetchYouTubeVideos = async (query: string) => {
+    try {
+      const apiKey = process.env.NEXT_PUBLIC_YOUTUBE_API_KEY;
+
+      const res = await axios.get(
+        `https://www.googleapis.com/youtube/v3/search`,
+        {
+          params: {
+            part: "snippet",
+            q: query,
+            maxResults: 2,
+            key: apiKey,
+            type: "video",
+            videoDuration: "medium",
+          },
+        }
+      );
+
+      return res.data.items?.map(
+        (item: any) => `https://www.youtube.com/watch?v=${item.id.videoId}`
+      );
+    } catch (err) {
+      console.error("YT FETCH ERROR:", err);
+      return [];
+    }
+  };
 
   if (loading) {
     return (
@@ -249,15 +307,169 @@ const MyTrackStart = () => {
                       </span>
                     )}
 
-                    <div className="w-9 h-9 bg-white border rounded-full flex items-center justify-center">
-                      <LuChevronDown className="text-black text-[22px] cursor-pointer" />
+                    <div
+                      className="w-9 h-9 bg-white border rounded-full flex items-center justify-center cursor-pointer"
+                      onClick={() =>
+                        setExpandedIndex(expandedIndex === index ? null : index)
+                      }
+                    >
+                      <LuChevronDown
+                        className={`text-[22px] transition-transform ${
+                          expandedIndex === index ? "rotate-180" : "rotate-0"
+                        }`}
+                      />
                     </div>
                   </div>
                 </div>
 
-                <p className="text-gray-800 font-inter -mt-1 mb-3 ml-6">
+                <p className="text-muted-foreground text-lg font-inter -mt-2 mb-3 ml-6">
                   {checkpoint.description}
                 </p>
+
+                {/* ====== COLLAPSIBLE CONTENT ====== */}
+                <div
+                  className={`transition-all duration-300 overflow-hidden ${
+                    expandedIndex === index
+                      ? "max-h-[2000px] opacity-100"
+                      : "max-h-0 opacity-0"
+                  }`}
+                >
+                  {/* SUBTOPICS */}
+                  <div className="mt-4 ml-6 space-y-4 font-inter">
+                    <h3 className="text-lg font-semibold text-black font-inter">
+                      Subtopics <LuGalleryVerticalEnd className="inline ml-2" />
+                    </h3>
+
+                    {checkpoint.subtopics.map((sub, subIndex) => {
+                      const subKey = `${index}-${subIndex}`;
+                      const isSubOpen = expandedSubtopics[subKey];
+
+                      return (
+                        <div
+                          key={sub.subtopic_order}
+                          className="bg-gray-50 p-3 rounded-lg border shadow"
+                        >
+                          {/* SUBTOPIC HEADER */}
+                          <div
+                            className="flex items-center justify-between cursor-pointer"
+                            onClick={() => toggleSubtopic(index, subIndex)}
+                          >
+                            <h4 className="font-semibold text-lg font-inter capitalize text-blue-600">
+                              {sub.title}
+                            </h4>
+
+                            <LuChevronDown
+                              className={`text-lg  transition-transform ${
+                                isSubOpen ? "rotate-180" : "rotate-0"
+                              }`}
+                            />
+                          </div>
+
+                          {/* SUBTOPIC CONTENT (collapsible) */}
+                          <div
+                            className={`transition-all duration-300 overflow-hidden ${
+                              isSubOpen
+                                ? "max-h-[1000px] opacity-100"
+                                : "max-h-0 opacity-0"
+                            }`}
+                          >
+                            <p className="text-base font-inter ml-4 mt-3  text-black">
+                              {sub.overview}
+                            </p>
+
+                            <div className="mt-5">
+                              <p className="text-base font-medium text-black font-inter">
+                                Resources:
+                              </p>
+                              <div className="list-disc ml-5 mt-3 text-sm text-black font-sora space-y-4">
+                                {sub.resources.map((link, idx) => (
+                                  <div
+                                    key={idx}
+                                    className=" bg-gradient-to-br from-pink-100 via-white to-white px-3 py-4 rounded-lg shadow border"
+                                  >
+                                    <a
+                                      href={link}
+                                      target="_blank"
+                                      className="text-right ml-auto flex items-center justify-end"
+                                    >
+                                      {link}
+                                    </a>
+                                  </div>
+                                ))}
+                              </div>
+                            </div>
+
+                            {/* YOUTUBE VIDEOS */}
+                            <div className="mt-6">
+                              <p className="text-base font-medium text-black font-inter">
+                                YouTube Videos:
+                              </p>
+
+                              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mt-3">
+                                {!youtubeData[`${index}-${subIndex}`] && (
+                                  <p className="text-gray-500">
+                                    Loading videos...
+                                  </p>
+                                )}
+
+                                {youtubeData[`${index}-${subIndex}`]?.map(
+                                  (yt, i) => (
+                                    <iframe
+                                      key={i}
+                                      className="w-full h-48 rounded-lg shadow"
+                                      src={yt.replace("watch?v=", "embed/")}
+                                      allowFullScreen
+                                    />
+                                  )
+                                )}
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                      );
+                    })}
+                  </div>
+
+                  {/* SKILLS */}
+                  <div className="mt-10 ml-6">
+                    <h3 className="text-lg font-semibold text-left text-black font-inter capitalize">
+                      Skills You will Gain{" "}
+                      <LuAward className="inline ml-2 text-[20px]" />
+                    </h3>
+
+                    <div className="grid grid-cols-2 gap-5 mt-3">
+                      {checkpoint.skills.map((skill, idx) => (
+                        <div key={idx} className="flex items-center gap-2">
+                          <div className="w-6 h-6 bg-green-500 rounded-full flex items-center justify-center">
+                            <LuCheck className="text-white text-[18px] inline" />
+                          </div>
+                          <p className="capitalize font-inter">{skill} </p>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+
+                  {/* TOPICS COVERED */}
+                  <div className="mt-10 ml-6 mb-6">
+                    <h3 className="text-lg font-semibold text-left text-black font-inter capitalize">
+                      Topics Covered{" "}
+                      <LuClipboardCheck className="inline ml-2 text-[20px] -mt-1" />
+                    </h3>
+
+                    <div className="grid grid-cols-2 gap-5 mt-3">
+                      {checkpoint.topics_covered.map((topic, idx) => (
+                        <div key={idx} className="flex items-center gap-2">
+                          <div className="w-6 h-6 bg-green-500 rounded-full flex items-center justify-center">
+                            <LuCheckCheck className="text-white text-[18px] inline" />
+                          </div>
+                          <p className="capitalize font-inter tracking-tight">
+                            {topic}{" "}
+                          </p>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                </div>
               </div>
             );
           })}
