@@ -16,11 +16,7 @@ export const extractCheckpoints = (roadmap_data: any) => {
   }));
 };
 
-/**
- * Ensure a tracks row exists for (roadmap_id, user_id).
- * If not, create it with the extracted checkpoints.
- * Returns the created/found RoadmapTrack and the first checkpoint.
- */
+
 export const getOrCreateRoadmapTrack = async (
   roadmapRow: { id: number; user_id: string; roadmap_data: any },
 ) => {
@@ -51,8 +47,7 @@ export const getOrCreateRoadmapTrack = async (
     .insert({
       roadmap_id: roadmapRow.id,
       user_id: roadmapRow.user_id,
-      checkpoints,                 // JSONB array
-      // status: "not_started",     
+      checkpoints,                 
     })
     .select()
     .single();

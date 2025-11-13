@@ -115,8 +115,9 @@ const MyTracks = () => {
       setStartingId(track.id);
       toast.info("Preparing your track...");
 
+      // MESSAGES TIMELINE----
       const loadingMessages = [
-        "Clario is generating your personalized learning path...",
+        "Generating your personalized learning path...",
         "Analyzing roadmap data...",
         "Looking for external resources...",
         "Fetching YouTube tutorials...",
@@ -125,10 +126,10 @@ const MyTracks = () => {
       ];
 
       loadingMessages.forEach((_, index) => {
-        setTimeout(() => setLoadingStep(index), index * 1200); // 1.2s gap per step
+        setTimeout(() => setLoadingStep(index), index * 1200);
       });
 
-      // === BACKEND LOGIC RUNS HERE ===
+      // CREATING AND SAVING CHECKPOINTS---
       if (track.status === "not_started") {
         const { firstCheckpoint } = await getOrCreateRoadmapTrack({
           id: track.id,
@@ -136,12 +137,17 @@ const MyTracks = () => {
           roadmap_data: track.roadmap_data,
         });
 
+        // GETTING FIRST DATA---
+        const checkpointTitle = firstCheckpoint?.title ?? "";
+        const checkpointDescription = firstCheckpoint?.description ?? "";
+
+        console.log("FIRST checkpointTitle", checkpointTitle);
+        console.log("FIRST checkpointDescription", checkpointDescription);
+
         await supabase
           .from("roadmapUsers")
           .update({ status: "going_on" })
           .eq("id", track.id);
-
-        const firstTitle = encodeURIComponent(firstCheckpoint?.title ?? "");
 
         // Wait for full dialog duration (7s)
         setTimeout(() => {
