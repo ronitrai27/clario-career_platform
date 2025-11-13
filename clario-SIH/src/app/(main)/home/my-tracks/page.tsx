@@ -304,8 +304,8 @@ const MyTracks = () => {
       </div>
 
       {/* =========ALL TRACKS WITHT HE PROGRESS========= */}
-      <div className="mt-8 p-6">
-        <div className="flex items-center gap-10">
+      <div className="mt-6 p-6">
+        <div className="flex items-center gap-10 mb-8">
           <h1 className="font-semibold text-2xl font-inter">
             My Tracks <LuTelescope className="inline ml-2" />
           </h1>
