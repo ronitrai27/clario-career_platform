@@ -89,7 +89,7 @@ const SlidingCards = () => {
                 className={`absolute -top-14 -left-5 inset-0 bg-gradient-to-r ${card.gradient}/30 blur-2xl w-20 h-36 rounded-full `}
               ></div>
               {/* Left Side - Content */}
-              <div className="flex-1 px-12 py-10">
+              <div className="flex-1 px-8 py-10">
                 <div className="max-w-lg">
                   <h2 className="text-[27px] font-semibold text-black mb-4 leading-tight font-sora">
                     {card.title}
