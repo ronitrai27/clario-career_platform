@@ -1,5 +1,6 @@
 "use client";
 import { Button } from "@/components/ui/button";
+import { useSidebar } from "@/components/ui/sidebar";
 import { useUserData } from "@/context/UserDataProvider";
 import { AnimatePresence, motion } from "framer-motion";
 import Image from "next/image";
@@ -17,6 +18,7 @@ import {
 const AiSuggestedBoxHome = () => {
   const { user } = useUserData();
   const [showAltCard, setShowAltCard] = useState(false);
+  const { open: sidebarOpen, isMobile } = useSidebar();
 
   // Auto toggle every 5s
   useEffect(() => {
@@ -39,26 +41,26 @@ const AiSuggestedBoxHome = () => {
               animate={{ x: 0, opacity: 1 }}
               exit={{ x: -50, opacity: 0 }}
               transition={{ duration: 0.5, ease: "easeInOut" }}
-              className="border border-amber-400 bg-yellow-50 rounded-md w-[820px] h-60 mx-auto flex items-center justify-center text-center  relative overflow-hidden"
+              className={`border border-amber-400 bg-yellow-50 w-full rounded-md ${sidebarOpen ? "max-w-[980px]": "max-w-[980px]"} h-60 mx-auto flex items-center justify-center text-center  relative overflow-hidden`}
             >
-               <div className="flex relative h-full w-full">
+              <div className="flex relative h-full w-full">
                 {/* Left side images */}
-               <div>
-                 <Image
-                  src="/prep2.png"
-                  alt="Decorative Element"
-                  width={300}
-                  height={300}
-                  className="object-contain absolute left-0 -bottom-12 z-50"
-                />
-                <Image
-                  src="/staic6.png"
-                  alt="Decorative Element"
-                  width={300}
-                  height={300}
-                  className="absolute -left-2 -top-10"
-                />
-               </div>
+                <div>
+                  <Image
+                    src="/prep2.png"
+                    alt="Decorative Element"
+                    width={300}
+                    height={300}
+                    className="object-contain absolute left-0 -bottom-12 z-50"
+                  />
+                  <Image
+                    src="/staic6.png"
+                    alt="Decorative Element"
+                    width={300}
+                    height={300}
+                    className="absolute -left-2 -top-10"
+                  />
+                </div>
 
                 {/* Right Decorative shapes */}
                 <div className="absolute -bottom-16 right-0 w-16 h-16">
@@ -87,8 +89,6 @@ const AiSuggestedBoxHome = () => {
                       Interview Prep <LuVideo />
                     </Button>
                   </div>
-
-               
                 </div>
               </div>
             </motion.div>
@@ -99,7 +99,7 @@ const AiSuggestedBoxHome = () => {
               animate={{ x: 0, opacity: 1 }}
               exit={{ x: -50, opacity: 0 }}
               transition={{ duration: 0.5, ease: "easeInOut" }}
-              className="border border-rose-400 bg-gradient-to-br from-rose-50 via-rose-50 to-rose-300 rounded-md w-[820px] h-60 mx-auto relative overflow-hidden"
+              className={`border border-rose-400 bg-gradient-to-br from-rose-50 via-rose-50 to-rose-300 rounded-md w-full rounded-md ${sidebarOpen ? "max-w-[980px]": "max-w-[980px]"} h-60 mx-auto relative overflow-hidden`}
             >
               <div className="flex relative h-full">
                 {/* Left side images */}
@@ -198,21 +198,21 @@ const AiSuggestedBoxHome = () => {
           </motion.div>
         )}
       </AnimatePresence>
-       {/* 🔵 Indicator dots */}
-    {user?.isQuizDone && (
-      <div className="flex justify-center gap-2 mt-4">
-        {[0, 1].map((_, i) => (
-          <div
-            key={i}
-            className={`w-3 h-3 rounded-full transition-all duration-500 ${
-              showAltCard === (i === 1)
-                ? "bg-blue-500 scale-110"
-                : "bg-gray-300 opacity-70"
-            }`}
-          />
-        ))}
-      </div>
-    )}
+      {/* 🔵 Indicator dots */}
+      {user?.isQuizDone && (
+        <div className="flex justify-center gap-2 mt-4">
+          {[0, 1].map((_, i) => (
+            <div
+              key={i}
+              className={`w-3 h-3 rounded-full transition-all duration-500 ${
+                showAltCard === (i === 1)
+                  ? "bg-blue-500 scale-110"
+                  : "bg-gray-300 opacity-70"
+              }`}
+            />
+          ))}
+        </div>
+      )}
     </div>
   );
 };

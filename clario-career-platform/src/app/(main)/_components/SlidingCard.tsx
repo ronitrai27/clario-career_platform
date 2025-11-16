@@ -73,7 +73,7 @@ const SlidingCards = () => {
   };
 
   return (
-    <div className="relative w-full max-w-[895px] mx-auto p-4">
+    <div className={`relative w-full mx-auto p-4 ${sidebarOpen ? "max-w-[1200px]" : "max-w-[1300px]"}`}>
       {/* Main Card Container */}
       <div className="relative h-60 overflow-hidden rounded-xl border border-gray-200 shadow-sm bg-white">
         <div

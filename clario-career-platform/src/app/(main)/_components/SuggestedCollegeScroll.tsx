@@ -68,8 +68,8 @@ const SuggestedCollegeScroll = () => {
 
   if (loadingCollege) {
     return (
-      <div className="w-full max-w-[1150px] mx-auto px-4 mt-5">
-        <div className="flex space-x-6 overflow-x-auto px-2 scrollbar-hide max-w-full">
+      <div className="w-full  mx-auto px-6 mt-5">
+        <div className="flex space-x-6 overflow-x-auto px-2 scrollbar-hide w-full">
           {[...Array(5)].map((_, i) => (
             <Skeleton
               key={i}
@@ -82,7 +82,7 @@ const SuggestedCollegeScroll = () => {
   }
 
   return (
-    <div className="max-w-[1100px] mx-auto px-4 mt-4">
+    <div className="w-full mx-auto px-5 mt-4">
       <div className="flex gap-4 overflow-x-auto pb-4">
         {suggestedCollegeData.map((college, idx) => {
           // pastel color sets

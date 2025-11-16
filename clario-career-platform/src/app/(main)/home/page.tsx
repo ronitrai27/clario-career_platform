@@ -187,7 +187,7 @@ export default function HomePage() {
   };
 
   return (
-    <section className="h-full  bg-gradient-to-b from-gray-50 to-gray-100 py-6 pl-0 pr-4 overflow-hidden w-full">
+    <section className={`h-full transition-all duration-200 ease-in-out ${sidebarOpen ? "w-[calc(100vw-14.5rem)]": "w-screen"}  bg-gradient-to-b from-gray-50 to-gray-100 py-6 px-5 overflow-hidden`}>
       <div className="flex flex-col">
         <div className="flex h-full justify-between overflow-hidden ">
           {/*---------- Left side--------------- */}
@@ -221,8 +221,8 @@ export default function HomePage() {
 
             {/* MENTORS !! */}
             <div
-              className={`${
-                sidebarOpen ? "max-w-[880px]" : "w-[1020px]"
+              className={` w-full ${
+                sidebarOpen ? "max-w-[1020px]" : "max-w-[1200px]"
               } mx-auto mt-6 bg-white  border border-gray-200 p-2 rounded-xl  overflow-hidden`}
             >
               <div className="flex items-center justify-between pr-8">
@@ -446,7 +446,7 @@ export default function HomePage() {
         </div>
         {/* COLLEGES */}
         {user?.isQuizDone && (
-          <div className="w-full px-5 py-4 mt-14 bg-gradient-to-br from-white to-white border border-gray-200 max-w-[1150px] mx-auto rounded-xl shadow">
+          <div className={`w-full px-5 py-4 mt-14 bg-gradient-to-br from-white to-white border border-gray-200  mx-auto rounded-xl shadow`}>
             <div className="flex items-center justify-between pr-8 w-full">
               <div className="flex flex-col">
                 <h2 className="text-[26px]  tracking-tight font-medium font-inter mb-1 ">
