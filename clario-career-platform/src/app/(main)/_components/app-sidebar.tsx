@@ -268,7 +268,7 @@ export function AppSidebar() {
                 {user?.remainingCredits}
               </p>
 
-              <button className="text-xs tracking-tight font-inter cursor-pointer text-blue-600 bg-gray-100/40 hover:bg-gray-100/70  px-2 rounded-sm flex items-center gap-2 mt-3">
+              <button onClick={()=>router.push("/home/settings/billing")} className="text-xs tracking-tight font-inter cursor-pointer text-blue-600 bg-gray-100/40 hover:bg-gray-100/70  px-2 rounded-sm flex items-center gap-2 mt-3">
                 Top Up <Sparkle className="" size={20} />
               </button>
             </div>

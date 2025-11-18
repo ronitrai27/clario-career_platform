@@ -209,6 +209,9 @@ importers:
       pdf-parse:
         specifier: ^1.1.1
         version: 1.1.1
+      razorpay:
+        specifier: ^2.9.6
+        version: 2.9.6
       react:
         specifier: 19.1.0
         version: 19.1.0
@@ -5234,6 +5237,9 @@ packages:
 
   randombytes@2.1.0:
     resolution: {integrity: sha512-vYl3iOX+4CKUWuxGi9Ukhie6fsqXqS9FE2Zaic4tNFD2N2QQaXOMFbuKK4QmDHC0JO6B1Zp41J0LpT0oR68amQ==}
+
+  razorpay@2.9.6:
+    resolution: {integrity: sha512-zsHAQzd6e1Cc6BNoCNZQaf65ElL6O6yw0wulxmoG5VQDr363fZC90Mp1V5EktVzG45yPyNomNXWlf4cQ3622gQ==}
 
   react-big-calendar@1.19.4:
     resolution: {integrity: sha512-FrvbDx2LF6JAWFD96LU1jjloppC5OgIvMYUYIPzAw5Aq+ArYFPxAjLqXc4DyxfsQDN0TJTMuS/BIbcSB7Pg0YA==}
@@ -11362,6 +11368,12 @@ snapshots:
   randombytes@2.1.0:
     dependencies:
       safe-buffer: 5.2.1
+
+  razorpay@2.9.6:
+    dependencies:
+      axios: 1.11.0(debug@4.4.1)
+    transitivePeerDependencies:
+      - debug
 
   react-big-calendar@1.19.4(react-dom@19.1.0(react@19.1.0))(react@19.1.0):
     dependencies:

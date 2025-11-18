@@ -15,6 +15,7 @@ import {
   LuClipboardCheck,
   LuFlagTriangleRight,
   LuGalleryVerticalEnd,
+  LuGraduationCap,
   LuLockKeyhole,
   LuLockKeyholeOpen,
   LuMapPinned,
@@ -22,6 +23,8 @@ import {
 import { Separator } from "@/components/ui/separator";
 import Image from "next/image";
 import axios from "axios";
+import { Button } from "@/components/ui/button";
+import { useQuizStore } from "@/lib/functions/MockTest/QuizStore";
 
 const MyTrackStart = () => {
   const supabase = createClient();
@@ -40,6 +43,8 @@ const MyTrackStart = () => {
   }>({});
 
   const [youtubeData, setYoutubeData] = useState<Record<string, string[]>>({});
+
+  const { setCareerPath, reset } = useQuizStore();
 
   useEffect(() => {
     const fetchTrack = async () => {
@@ -134,6 +139,20 @@ const MyTrackStart = () => {
       console.error("YT FETCH ERROR:", err);
       return [];
     }
+  };
+
+  // ===========================================
+  const handleMockTest = (checkpoint: Checkpoint) => {
+    reset();
+    const topics = checkpoint.topics_covered?.length
+      ? checkpoint.topics_covered.join(", ")
+      : checkpoint.title;
+
+    setCareerPath(
+      `Checkpoint ${checkpoint.checkpoint_order}: ${checkpoint.title} - Topics: ${topics}`
+    );
+
+    router.push(`/home/my-tracks/${params.id}/mocktest/quiz`);
   };
 
   if (loading) {
@@ -469,6 +488,20 @@ const MyTrackStart = () => {
                       ))}
                     </div>
                   </div>
+
+                  {/* MOCK TEST */}
+                  <h2 className="ml-6 text-lg font-semibold text-left text-black font-inter capitalize">
+                    Take Your Mock Test Now{" "}
+                    <LuAward className="inline ml-2 text-[20px]" />
+                  </h2>
+                  <Button
+                    onClick={() => handleMockTest(checkpoint)}
+                    className="font-inter text-sm tracking-tight mt-4 ml-6 bg-gradient-to-br from-indigo-400 to-blue-400"
+                    size="sm"
+                  >
+                    Take Test{" "}
+                    <LuGraduationCap className="inline ml-2 text-[20px]" />
+                  </Button>
                 </div>
               </div>
             );
