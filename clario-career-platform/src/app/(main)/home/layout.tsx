@@ -18,12 +18,15 @@ export default function Layout({ children }: { children: React.ReactNode }) {
     pathname === "/home/profile" ||
     pathname === "/home/settings/billing" ||
     pathname === "/home/ai-tools/resume-maker/start" ||
-    pathname === "/home/interview-prep/start";
+    pathname === "/home/interview-prep/start" ||
+    pathname.includes("/mocktest/");
+
+  const hideSidebar = pathname.includes("/mocktest");
 
   return (
     <div className="w-screen ">
       <SidebarProvider>
-        <AppSidebar />
+        {!hideSidebar && <AppSidebar />}
         <main className="flex-1 flex flex-col">
           <QuizDataProvider>
             <InterviewProvider>

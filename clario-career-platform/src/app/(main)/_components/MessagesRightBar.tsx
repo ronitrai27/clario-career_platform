@@ -46,20 +46,20 @@ const MessagesRightBar = () => {
 
         <MessageNamesList />
       </div>
-      <div className="bg-gradient-to-tl from-white to-blue-200 w-full p-2 rounded-lg h-full border shadow">
-        <p className="font-medium text-xl text-center tracking-tight font-inter">
+      <div className="bg-gradient-to-tl from-slate-700 to-slate-900 w-full p-2 rounded-lg h-full border shadow">
+        <p className="font-medium text-xl text-center text-white tracking-tight font-inter">
           Discover Users
         </p>
-        <p className="text-sm text-center tracking-tight font-inter mt-1 mb-3 text-muted-foreground">
+        <p className="text-sm text-center tracking-tight  font-inter mt-1 mb-3 text-muted-foreground">
           discover others from same institution
         </p>
         <div>
           {discoverUsers.length === 0 ? (
-            <div className="flex items-center justify-center h-full text-gray-500">
+            <div className="flex items-center justify-center h-full text-gray-300">
               No users found
             </div>
           ) : (
-            <div className="flex flex-col gap-1">
+            <div className="flex flex-col gap-1 text-white">
               {discoverUsers.map((u) => (
                 <div
                   key={u.id}
