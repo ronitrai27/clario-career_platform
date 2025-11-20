@@ -41,11 +41,28 @@ const SuggestedCollegeScroll = () => {
       let state: string | null = null;
       try {
         const res = await fetch(
-          `https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lon}`
+          `https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lon}`,
+          {
+            headers: {
+              "User-Agent": "MyCareerApp/1.0",
+              "Accept-Language": "en",
+            },
+          }
         );
+
         const data = await res.json();
-        state = data?.address?.state?.toLowerCase() || null;
-        console.log("USER CITY STATE -------------", state);
+        const address = data?.address || {};
+
+        console.log("FULL ADDRESS:", address);
+
+        state =
+          (
+            address.state ||
+            address.state_district ||
+            address.city ||
+            address.town ||
+            address.village
+          )?.toLowerCase() || null;
       } catch (err) {
         console.error("Error fetching state from coordinates:", err);
       }

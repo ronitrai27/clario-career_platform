@@ -460,6 +460,7 @@ export default function HomePage() {
               <div>
                 <Button
                   variant="outline"
+                  onClick={()=>router.push("/home/career-board")}
                   className="cursor-pointer text-sm tracking-tight font-inter"
                 >
                   See All <Building2 className="inline ml-2 text-blue-500" />
