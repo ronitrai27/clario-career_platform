@@ -12,8 +12,6 @@ import {
 import { redis } from "@/lib/redis";
 import { useNotificationStore } from "../store/NotificationStore";
 
-
-
 // Interface for the response structure
 interface PaginatedMentors {
   mentors: DBMentor[];
@@ -24,6 +22,30 @@ export interface MentorVideo {
   id: string;
   video_url: string;
 }
+
+const RELATED_CAREERS: Record<string, string[]> = {
+  "data scientist": [
+    "ml engineer",
+    "ai engineer",
+    "data analyst",
+    "backend engineer",
+    "backend developer",
+    "software engineer",
+  ],
+  "ml engineer": ["data scientist", "ai engineer", "data engineer"],
+  "software engineer": [
+    "frontend engineer",
+    "backend engineer",
+    "full stack engineer",
+    "backend developer",
+  ],
+  "frontend engineer": ["software engineer", "backend engineer"],
+  "backend engineer": [
+    "software engineer",
+    "data engineer",
+    "backend developer",
+  ],
+};
 
 export async function getMatchingMentors(
   userMainFocus: string
@@ -71,30 +93,48 @@ export async function getMatchingMentors(
 
 export async function getAllMentorsPaginated(
   page: number = 1,
-  limit: number = 6
+  limit: number = 6,
+  userCareer: string
 ): Promise<PaginatedMentors> {
   const supabase = createClient();
 
-  const start = (page - 1) * limit;
-  const end = start + limit - 1;
+  const { data: mentors, error } = await supabase.from("mentors").select("*");
 
-  const { data, error, count } = await supabase
-    .from("mentors")
-    .select("*", { count: "exact" })
-    .order("created_at", { ascending: false })
-    .range(start, end);
-
-  if (error) {
+  if (error || !mentors) {
     console.error("Mentors fetch error:", error);
     return { mentors: [], hasMore: false, total: 0 };
   }
 
-  const hasMore = count !== null ? end + 1 < count : false;
-  const total = count || 0;
+  const relatedCareers = RELATED_CAREERS[userCareer.toLowerCase()] || [];
 
-  const result: PaginatedMentors = { mentors: data || [], hasMore, total };
+  const scoreMentor = (mentor: DBMentor) => {
+    const position = mentor.current_position.toLowerCase();
+    const user = userCareer.toLowerCase();
 
-  return result;
+    if (position.includes(user)) return 3;
+
+    if (relatedCareers.some((rc) => position.includes(rc))) return 2;
+
+    return 1;
+  };
+
+  const sorted = mentors
+    .map((m) => ({ ...m, score: scoreMentor(m) }))
+    .sort((a, b) => b.score - a.score)
+    .map(({ score, ...rest }) => rest);
+
+  const start = (page - 1) * limit;
+  const end = start + limit;
+
+  const paginated = sorted.slice(start, end);
+  const hasMore = end < sorted.length;
+  const total = sorted.length;
+
+  return {
+    mentors: paginated,
+    hasMore,
+    total,
+  };
 }
 
 export async function getRandomUsersByInstitution(
@@ -279,41 +319,100 @@ export async function getAllMentorProfiles(): Promise<MentorProfile[]> {
 //   return data as College[];
 // }
 
+// ============================================================
+// export async function getSuggestedCollegeData(
+//   userDegrees: string[],
+//   userState: string
+// ): Promise<College[]> {
+//   const supabase = createClient();
+
+//   const normalizedDegrees = userDegrees.map((degree) => {
+//     return degree.toLowerCase().trim().split(" ")[0];
+//   });
+
+//   const normalizedState = userState.toLowerCase().trim();
+
+//   console.log("🎓 Normalized degrees:", normalizedDegrees);
+//   console.log("📍 User state:", normalizedState);
+
+//   const { data, error } = await supabase
+//     .from("colleges")
+//     .select("*")
+//     .overlaps("best_suit_for", normalizedDegrees)
+//     .ilike("location", `%${normalizedState}%`)
+//     .limit(10);
+
+//   if (error) {
+//     console.error("❌ Error fetching suggested colleges:", error);
+//     return [];
+//   }
+
+//   if (!data || data.length === 0) {
+//     console.warn("⚠️ No colleges found for state:", normalizedState);
+//     return [];
+//   }
+
+//   console.log("✅ Colleges fetched for state:", normalizedState);
+//   return data as College[];
+// }
+// =======================================================================
+
 export async function getSuggestedCollegeData(
   userDegrees: string[],
   userState: string
 ): Promise<College[]> {
   const supabase = createClient();
 
-  const normalizedDegrees = userDegrees.map((degree) => {
-    return degree.toLowerCase().trim().split(" ")[0];
-  });
+
+  const normalizedDegrees = userDegrees.map(
+    (degree) => degree.toLowerCase().trim().split(" ")[0]
+  );
 
   const normalizedState = userState.toLowerCase().trim();
 
   console.log("🎓 Normalized degrees:", normalizedDegrees);
-  console.log("📍 User state:", normalizedState);
+  console.log("📍 User state/city:", normalizedState);
 
-  const { data, error } = await supabase
+  const { data: colleges, error } = await supabase
     .from("colleges")
     .select("*")
-    .overlaps("best_suit_for", normalizedDegrees)
-    .ilike("location", `%${normalizedState}%`)
-    .limit(10);
+    .overlaps("best_suit_for", normalizedDegrees);
 
   if (error) {
     console.error("❌ Error fetching suggested colleges:", error);
     return [];
   }
 
-  if (!data || data.length === 0) {
-    console.warn("⚠️ No colleges found for state:", normalizedState);
+  // console.log("Total colleges from DB:", colleges?.length);
+
+  const filtered = colleges.filter((college) => {
+    if (!college.location) return false;
+
+    // console.log("RAW LOCATION:", JSON.stringify(college.location));
+
+
+    const parts = college.location
+      .split(",") 
+      .map((p: any) => p.toLowerCase().trim());
+
+    // console.log("📍 College location parts:", parts);
+
+    return parts.some(
+      (part: any) =>
+        part === normalizedState ||
+        part.includes(normalizedState) ||
+        normalizedState.includes(part)
+    );
+  });
+
+  if (filtered.length === 0) {
+    console.warn(`⚠️ No colleges found for: ${normalizedState}`);
     return [];
   }
 
-  console.log("✅ Colleges fetched for state:", normalizedState);
-  return data as College[];
+  return filtered.slice(0, 10);
 }
+
 // 1. GET selectedCareer
 export async function getSelectedCareer(userId: any): Promise<string | null> {
   const supabase = createClient();

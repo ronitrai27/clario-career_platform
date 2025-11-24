@@ -32,6 +32,7 @@ import { Video } from "@imagekit/next";
 import { useUserData } from "@/context/UserDataProvider";
 import { useRouter } from "next/navigation";
 import styled from "styled-components";
+import { useQuizData } from "@/context/userQuizProvider";
 
 const fallbackAvatars = [
   "/a1.png",
@@ -48,6 +49,7 @@ interface MentorVideo {
 
 export default function MentorConnect() {
   const { user } = useUserData();
+  const { quizData } = useQuizData();
   const [mentorData, setMentorData] = useState<DBMentor[]>([]);
   const [page, setPage] = useState(1);
   const [hasMore, setHasMore] = useState(true);
@@ -75,7 +77,11 @@ export default function MentorConnect() {
       mentors: newMentors,
       hasMore,
       total: total,
-    } = await getAllMentorsPaginated(pageNum, 6);
+    } = await getAllMentorsPaginated(
+      pageNum,
+      6,
+      quizData?.selectedCareer || "software engineer"
+    );
 
     setMentorData((prev) => {
       if (pageNum === 1) {
@@ -88,6 +94,8 @@ export default function MentorConnect() {
     setTotalMentors(total);
     setLoadingMentors(false);
   };
+
+  // console.log("Mentor data---------->",mentorData);
 
   useEffect(() => {
     loadMentors(1);
@@ -221,7 +229,11 @@ export default function MentorConnect() {
               Available
             </div>
             {/* Bookings */}
-            <Button className="font-inter text-sm cursor-pointer" variant="outline" onClick={()=>router.push("/home/mentor-connect/bookings")}>
+            <Button
+              className="font-inter text-sm cursor-pointer"
+              variant="outline"
+              onClick={() => router.push("/home/mentor-connect/bookings")}
+            >
               <LuHistory className="mr-2" />
               My Bookings
             </Button>
@@ -245,6 +257,13 @@ export default function MentorConnect() {
               >
                 {/* HEADER */}
                 <div className={`h-16 ${bgColor} w-full relative`}>
+                  {quizData?.selectedCareer.toLowerCase() ==
+                    mentor?.current_position && (
+                    <div className="bg-white border border-yellow-500 shadow-md px-2 py-1  absolute top-2 right-4 rounded-full ">
+                      <h3 className="text-xs font-raleway  tracking-tight">Recomended</h3>
+                    </div>
+                  )}
+
                   <Image
                     src={mentor?.avatar || "/user.png"}
                     alt={mentor?.full_name || "User"}
