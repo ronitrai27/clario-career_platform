@@ -107,7 +107,7 @@ export default function MentorConnect() {
     "border-pink-500",
   ];
   const bgColors = [
-    "bg-red-500",
+    "bg-yellow-500",
     "bg-blue-500",
     "bg-green-500",
     "bg-yellow-500",

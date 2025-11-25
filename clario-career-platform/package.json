@@ -65,6 +65,7 @@
     "dotenv": "^17.2.2",
     "duck-duck-scrape": "^2.2.7",
     "framer-motion": "^12.23.12",
+    "googleapis": "^166.0.0",
     "html-to-image": "^1.11.13",
     "html2canvas": "^1.4.1",
     "imagekit": "^6.0.0",

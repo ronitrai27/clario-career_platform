@@ -11,10 +11,11 @@ import SlidingCards from "../_components/SlidingCard";
 import ActionsButtons from "../_components/ActionButtonsHome";
 import {
   getMatchingMentors,
+  getRandomUsersByCareer,
   getRandomUsersByInstitution,
 } from "@/lib/functions/dbActions";
 import { useEffect, useState } from "react";
-import { DBMentor } from "@/lib/types/allTypes";
+import { DBMentor, UserQuizData } from "@/lib/types/allTypes";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import Image from "next/image";
 // import Rating from "@mui/material/Rating";
@@ -67,6 +68,7 @@ import MessageNamesList from "./test/showchats/page";
 import confetti from "canvas-confetti";
 import AiSuggestedBoxHome from "../_components/AiSuggestedBoxHome";
 import { useNotificationStore } from "@/lib/store/NotificationStore";
+import { useQuizData } from "@/context/userQuizProvider";
 
 const fallbackAvatars = [
   "/a1.png",
@@ -81,10 +83,11 @@ export default function HomePage() {
   const supabase = createClient();
   const router = useRouter();
   const { user, loading, ensureUserInDB } = useUserData();
+  const {quizData} = useQuizData();
   const { open: sidebarOpen, isMobile } = useSidebar();
   const [mentors, setMentors] = useState<DBMentor[]>([]);
   const [mentorLoading, setMentorLoading] = useState<boolean>(false);
-  const [discoverUsers, setDiscoverUsers] = useState<DBUser[]>([]);
+  const [discoverUsers, setDiscoverUsers] = useState<UserQuizData[]>([]);
   const [discoverLoading, setDiscoverLoading] = useState(false);
   const [open, setOpen] = useState(false);
 
@@ -120,16 +123,17 @@ export default function HomePage() {
       .finally(() => setMentorLoading(false));
   }, [user]);
 
-  // DISCOVER USERS FROM SAME INSTITUTION---------------------------
+  // =========================================================
+  // DISCOVER USERS FROM SAME CAREER---------------------------
   useEffect(() => {
-    if (!user || !user.institutionName) return;
-    if (discoverUsers.length > 0) return;
+    if (!user || !quizData?.selectedCareer) return;
+    // if (discoverUsers.length > 0) return;
 
     setDiscoverLoading(true);
-    getRandomUsersByInstitution(user.institutionName, user.id)
+    getRandomUsersByCareer(quizData.selectedCareer, user.id)
       .then((data) => setDiscoverUsers(data))
       .finally(() => setDiscoverLoading(false));
-  }, [user]);
+  }, [user, quizData?.selectedCareer]);
 
   // -----------CONFETTI---------------------
   const handleClick = () => {
@@ -376,7 +380,7 @@ export default function HomePage() {
                             {/* Left: avatar + details */}
                             <div className="flex items-center gap-3">
                               <Image
-                                src={u.avatar || "/user.png"}
+                                src={u.userAvatar || "/user.png"}
                                 alt={u.userName}
                                 width={35}
                                 height={35}
@@ -384,16 +388,18 @@ export default function HomePage() {
                               />
                               <div>
                                 <p className="font-medium text-sm tracking-tight font-inter">
-                                  {u.userName}
+                                  {u.userName || "Loading"}
                                 </p>
                                 <p className="text-sm text-muted-foreground font-inter max-w-[120px] truncate">
-                                  {u.institutionName}
+                                  {u.selectedCareer}
                                 </p>
                               </div>
                             </div>
 
                             {/* Right: message button */}
-                            <button className="px-3 py-1 text-xs tracking-tight font-inter bg-blue-400 text-white rounded-lg hover:bg-blue-500 transition">
+                            <button 
+                             onClick={() => router.push(`/home/messages/peer/${u.userId}`)}
+                             className="px-3 py-1 text-xs tracking-tight font-inter bg-blue-400 text-white rounded-lg hover:bg-blue-500 transition">
                               Message
                             </button>
                           </div>

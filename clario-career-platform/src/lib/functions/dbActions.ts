@@ -163,6 +163,35 @@ export async function getRandomUsersByInstitution(
   return shuffled.slice(0, 5);
 }
 
+export async function getRandomUsersByCareer(
+  career: string,
+  currentUserId: any
+): Promise<UserQuizData[]> {
+  const supabase = createClient();
+
+  console.log("🎓 Career:", career);
+
+  const { data, error } = await supabase
+    .from("userQuizData")
+    .select("*")
+    .eq("selectedCareer", career)
+    .neq("userId", currentUserId)
+    .limit(20);
+
+  if (error) {
+    console.error("Error fetching users:", error.message);
+    return [];
+  }
+
+  // console.log("🎓 Randomly selected users:", data);
+
+  if (!data) return [];
+
+  const shuffled = data.sort(() => Math.random() - 0.5);
+  // console.log("🎓 Randomly selected users:", shuffled);
+  return shuffled.slice(0, 10);
+}
+
 export async function getUserQuizData(userId: any): Promise<UserQuizData[]> {
   const supabase = createClient();
   const cacheKey = `quizdata:${userId}`; // create a unique key based on the user ID
@@ -363,7 +392,6 @@ export async function getSuggestedCollegeData(
 ): Promise<College[]> {
   const supabase = createClient();
 
-
   const normalizedDegrees = userDegrees.map(
     (degree) => degree.toLowerCase().trim().split(" ")[0]
   );
@@ -390,9 +418,8 @@ export async function getSuggestedCollegeData(
 
     // console.log("RAW LOCATION:", JSON.stringify(college.location));
 
-
     const parts = college.location
-      .split(",") 
+      .split(",")
       .map((p: any) => p.toLowerCase().trim());
 
     // console.log("📍 College location parts:", parts);

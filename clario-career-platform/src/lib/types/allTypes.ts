@@ -34,6 +34,8 @@ export type DBUser = {
   isQuizDone: boolean;
   latitude: number;
   longitude: number;
+  google_refresh_token: string;
+  isPro: boolean;
 };
 
 export type UserQuizData = {
@@ -43,6 +45,8 @@ export type UserQuizData = {
   userId: string;
   user_current_status: string;
   user_mainFocus: string;
+  userName: string;
+  userAvatar: string;
   selectedCareer: string;
 };
 
@@ -54,6 +58,7 @@ export type UserCalendarEvent = {
   end: Date; // mapped from end_time
   created_at?: string;
   updated_at?: string;
+  google_event_id?: string;
 };
 
 export type MentorProfile = {
@@ -187,25 +192,4 @@ export interface RoadmapTrack {
   user_id: any; // FK to user table
   checkpoints: Checkpoint[];   // ALL checkpoints here
 }
-
-// ===========================
-// [
-//   {
-//     "checkpoint_order": 1,
-//     "title": "Python Programming",
-//     "description": "Learn the basics of Python programming",
-//     "skills": ["Syntax", "Variables", "Problem solving"],
-//     "topics_covered": ["", "", "", ""],
-//     "isMockDone": false,
-//     "subtopics": [
-//       {
-//         "subtopic_order": 1,
-//         "title": "Variables and Data Types",
-//         "overview": "Variables store data...",
-//         "resources": ["", ""],
-//         "youtube_videos": ["", ""]
-//       },
-//     ]
-//   }
-// ]
 

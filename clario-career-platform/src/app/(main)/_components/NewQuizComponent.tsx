@@ -166,6 +166,8 @@ export default function Quiz() {
           user_current_status: user.current_status,
           user_mainFocus: user.mainFocus,
           quizInfo: insights, // JSONB
+          userName: user.userName,
+          userAvatar: user.avatar
         },
       ]);
 

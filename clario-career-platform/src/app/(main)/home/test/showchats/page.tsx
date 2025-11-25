@@ -124,6 +124,7 @@ const MessageNamesList: React.FC = () => {
           <li
             key={u.id}
             className="flex flex-col gap-1 bg-gray-50 rounded-md p-2"
+             onClick={() => router.push(`/home/messages/${u.type}/${u.id}`)}
           >
             <div
               className="flex items-center gap-3 cursor-pointer "
