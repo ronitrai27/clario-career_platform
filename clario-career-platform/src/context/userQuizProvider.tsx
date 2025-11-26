@@ -16,7 +16,11 @@ const QuizContext = createContext<QuizContextType>({
   refreshQuizData: async () => {},
 });
 
-export const QuizDataProvider = ({ children }: { children: React.ReactNode }) => {
+export const QuizDataProvider = ({
+  children,
+}: {
+  children: React.ReactNode;
+}) => {
   const { user, loading } = useUserData();
   const [quizData, setQuizData] = useState<UserQuizData | null>(null);
   const [loadingQuiz, setLoadingQuiz] = useState(false);
@@ -34,12 +38,7 @@ export const QuizDataProvider = ({ children }: { children: React.ReactNode }) =>
       .limit(1)
       .single();
 
-    if (error) {
-      console.error("Error fetching quiz data:", error);
-      setQuizData(null);
-    } else {
-      setQuizData(data as UserQuizData);
-    }
+    if (!error) setQuizData(data as UserQuizData);
 
     setLoadingQuiz(false);
   };
@@ -47,6 +46,31 @@ export const QuizDataProvider = ({ children }: { children: React.ReactNode }) =>
   useEffect(() => {
     fetchQuizData();
   }, [user, loading]);
+
+  useEffect(() => {
+    if (!user?.id) return;
+
+    const channel = supabase
+      .channel("quiz-update-listener")
+      .on(
+        "postgres_changes",
+        {
+          event: "UPDATE",
+          schema: "public",
+          table: "userQuizData",
+          filter: `userId=eq.${user.id}`,
+        },
+        () => {
+          fetchQuizData(); 
+        }
+      )
+      .subscribe();
+
+
+    return () => {
+      supabase.removeChannel(channel);
+    };
+  }, [user?.id]);
 
   return (
     <QuizContext.Provider

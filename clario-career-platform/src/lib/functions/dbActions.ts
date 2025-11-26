@@ -28,16 +28,16 @@ const RELATED_CAREERS: Record<string, string[]> = {
     "ml engineer",
     "ai engineer",
     "data analyst",
-    "backend engineer",
-    "backend developer",
     "software engineer",
   ],
+  "data analyst": ["data scientist", "ai engineer", "ml engineer", "software engineer"],
   "ml engineer": ["data scientist", "ai engineer", "data engineer"],
   "software engineer": [
     "frontend engineer",
     "backend engineer",
     "full stack engineer",
     "backend developer",
+    "cloud engineer",
   ],
   "frontend engineer": ["software engineer", "backend engineer"],
   "backend engineer": [
@@ -45,6 +45,7 @@ const RELATED_CAREERS: Record<string, string[]> = {
     "data engineer",
     "backend developer",
   ],
+  "ethical hacker": ["software engineer", "cybersecurity analyst"],
 };
 
 export async function getMatchingMentors(

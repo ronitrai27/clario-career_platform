@@ -6,6 +6,7 @@ import {
   LuBook,
   LuBookMarked,
   LuFilter,
+  LuGraduationCap,
   LuHistory,
   LuLinkedin,
   LuLoader,
@@ -99,7 +100,7 @@ export default function MentorConnect() {
 
   useEffect(() => {
     loadMentors(1);
-  }, []);
+  }, [quizData?.selectedCareer]);
   const borderColors = [
     "border-blue-500",
     "border-green-500",
@@ -200,14 +201,14 @@ export default function MentorConnect() {
             Discover More By Category
           </h2>
           <div className="flex items-center gap-1 font-inter text-sm bg-white p-2 shadow rounded-lg">
-            <Award className="w-7 h-7 text-blue-500 " />
-            Top Rated Mentors
+            <LuGraduationCap className="w-7 h-7 text-blue-500 " />
+            {quizData?.selectedCareer}
           </div>
         </div>
 
         <div className=" w-full mx-auto flex items-center justify-between  px-4 py-2 my-6">
           <p className="font-inter text-base ">
-            <span className="font-semibold">45</span> Mentors Found
+            <span className="font-semibold">15</span> Mentors Found
           </p>
           <div className="flex items-center gap-5">
             {/* Search Bar */}
@@ -253,14 +254,16 @@ export default function MentorConnect() {
             return (
               <div
                 key={mentor.id}
-                className="bg-white border border-gray-200 shadow-md rounded-md h-[300px] w-[330px] overflow-hidden relative flex flex-col"
+                className={`bg-white border border-gray-200 shadow-md rounded-md h-[300px] w-[330px]  relative flex flex-col 
+                  ${quizData?.selectedCareer.toLowerCase() ==
+                    mentor?.current_position && " shadow-pink-200"}`}
               >
                 {/* HEADER */}
-                <div className={`h-16 ${bgColor} w-full relative`}>
+                <div className={`h-16 ${bgColor} w-full relative rounded-sm`}>
                   {quizData?.selectedCareer.toLowerCase() ==
                     mentor?.current_position && (
-                    <div className="bg-white border border-yellow-500 shadow-md px-2 py-1  absolute top-2 right-4 rounded-full ">
-                      <h3 className="text-xs font-raleway  tracking-tight">Recomended</h3>
+                    <div className="bg-white border border-yellow-500 shadow-md px-2 py-1  absolute -top-5 left-1/2 -translate-x-1/2 rounded-full ">
+                      <h3 className="text-sm font-inter  tracking-tight">Recomended</h3>
                     </div>
                   )}
 
@@ -296,10 +299,13 @@ export default function MentorConnect() {
                   <h3 className="font-inter text-base text-muted-foreground capitalize">
                     {mentor?.current_position}
                   </h3>
-                  <h2 className="text-sm font-inter mt-3 text-center">
+                  <h2 className="text-sm font-inter mt-3 text-center line-clamp-2">
                     <span className="font-semibold">Expertise: </span>
                     {mentor?.expertise?.join(" , ") || "No expertise added"}
                   </h2>
+
+                  <p className="text-center mt-2 capitalize font-semibold text-yellow-500 font-sora  text-sm ">{quizData?.selectedCareer.toLowerCase() ==
+                    mentor?.current_position && "Perfect match"} </p>
 
                   {/* FOOTER  */}
                   <div className="mt-auto pb-3">

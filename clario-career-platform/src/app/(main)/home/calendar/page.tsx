@@ -23,6 +23,7 @@ import { LuChevronLeft, LuLoader } from "react-icons/lu";
 import { Calendar1 } from "lucide-react";
 
 import Link from "next/link";
+import { toast } from "sonner";
 
 const localizer = momentLocalizer(moment);
 // const DnDCalendar = withDragAndDrop(Calendar);
@@ -122,98 +123,6 @@ export default function MyCalendar() {
     setIsOpenEvent(true);
   };
 
-  // const handleSave = async () => {
-  //   if (selectedEvent) {
-  //     // edit mode
-  //     const { data, error } = await supabase
-  //       .from("userCalendar")
-  //       .update({
-  //         title,
-  //         start_time: startDate,
-  //         end_time: endDate,
-  //       })
-  //       .eq("id", selectedEvent.id)
-  //       .select();
-
-  //     if (!error && data) {
-  //       setEvents((prev) =>
-  //         prev.map((ev) =>
-  //           ev.id === selectedEvent.id
-  //             ? { ...ev, title, start: startDate!, end: endDate! }
-  //             : ev
-  //         )
-  //       );
-  //     }
-  //     const refresh = await getRefreshToken();
-
-  //     if (refresh && selectedEvent.google_event_id) {
-  //       await updateGoogleEvent(
-  //         {
-  //           google_event_id: selectedEvent.google_event_id,
-  //           title,
-  //           start: startDate,
-  //           end: endDate,
-  //         },
-  //         refresh
-  //       );
-  //     }
-  //   } else if (title && startDate && endDate) {
-  //     // create mode
-  //     const { data, error } = await supabase
-  //       .from("userCalendar")
-  //       .insert([
-  //         {
-  //           user_id: user?.id,
-  //           title,
-  //           start_time: startDate,
-  //           end_time: endDate,
-  //         },
-  //       ])
-  //       .select();
-
-  //     // if (!error && data && data[0]) {
-  //     //   const newEvent: UserCalendarEvent = {
-  //     //     ...data[0],
-  //     //     start: new Date(data[0].start_time),
-  //     //     end: new Date(data[0].end_time),
-  //     //   };
-  //     //   setEvents((prev) => [...prev, newEvent]);
-  //     // }
-
-  //     if (!error && data && data[0]) {
-  //       const refresh = await getRefreshToken();
-
-  //       let googleEventId = null;
-  //       if (refresh) {
-  //         googleEventId = await createGoogleEvent(
-  //           {
-  //             title,
-  //             start: startDate,
-  //             end: endDate,
-  //           },
-  //           refresh
-  //         );
-
-  //         // save google event id in supabase
-  //         await supabase
-  //           .from("userCalendar")
-  //           .update({ google_event_id: googleEventId })
-  //           .eq("id", data[0].id);
-  //       }
-
-  //       const newEvent: UserCalendarEvent = {
-  //         ...data[0],
-  //         google_event_id: googleEventId,
-  //         start: new Date(data[0].start_time),
-  //         end: new Date(data[0].end_time),
-  //       };
-
-  //       setEvents((prev) => [...prev, newEvent]);
-  //     }
-  //   }
-  //   setIsOpenEvent(false);
-  // };
-
   // =============================================
 
   // ===============================================
@@ -246,6 +155,7 @@ export default function MyCalendar() {
       await fetch("/api/google/sync", {
         method: "POST",
         body: JSON.stringify({
+          userId: user?.id,
           type: "update",
           event: {
             google_event_id: selectedEvent.google_event_id,
@@ -288,6 +198,7 @@ export default function MyCalendar() {
         const res = await fetch("/api/google/sync", {
           method: "POST",
           body: JSON.stringify({
+            userId: user?.id,
             type: "create",
             event: {
               title,
@@ -298,6 +209,12 @@ export default function MyCalendar() {
         });
 
         const { google_event_id } = await res.json();
+
+        if(!google_event_id) {
+          toast.error("Failed to sync with Google Calendar. Please try again.");
+        }
+
+        console.log("GOOGLE EVENT ID", google_event_id);
 
         // 🔵 Save google_event_id to Supabase
         if (google_event_id) {
@@ -311,22 +228,6 @@ export default function MyCalendar() {
 
     setIsOpenEvent(false);
   };
-
-  // const handleEventDrop = async ({ event, start, end }: any) => {
-  //   const { error } = await supabase
-  //     .from("userCalendar")
-  //     .update({
-  //       start_time: start,
-  //       end_time: end,
-  //     })
-  //     .eq("id", event.id);
-
-  //   if (!error) {
-  //     setEvents((prev) =>
-  //       prev.map((ev) => (ev.id === event.id ? { ...ev, start, end } : ev))
-  //     );
-  //   }
-  // };
 
   //  handle resize
 
@@ -348,6 +249,7 @@ export default function MyCalendar() {
     await fetch("/api/google/sync", {
       method: "POST",
       body: JSON.stringify({
+        userId: user?.id,
         type: "update",
         event: {
           google_event_id: event.google_event_id,
@@ -359,33 +261,6 @@ export default function MyCalendar() {
     });
   };
   // =====================================================
-  // const handleEventResize = async ({ event, start, end }: any) => {
-  //   const { error } = await supabase
-  //     .from("userCalendar")
-  //     .update({
-  //       start_time: start,
-  //       end_time: end,
-  //     })
-  //     .eq("id", event.id);
-
-  //   if (!error) {
-  //     setEvents((prev) =>
-  //       prev.map((ev) => (ev.id === event.id ? { ...ev, start, end } : ev))
-  //     );
-  //   }
-  //   const refresh = await getRefreshToken();
-  //   if (refresh && event.google_event_id) {
-  //     await updateGoogleEvent(
-  //       {
-  //         google_event_id: event.google_event_id,
-  //         title: event.title,
-  //         start,
-  //         end,
-  //       },
-  //       refresh
-  //     );
-  //   }
-  // };
 
   // ========================================================
   const handleEventResize = async ({ event, start, end }: any) => {
@@ -405,6 +280,7 @@ export default function MyCalendar() {
     await fetch("/api/google/sync", {
       method: "POST",
       body: JSON.stringify({
+        userId: user?.id,
         type: "update",
         event: {
           google_event_id: event.google_event_id,

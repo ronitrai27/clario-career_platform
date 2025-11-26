@@ -3,18 +3,22 @@ import { google } from "googleapis";
 import { createClient } from "@/lib/supabase/client";
 
 export async function POST(req: Request) {
-  const { type, event } = await req.json();
+  const { type, event, userId } = await req.json();
+
+  if (!userId) {
+    return NextResponse.json({ error: "Missing userId" }, { status: 400 });
+  }
 
   const supabase = createClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
 
+  // directly use userId from frontend
   const { data: u } = await supabase
     .from("users")
     .select("google_refresh_token")
-    .eq("id", user?.id)
+    .eq("id", userId)
     .single();
+
+  console.log("U GOOGLE SYNC", u);
 
   if (!u || !u.google_refresh_token) {
     return NextResponse.json({ error: "Not connected" }, { status: 400 });
@@ -71,3 +75,4 @@ export async function POST(req: Request) {
 
   return NextResponse.json({ error: "Invalid type" }, { status: 400 });
 }
+
