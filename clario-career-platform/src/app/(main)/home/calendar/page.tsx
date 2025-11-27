@@ -24,6 +24,7 @@ import { Calendar1, Loader2 } from "lucide-react";
 
 import Link from "next/link";
 import { toast } from "sonner";
+import { google } from "googleapis";
 
 const localizer = momentLocalizer(moment);
 // const DnDCalendar = withDragAndDrop(Calendar);
@@ -94,7 +95,9 @@ export default function MyCalendar() {
   }, [user?.id]);
 
   // =====================================
+  // =====================================
   // ========GOOGLE CALENDAR=============
+
   const getRefreshToken = async () => {
     const { data } = await supabase
       .from("users")
@@ -124,15 +127,13 @@ export default function MyCalendar() {
     setIsOpenEvent(true);
   };
 
-  // =============================================
+  // ==============================================
 
-  // ===============================================
   const handleSave = async () => {
     if (selectedEvent) {
       // -------------------------
       // EDIT MODE
       // -------------------------
-      // setCreateLoading(true);
       const { data, error } = await supabase
         .from("userCalendar")
         .update({
@@ -173,6 +174,7 @@ export default function MyCalendar() {
       // -------------------------
 
       setCreateLoading(true);
+
       const { data, error } = await supabase
         .from("userCalendar")
         .insert([
@@ -188,16 +190,17 @@ export default function MyCalendar() {
       if (!error && data && data[0]) {
         const created = data[0];
 
-        // 🔵 FIRST insert event locally (UI)
+        // 🔵 First insert locally
         const newEvent: UserCalendarEvent = {
           ...created,
           start: new Date(created.start_time),
           end: new Date(created.end_time),
           google_event_id: null,
         };
+
         setEvents((prev) => [...prev, newEvent]);
 
-        // 🔵 THEN sync with Google Calendar
+        // 🔵 Sync with Google Calendar
         const res = await fetch("/api/google/sync", {
           method: "POST",
           body: JSON.stringify({
@@ -219,12 +222,19 @@ export default function MyCalendar() {
 
         console.log("GOOGLE EVENT ID", google_event_id);
 
-        // 🔵 Save google_event_id to Supabase
+        // 🔵 Save to Supabase + State (THE FIX)
         if (google_event_id) {
           await supabase
             .from("userCalendar")
             .update({ google_event_id })
             .eq("id", created.id);
+
+          // 🔥 Update the local React state
+          setEvents((prev) =>
+            prev.map((ev) =>
+              ev.id === created.id ? { ...ev, google_event_id } : ev
+            )
+          );
         }
       }
 
@@ -235,10 +245,9 @@ export default function MyCalendar() {
     setIsOpenEvent(false);
   };
 
-  //  handle resize
-
-  //  ========================================================
-
+  // ===============================================
+  // Handle Drag + Drop
+  // ===============================================
 
   const handleEventDrop = async ({ event, start, end }: any) => {
     await supabase
@@ -253,10 +262,13 @@ export default function MyCalendar() {
       prev.map((ev) => (ev.id === event.id ? { ...ev, start, end } : ev))
     );
 
+    //  If google_event_id is missing, show error
     if (!event.google_event_id) {
       toast.error("Google Event ID missing — cannot update Google Calendar");
       return;
     }
+
+    console.log("UPDATE GOOGLE CALENDAR");
 
     await fetch("/api/google/sync", {
       method: "POST",
@@ -328,25 +340,21 @@ export default function MyCalendar() {
 
         <Link href={`/api/google/connect?user_id=${user?.id}`}>
           {user?.google_refresh_token ? (
-            <Link href={`/api/google/connect?user_id=${user?.id}`}>
-              <Button
-                className="font-inter cursor-pointer flex items-center gap-2 bg-green-500 text-white hover:bg-green-600"
-                size="sm"
-              >
-                Connected to Google
-                <Calendar1 className="inline" />
-              </Button>
-            </Link>
+            <Button
+              className="font-inter cursor-pointer flex items-center gap-2 bg-green-500 text-white hover:bg-green-600"
+              size="sm"
+            >
+              Connected to Google
+              <Calendar1 className="inline" />
+            </Button>
           ) : (
-            <Link href={`/api/google/connect?user_id=${user?.id}`}>
-              <Button
-                className="font-inter cursor-pointer flex items-center gap-2 bg-blue-600 text-white hover:bg-blue-700"
-                size="sm"
-              >
-                Connect Google Calendar
-                <Calendar1 className="inline" />
-              </Button>
-            </Link>
+            <Button
+              className="font-inter cursor-pointer flex items-center gap-2 bg-blue-600 text-white hover:bg-blue-700"
+              size="sm"
+            >
+              Connect Google Calendar
+              <Calendar1 className="inline" />
+            </Button>
           )}
         </Link>
       </div>

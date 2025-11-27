@@ -62,6 +62,8 @@ export default function MentorConnect() {
   const [loadingVideo, setLoadingVideo] = useState(true);
   const router = useRouter();
 
+  const [exactMatches, setExactMatches] = useState(0);
+
   useEffect(() => {
     if (!user) return;
     const fetchVideos = async () => {
@@ -77,6 +79,7 @@ export default function MentorConnect() {
     const {
       mentors: newMentors,
       hasMore,
+      exactMatches,
       total: total,
     } = await getAllMentorsPaginated(
       pageNum,
@@ -93,6 +96,7 @@ export default function MentorConnect() {
 
     setHasMore(hasMore);
     setTotalMentors(total);
+    setExactMatches(exactMatches);
     setLoadingMentors(false);
   };
 
@@ -206,13 +210,17 @@ export default function MentorConnect() {
           </div>
         </div>
 
-        <div className=" w-full mx-auto flex items-center justify-between  px-4 py-2 my-6">
-          <p className="font-inter text-base ">
-            <span className="font-semibold">15</span> Mentors Found
+        <div className=" w-full mx-auto flex items-center justify-between  px-2 py-2 my-6">
+          <p className="font-inter text-base">
+            <span className="font-semibold">{totalMentors}</span> Mentors Fetched
+          </p>
+
+          <p className="font-inter text-base tracking-tight text-yellow-600">
+            <span className="font-semibold">{exactMatches}</span> Exact Matches Found
           </p>
           <div className="flex items-center gap-5">
             {/* Search Bar */}
-            <div className="flex items-center w-[320px] bg-white border border-gray-200 rounded-lg px-3 ">
+            <div className="flex items-center w-[300px] bg-white border border-gray-200 rounded-lg px-3 ">
               <LuSearch className="text-lg text-gray-600 ml-2" />
               <Input
                 placeholder="Search mentors"
@@ -255,15 +263,19 @@ export default function MentorConnect() {
               <div
                 key={mentor.id}
                 className={`bg-white border border-gray-200 shadow-md rounded-md h-[300px] w-[330px]  relative flex flex-col 
-                  ${quizData?.selectedCareer.toLowerCase() ==
-                    mentor?.current_position && " shadow-pink-200"}`}
+                  ${
+                    quizData?.selectedCareer.toLowerCase() ==
+                      mentor?.current_position && " shadow-pink-200"
+                  }`}
               >
                 {/* HEADER */}
                 <div className={`h-16 ${bgColor} w-full relative rounded-sm`}>
-                  {quizData?.selectedCareer.toLowerCase() ==
+                  {quizData?.selectedCareer?.toLowerCase() ===
                     mentor?.current_position && (
-                    <div className="bg-white border border-yellow-500 shadow-md px-2 py-1  absolute -top-5 left-1/2 -translate-x-1/2 rounded-full ">
-                      <h3 className="text-sm font-inter  tracking-tight">Recomended</h3>
+                    <div className="bg-white border border-yellow-500 shadow-md px-2 py-1 absolute -top-5 left-1/2 -translate-x-1/2 rounded-full">
+                      <h3 className="text-sm font-inter tracking-tight">
+                        Recommended
+                      </h3>
                     </div>
                   )}
 
@@ -304,8 +316,10 @@ export default function MentorConnect() {
                     {mentor?.expertise?.join(" , ") || "No expertise added"}
                   </h2>
 
-                  <p className="text-center mt-2 capitalize font-semibold text-yellow-500 font-sora  text-sm ">{quizData?.selectedCareer.toLowerCase() ==
-                    mentor?.current_position && "Perfect match"} </p>
+                  <p className="text-center mt-2 capitalize font-semibold text-yellow-500 font-sora  text-sm ">
+                    {quizData?.selectedCareer.toLowerCase() ==
+                      mentor?.current_position && "Perfect match"}{" "}
+                  </p>
 
                   {/* FOOTER  */}
                   <div className="mt-auto pb-3">

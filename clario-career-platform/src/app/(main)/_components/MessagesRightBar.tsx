@@ -1,12 +1,13 @@
 "use client";
 import { useUserData } from "@/context/UserDataProvider";
-import { getRandomUsersByInstitution } from "@/lib/functions/dbActions";
+import { getRandomUsersByCareer } from "@/lib/functions/dbActions";
 import { createClient } from "@/lib/supabase/client";
-import { DBUser } from "@/lib/types/allTypes";
+import { DBUser, UserQuizData } from "@/lib/types/allTypes";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
 import React, { useEffect, useState } from "react";
 import MessageNamesList from "../home/test/showchats/page";
+import { useQuizData } from "@/context/userQuizProvider";
 
 type Message = {
   id: string;
@@ -21,19 +22,20 @@ const MessagesRightBar = () => {
   const supabase = createClient();
   const router = useRouter();
   const { user, loading } = useUserData();
-  const [discoverUsers, setDiscoverUsers] = useState<DBUser[]>([]);
+  const {quizData} = useQuizData();
+  const [discoverUsers, setDiscoverUsers] = useState<UserQuizData[]>([]);
   const [discoverLoading, setDiscoverLoading] = useState(false);
 
   // DISCOVER USERS FROM SAME INSTITUTION---------------------------
   useEffect(() => {
-    if (!user || !user.institutionName) return;
+    if (!user || !quizData) return;
     if (discoverUsers.length > 0) return;
 
     setDiscoverLoading(true);
-    getRandomUsersByInstitution(user.institutionName, user.id)
+    getRandomUsersByCareer(quizData?.selectedCareer, user.id)
       .then((data) => setDiscoverUsers(data))
       .finally(() => setDiscoverLoading(false));
-  }, [user]);
+  }, [user, quizData?.selectedCareer]);
 
   // ------------------------------------------------------
 
@@ -51,7 +53,7 @@ const MessagesRightBar = () => {
           Discover Users
         </p>
         <p className="text-sm text-center tracking-tight  font-inter mt-1 mb-3 text-muted-foreground">
-          discover others from same institution
+          discover others of same career paths.
         </p>
         <div>
           {discoverUsers.length === 0 ? (
@@ -68,7 +70,7 @@ const MessagesRightBar = () => {
                   {/* Left: avatar + details */}
                   <div className="flex items-center gap-3">
                     <Image
-                      src={u.avatar || "/user.png"}
+                      src={u.userAvatar || "/user.png"}
                       alt={u.userName}
                       width={35}
                       height={35}
@@ -79,14 +81,14 @@ const MessagesRightBar = () => {
                         {u.userName}
                       </p>
                       <p className="text-sm text-muted-foreground font-inter max-w-[120px] truncate">
-                        {u.institutionName}
+                        {u.selectedCareer}
                       </p>
                     </div>
                   </div>
 
                   {/* Right: message button */}
                   <button
-                    onClick={() => router.push(`/home/messages/peer/${u.id}`)}
+                    onClick={() => router.push(`/home/messages/peer/${u.userId}`)}
                     className="px-3 py-1 text-xs tracking-tight font-inter bg-blue-400 text-white rounded-lg hover:bg-blue-500 transition"
                   >
                     Message

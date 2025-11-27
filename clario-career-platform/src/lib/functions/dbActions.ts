@@ -17,6 +17,7 @@ interface PaginatedMentors {
   mentors: DBMentor[];
   hasMore: boolean;
   total: number;
+  exactMatches: number;
 }
 export interface MentorVideo {
   id: string;
@@ -92,6 +93,7 @@ export async function getMatchingMentors(
   return data || [];
 }
 
+
 export async function getAllMentorsPaginated(
   page: number = 1,
   limit: number = 6,
@@ -103,7 +105,7 @@ export async function getAllMentorsPaginated(
 
   if (error || !mentors) {
     console.error("Mentors fetch error:", error);
-    return { mentors: [], hasMore: false, total: 0 };
+    return { mentors: [], hasMore: false, total: 0, exactMatches: 0 };
   }
 
   const relatedCareers = RELATED_CAREERS[userCareer.toLowerCase()] || [];
@@ -113,9 +115,7 @@ export async function getAllMentorsPaginated(
     const user = userCareer.toLowerCase();
 
     if (position.includes(user)) return 3;
-
     if (relatedCareers.some((rc) => position.includes(rc))) return 2;
-
     return 1;
   };
 
@@ -131,12 +131,19 @@ export async function getAllMentorsPaginated(
   const hasMore = end < sorted.length;
   const total = sorted.length;
 
+  // ✅ COUNT EXACT MATCHES
+  const exactMatches = mentors.filter(
+    (m) => m.current_position?.toLowerCase() === userCareer?.toLowerCase()
+  ).length;
+
   return {
     mentors: paginated,
     hasMore,
     total,
+    exactMatches,
   };
 }
+
 
 export async function getRandomUsersByInstitution(
   institutionName: string,
