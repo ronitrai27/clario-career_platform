@@ -809,7 +809,7 @@ const JobTracker = () => {
               <p>
                 <span className="font-semibold">Type:</span> {selectedJob.type}
               </p>
-              <p>
+              <p className="font-inter line-clamp-6">
                 <span className="font-semibold">Description:</span>{" "}
                 {selectedJob.description}
               </p>

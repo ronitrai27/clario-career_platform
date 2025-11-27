@@ -141,12 +141,13 @@ const InterviewStart = () => {
       ?.map((q: any) => q.question)
       .join(", ");
 
+      // gpt-4.1-mini
     const jobTitle = interviewData?.jobTitle;
     try {
       await vapi.start({
         model: {
-          provider: "openai",
-          model: "gpt-4.1-mini",
+          provider: "google",
+          model: "gemini-2.5-pro",
           messages: [
             {
               role: "system",
