@@ -17,12 +17,13 @@ interface DBUser {
   userPhone: string;
   institutionName: string;
   mainFocus: string;
-  calendarConnected: boolean;
+  // calendarConnected: boolean;
   is_verified: boolean;
   isQuizDone: boolean;
   latitude: number;
   longitude: number;
   isPro: boolean;
+  google_refresh_token: string;
 }
 // mentors ---
 interface DBMentor {

@@ -20,7 +20,7 @@ import { createClient } from "@/lib/supabase/client";
 import { UserCalendarEvent } from "@/lib/types/allTypes";
 import { useUserData } from "@/context/UserDataProvider";
 import { LuChevronLeft, LuLoader } from "react-icons/lu";
-import { Calendar1 } from "lucide-react";
+import { Calendar1, Loader2 } from "lucide-react";
 
 import Link from "next/link";
 import { toast } from "sonner";
@@ -66,6 +66,7 @@ export default function MyCalendar() {
   const [endDate, setEndDate] = useState<Date | null>(null);
   const supabase = createClient();
   const [loading, setLoading] = useState(false);
+  const [createLoading, setCreateLoading] = useState(false);
 
   useEffect(() => {
     setLoading(true);
@@ -131,6 +132,7 @@ export default function MyCalendar() {
       // -------------------------
       // EDIT MODE
       // -------------------------
+      // setCreateLoading(true);
       const { data, error } = await supabase
         .from("userCalendar")
         .update({
@@ -170,6 +172,7 @@ export default function MyCalendar() {
       // CREATE MODE
       // -------------------------
 
+      setCreateLoading(true);
       const { data, error } = await supabase
         .from("userCalendar")
         .insert([
@@ -210,7 +213,7 @@ export default function MyCalendar() {
 
         const { google_event_id } = await res.json();
 
-        if(!google_event_id) {
+        if (!google_event_id) {
           toast.error("Failed to sync with Google Calendar. Please try again.");
         }
 
@@ -224,6 +227,9 @@ export default function MyCalendar() {
             .eq("id", created.id);
         }
       }
+
+      setCreateLoading(false);
+      toast.success("Event created successfully in Google Calendar");
     }
 
     setIsOpenEvent(false);
@@ -232,6 +238,8 @@ export default function MyCalendar() {
   //  handle resize
 
   //  ========================================================
+
+
   const handleEventDrop = async ({ event, start, end }: any) => {
     await supabase
       .from("userCalendar")
@@ -245,7 +253,11 @@ export default function MyCalendar() {
       prev.map((ev) => (ev.id === event.id ? { ...ev, start, end } : ev))
     );
 
-    // sync google
+    if (!event.google_event_id) {
+      toast.error("Google Event ID missing — cannot update Google Calendar");
+      return;
+    }
+
     await fetch("/api/google/sync", {
       method: "POST",
       body: JSON.stringify({
@@ -260,6 +272,7 @@ export default function MyCalendar() {
       }),
     });
   };
+
   // =====================================================
 
   // ========================================================
@@ -314,13 +327,27 @@ export default function MyCalendar() {
         </p>
 
         <Link href={`/api/google/connect?user_id=${user?.id}`}>
-          <Button
-            className="font-inter cursor-pointer"
-            size="sm"
-            variant="outline"
-          >
-            Connect Google Calendar <Calendar1 className="inline ml-2" />
-          </Button>
+          {user?.google_refresh_token ? (
+            <Link href={`/api/google/connect?user_id=${user?.id}`}>
+              <Button
+                className="font-inter cursor-pointer flex items-center gap-2 bg-green-500 text-white hover:bg-green-600"
+                size="sm"
+              >
+                Connected to Google
+                <Calendar1 className="inline" />
+              </Button>
+            </Link>
+          ) : (
+            <Link href={`/api/google/connect?user_id=${user?.id}`}>
+              <Button
+                className="font-inter cursor-pointer flex items-center gap-2 bg-blue-600 text-white hover:bg-blue-700"
+                size="sm"
+              >
+                Connect Google Calendar
+                <Calendar1 className="inline" />
+              </Button>
+            </Link>
+          )}
         </Link>
       </div>
       <DndCalendar
@@ -388,8 +415,21 @@ export default function MyCalendar() {
             <Button onClick={() => setIsOpenEvent(false)} variant="outline">
               Cancel
             </Button>
-            <Button onClick={handleSave}>
-              {selectedEvent ? "Update" : "Create"}
+            <Button
+              onClick={handleSave}
+              className="font-inter flex items-center gap-2"
+              disabled={createLoading}
+            >
+              {createLoading ? (
+                <>
+                  <Loader2 className="animate-spin h-4 w-4" />
+                  Saving...
+                </>
+              ) : selectedEvent ? (
+                "Update"
+              ) : (
+                "Create"
+              )}
             </Button>
           </DialogFooter>
         </DialogContent>
