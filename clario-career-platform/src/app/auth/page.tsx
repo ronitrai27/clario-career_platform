@@ -217,6 +217,17 @@ export default function AuthPage() {
                   {isSignup ? "Sign In" : "Sign Up"}
                 </span>
               </p>
+
+              <p
+                onClick={() => router.push("/auth-mentor")}
+                className="text-base font-medium"
+              >
+                {" "}
+                Are you a Mentor ?{" "}
+                <span className="text-blue-500 cursor-pointer">
+                  Click here!
+                </span>
+              </p>
             </div>
 
             {error && (
@@ -240,7 +251,7 @@ export default function AuthPage() {
       `,
             }}
           />
-         
+
           <div className="absolute top-[16%] left-1/2 -translate-x-1/2 -translate-y-1/2">
             <AnimatedGradientTextDemo />
           </div>

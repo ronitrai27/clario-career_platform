@@ -212,11 +212,13 @@ export default function MentorConnect() {
 
         <div className=" w-full mx-auto flex items-center justify-between  px-2 py-2 my-6">
           <p className="font-inter text-base">
-            <span className="font-semibold">{totalMentors}</span> Mentors Fetched
+            <span className="font-semibold">{totalMentors}</span> Mentors
+            Fetched
           </p>
 
           <p className="font-inter text-base tracking-tight text-yellow-600">
-            <span className="font-semibold">{exactMatches}</span> Exact Matches Found
+            <span className="font-semibold">{exactMatches}</span> Exact Matches
+            Found
           </p>
           <div className="flex items-center gap-5">
             {/* Search Bar */}
@@ -262,11 +264,13 @@ export default function MentorConnect() {
             return (
               <div
                 key={mentor.id}
-                className={`bg-white border border-gray-200 shadow-md rounded-md h-[300px] w-[330px]  relative flex flex-col 
-                  ${
-                    quizData?.selectedCareer.toLowerCase() ==
-                      mentor?.current_position && " shadow-pink-200"
-                  }`}
+                className={`bg-white border border-gray-200 shadow-md rounded-md h-[300px] w-[330px] relative flex flex-col 
+    ${
+      quizData?.selectedCareer?.toLowerCase() ===
+      mentor?.current_position?.toLowerCase()
+        ? "shadow-pink-200"
+        : ""
+    }`}
               >
                 {/* HEADER */}
                 <div className={`h-16 ${bgColor} w-full relative rounded-sm`}>
@@ -317,8 +321,9 @@ export default function MentorConnect() {
                   </h2>
 
                   <p className="text-center mt-2 capitalize font-semibold text-yellow-500 font-sora  text-sm ">
-                    {quizData?.selectedCareer.toLowerCase() ==
-                      mentor?.current_position && "Perfect match"}{" "}
+                    {quizData?.selectedCareer?.toLowerCase() ===
+                      mentor?.current_position?.toLowerCase() &&  
+                      "Perfect match"}
                   </p>
 
                   {/* FOOTER  */}

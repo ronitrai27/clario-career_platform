@@ -23,7 +23,7 @@ import {
 } from "@/components/ui/select";
 // import { Textarea } from "@/components/ui/textarea";
 import { StepIndicator } from "./stepIndicator";
-import { Calendar, Copy, Loader2, Share2, UserPlus } from "lucide-react";
+import { Calendar, Copy, Loader2, Share2, Star, UserPlus } from "lucide-react";
 import { toast } from "sonner";
 import {
   LuActivity,
@@ -47,7 +47,6 @@ const PROFESSION_OPTIONS: Profession[] = [
   "12th Student",
   "Diploma",
   "Graduate",
-  // "Postgraduate",
   "Working professional",
 ];
 
@@ -89,7 +88,6 @@ type FormData = {
   profession?: Profession;
   // Step 3
   focus?: string;
-
 };
 
 export function OnboardingCard() {
@@ -153,8 +151,6 @@ export function OnboardingCard() {
   function prevStep() {
     if (step > 1) setStep((s) => s - 1);
   }
-
-
 
   function addInviteFromInput() {
     const v = emailInput.trim();
@@ -357,6 +353,7 @@ export function OnboardingCard() {
               <Label className="font-raleway font-semibold text-base">
                 What best describes you Currently?
               </Label>
+
               <Select
                 value={data.profession}
                 onValueChange={(v: Profession) => {
@@ -366,12 +363,35 @@ export function OnboardingCard() {
                 <SelectTrigger className="w-full">
                   <SelectValue placeholder="Select your current status" />
                 </SelectTrigger>
+
+                {/* ✅ MUST be inside Select */}
                 <SelectContent>
-                  {PROFESSION_OPTIONS.map((p) => (
-                    <SelectItem key={p} value={p}>
-                      {p}
-                    </SelectItem>
-                  ))}
+                  {PROFESSION_OPTIONS.map((p) => {
+                    const isRecommended = p === "12th Student";
+
+                    return (
+                      <SelectItem
+                        key={p}
+                        value={p}
+                        className={
+                          isRecommended
+                            ? "bg-primary/10 focus:bg-primary/20"
+                            : ""
+                        }
+                      >
+                        <div className="flex items-center justify-between w-full">
+                          <span>{p}</span>
+
+                          {isRecommended && (
+                            <span className="flex items-center gap-1 text-xs text-primary">
+                              <Star className="h-3 w-3 fill-primary ml-3" />
+                              Recommended
+                            </span>
+                          )}
+                        </div>
+                      </SelectItem>
+                    );
+                  })}
                 </SelectContent>
               </Select>
             </div>
