@@ -108,6 +108,13 @@ export default function AuthPage() {
 
               <h1 className="font-raleway text-3xl font-bold">Clario</h1>
             </div>
+            <div className="flex items-center">
+              <hr className="w-[40px]" />
+              <p className="text-center mb-6 text-sm font-inter whitespace-nowrap">
+                Continue using Clario with your favorite provider{" "}
+              </p>
+              <hr className="w-[40px]" />
+            </div>
             <div className="flex flex-col gap-3">
               <Button
                 className="font-inter text-sm tracking-wide bg-blue-50 text-black rounded border shadow-sm hover:bg-blue-100 hover:scale-105 hover:border-blue-400 cursor-pointer w-[280px] py-5"
@@ -150,16 +157,16 @@ export default function AuthPage() {
               </Button>
             </div>
             {/* ---- */}
-            <p className="font-inter text-base font-light my-7">
+            {/* <p className="font-inter text-base font-light my-7">
               {" "}
               or continue with{" "}
               <span className="font-medium font-raleway  text-blue-500  ml-4">
                 {isSignup ? "Creating Account" : "Logging In"}
               </span>
-            </p>
+            </p> */}
 
             <div className="flex flex-col gap-5 w-full max-w-[320px] mx-auto">
-              <div className="flex items-center justify-center gap-2 ">
+              {/* <div className="flex items-center justify-center gap-2 ">
                 <Label className="font-inter">Email</Label>
                 <Input
                   placeholder="Enter your email"
@@ -179,16 +186,9 @@ export default function AuthPage() {
                   className="w-full rounded border "
                 />
               </div>
-              {/* 👇 hCaptcha here */}
-              {/* <HCaptcha
-                sitekey={process.env.NEXT_PUBLIC_HCAPTCHA_SITE_KEY!}
-                onVerify={(captchaToken) => setToken(captchaToken)}
-                ref={captchaRef}
-                // size="invisible"
-                //  size="compact"
-              /> */}
+               */}
 
-              <Button
+              {/* <Button
                 className="rounded border font-sora cursor-pointer bg-black"
                 disabled={loading}
                 onClick={HandleAuth}
@@ -204,9 +204,9 @@ export default function AuthPage() {
                     <LuChevronRight />
                   </>
                 )}
-              </Button>
+              </Button> */}
 
-              <p className="font-inter text-sm font-light">
+              {/* <p className="font-inter text-sm font-light py-10">
                 {isSignup
                   ? "Already have an account?"
                   : "Don't have an account?"}{" "}
@@ -216,11 +216,11 @@ export default function AuthPage() {
                 >
                   {isSignup ? "Sign In" : "Sign Up"}
                 </span>
-              </p>
+              </p> */}
 
               <p
                 onClick={() => router.push("/auth-mentor")}
-                className="text-base font-medium"
+                className="text-base font-medium py-10 text-center"
               >
                 {" "}
                 Are you a Mentor ?{" "}
