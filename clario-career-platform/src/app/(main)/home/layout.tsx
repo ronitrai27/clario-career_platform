@@ -1,4 +1,5 @@
 "use client";
+
 import React from "react";
 import { SidebarProvider } from "@/components/ui/sidebar";
 import { AppSidebar } from "@/app/(main)/_components/app-sidebar";
@@ -16,7 +17,7 @@ export default function Layout({ children }: { children: React.ReactNode }) {
       pathname !== "/home/mentor-connect" &&
       pathname !== "/home/mentor-connect/bookings") ||
     pathname === "/home/profile" ||
-      pathname === "/home/calendar" ||
+    pathname === "/home/calendar" ||
     pathname === "/home/settings/billing" ||
     pathname === "/home/ai-tools/resume-maker/start" ||
     pathname === "/home/interview-prep/start" ||
