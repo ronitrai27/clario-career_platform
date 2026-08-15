@@ -1,0 +1,424 @@
+"use client";
+
+import { useEffect, useState } from "react";
+import { paginatedColleges } from "@/lib/functions/dbActions";
+import type { College } from "@/lib/types/allTypes";
+import Image from "next/image";
+import { LuActivity, LuChevronRight, LuPi, LuPin } from "react-icons/lu";
+import { Input } from "@/components/ui/input";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
+
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover";
+import { Building2, LucideActivity, Search } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { useQuizData } from "@/context/userQuizProvider";
+import { QuizCollegeQues } from "@/lib/types/allTypes";
+
+const quizDataCollege: QuizCollegeQues[] = [
+  {
+    id: "q1",
+    question: "What the main moto of yours joining a college?",
+    key: "moto",
+    options: ["Academics", "Placement", "Good Environment"],
+    type: "single",
+  },
+  {
+    id: "q2",
+    question: "What type of college would you prefer?",
+    key: "type",
+    options: ["Private", "Government", "Any"],
+    type: "single",
+  },
+  {
+    id: "q3",
+    question: "Which location preference suits you best?",
+    key: "location",
+    options: ["Nearby cities", "Far away cities", "Flexible with any location"],
+    type: "single",
+  },
+  {
+    id: "q4",
+    question: "Do you have any budget constraints? Your typical budget.",
+    key: "fees",
+    options: [
+      "Below ₹50,000",
+      "₹50,000 - ₹1,00,000",
+      "₹1,00,000 - ₹2,00,000",
+      "Above ₹2,00,000",
+    ],
+    type: "single",
+  },
+  {
+    id: "q5",
+    question: "How important is campus placement to you?",
+    key: "placement",
+    options: [
+      "Very important (Top recruiters & high packages)",
+      "Moderately important (Good average package)",
+      "Not a priority (Focus on academics/research)",
+    ],
+    type: "single",
+  },
+  {
+    id: "q6",
+    question:
+      "Would you like your college recommendations to prioritize any of these?",
+    key: "priority",
+    options: [
+      "Low Fees",
+      "High Placement Rate",
+      "Top Ranking",
+      "Best Fit for My Course",
+    ],
+    type: "multiple",
+  },
+];
+
+export default function CollegesList() {
+  const [colleges, setColleges] = useState<College[]>([]);
+  const [page, setPage] = useState(1);
+  const [loading, setLoading] = useState(false);
+  const { quizData } = useQuizData();
+
+  const [searchQuery, setSearchQuery] = useState("");
+
+  // colleges---------------------------->
+  const [nearbyActive, setNearbyActive] = useState(false);
+  const [collegeType, setCollegeType] = useState<string | null>(null);
+
+  // ===================================
+  // COLLEGE QUIZ
+  const [started, setStarted] = useState(false);
+  const [open, setOpen] = useState(false);
+  const [currentIndex, setCurrentIndex] = useState(0);
+  const [answers, setAnswers] = useState<Record<string, string | string[]>>({});
+
+  const currentQuestion = quizDataCollege[currentIndex];
+
+  const handleOptionSelect = (option: string) => {
+    if (!currentQuestion) return;
+
+    setAnswers((prev) => {
+      if (currentQuestion.type === "multiple") {
+        const prevSelected = (prev[currentQuestion.key] as string[]) || [];
+        const updated = prevSelected.includes(option)
+          ? prevSelected.filter((o) => o !== option)
+          : [...prevSelected, option];
+        return { ...prev, [currentQuestion.key]: updated };
+      } else {
+        return { ...prev, [currentQuestion.key]: option };
+      }
+    });
+  };
+
+  const handleNext = () => {
+    if (currentIndex < quizDataCollege.length - 1) {
+      setCurrentIndex((prev) => prev + 1);
+    } else {
+      console.log("✅ User Quiz Result:", answers);
+      setOpen(false);
+      setCurrentIndex(0);
+      setStarted(false);
+    }
+  };
+
+  // ==================================
+
+  useEffect(() => {
+    loadMoreColleges(1, true);
+  }, []);
+
+  const loadMoreColleges = async (
+    pageNum: number,
+    reset = false,
+    locationSearch?: string,
+    collegeType?: string
+  ) => {
+    setLoading(true);
+    const newColleges = await paginatedColleges(
+      pageNum,
+      6,
+      locationSearch || null,
+      collegeType || null
+    );
+    setColleges((prev) => (reset ? newColleges : [...prev, ...newColleges]));
+    setLoading(false);
+  };
+
+  const handleSearch = () => {
+    setPage(1);
+    loadMoreColleges(1, true, searchQuery);
+  };
+
+  const handleCollegeTypeChange = (type: string) => {
+    const newType = collegeType === type ? null : type;
+    setCollegeType(newType);
+    setPage(1);
+    loadMoreColleges(1, true, searchQuery, newType!);
+  };
+
+  return (
+    <div>
+      <div className="mb-10 flex items-center  gap-10  w-full">
+        <div className="bg-gradient-to-br from-slate-500 to-slate-800 w-[240px] h-[180px] shrink-0 rounded-lg p-4 flex flex-col ">
+          <h2 className="text-white font-inter text-xl leading-tight">
+            Get College Recomendation Based on your Interests
+          </h2>
+          <Button
+            size="sm"
+            variant="outline"
+            onClick={() => setOpen(true)}
+            className="text-sm font-inter w-fit mt-auto ml-auto cursor-pointer"
+          >
+            Check out <LuChevronRight />
+          </Button>
+        </div>
+
+        <div className="flex flex-col space-y-6  w-full">
+          <div className="flex items-center gap-6 w-full">
+            <div className="relative w-full max-w-[400px] flex justify-between items-center border border-blue-300 rounded-md px-4 bg-blue-50">
+              <Input
+                type="text"
+                placeholder="Search Colleges by Location..."
+                className="font-inter text-sm bg-transparent border-none shadow-none focus:outline-none focus:ring-0 focus-visible:border-0 focus-visible:ring-0 focus-visible:ring-offset-0"
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+              />
+
+              <Search
+                className=" text-blue-600 cursor-pointer hover:scale-105"
+                onClick={handleSearch}
+              />
+            </div>
+            <Button
+              onClick={() => setNearbyActive(!nearbyActive)}
+              className={`font-inter text-sm cursor-pointer flex items-center hover:bg-blue-100 hover:border-blue-500 hover:text-blue-600
+    ${nearbyActive ? "bg-blue-100 border-blue-500 text-blue-600" : ""}`}
+              variant={nearbyActive ? "default" : "outline"}
+            >
+              Recomended <Building2 className="ml-2" />
+            </Button>
+
+            <Popover>
+              <PopoverTrigger asChild>
+                <Button
+                  className="font-inter text-sm capitalize cursor-pointer flex items-center"
+                  variant="outline"
+                >
+                  {collegeType ? collegeType : "Type"}{" "}
+                  <LucideActivity className="ml-2" />
+                </Button>
+              </PopoverTrigger>
+              <PopoverContent className="w-48">
+                <div className="flex flex-col gap-2 font-inter">
+                  <Button
+                    variant={collegeType === "Private" ? "default" : "outline"}
+                    className="cursor-pointer border-none shadow-none"
+                    onClick={() => handleCollegeTypeChange("private")}
+                  >
+                    {" "}
+                    Private College{" "}
+                  </Button>{" "}
+                  <Button
+                    className="cursor-pointer border-none shadow-none"
+                    variant={
+                      collegeType === "Government" ? "default" : "outline"
+                    }
+                    onClick={() => handleCollegeTypeChange("government")}
+                  >
+                    {" "}
+                    Government College{" "}
+                  </Button>
+                </div>
+              </PopoverContent>
+            </Popover>
+          </div>
+
+          <div className="flex items-center gap-5 w-full justify-end pr-20">
+            <p className="font-inter">Ai suggested Degrees</p>
+            {quizData?.quizInfo?.degree?.length > 0 ? (
+              quizData?.quizInfo.degree.map((deg: string, index: number) => (
+                <span
+                  key={index}
+                  className="bg-blue-100 text-blue-700 font-inter space-x-3 text-sm px-3 py-1 rounded-full shadow-sm"
+                >
+                  {deg}
+                </span>
+              ))
+            ) : (
+              <span className="text-gray-400 font-inter text-sm">
+                No degree selected
+              </span>
+            )}
+          </div>
+        </div>
+      </div>
+
+      {!loading && colleges.length === 0 && (
+        <div className="my-8">
+          <p className="text-center text-gray-800 font-inter text-xl">
+            No colleges found.
+          </p>
+        </div>
+      )}
+
+      {/* Grid */}
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        {colleges.map((college) => (
+          <div
+            key={college.id}
+            className="border rounded-lg p-4 border-b-4 border-b-blue-500 shadow-sm hover:shadow-md bg-white relative overflow-hidden flex flex-col h-[290px]"
+          >
+            {/* <div className="w-40 h-20 rounded-full absolute -top-7 -left-5 bg-blue-500 opacity-15 blur-xl"></div> */}
+            <h2 className="font-semibold text-lg font-inter tracking-tight line-clamp-2  capitalize">
+              {college.college_name}
+            </h2>
+            <p className="text-base font-inter  my-1 capitalize text-gray-600">
+              <LuPin className="inline-block mr-1" />
+              {college.location}
+            </p>
+            <p className="text-sm font-sora font-medium ">
+              Type: {college.type}
+            </p>
+            <p className="text-base mt-4 font-inter ">
+              1st Year Fees: {college.fees || "N/A"}
+            </p>
+            <Image
+              src="/hat.png"
+              width={200}
+              height={200}
+              alt="jobs"
+              className="absolute opacity-10  -right-5  top-16 w-32 h-32"
+            />
+
+            <p className="text-base mt-2 font-inter ">
+              Highest Placement: {college.placement || "N/A"}
+            </p>
+            <div className="flex flex-wrap gap-2 mt-auto">
+              <span className="font-inter font-semibold text-blue-500">
+                {" "}
+                Best Suited For:
+              </span>
+              {college.best_suit_for.map((course, idx) => (
+                <span
+                  key={idx}
+                  className="px-2 py-1 bg-blue-100 text-blue-700 rounded-md text-xs font-inter uppercase"
+                >
+                  {course}
+                </span>
+              ))}
+            </div>
+          </div>
+        ))}
+      </div>
+
+      {/* Load More */}
+      <div className="flex justify-center mt-6">
+        <Button
+          disabled={loading}
+          variant="outline"
+          onClick={() => {
+            const nextPage = page + 1;
+            setPage(nextPage);
+            loadMoreColleges(nextPage, false, searchQuery);
+          }}
+          className="px-4 py-2  disabled:opacity-50"
+        >
+          {loading ? "Loading..." : "Load More"}
+        </Button>
+      </div>
+
+      {/* ========================== */}
+      <Dialog open={open} onOpenChange={setOpen}>
+        <DialogContent className="min-w-[880px] h-[600px] p-0 overflow-hidden">
+          {!started ? (
+            <div className="flex">
+              {/* LEFT SIDE */}
+              <div className="h-full bg-gradient-to-br from-blue-200 to-rose-300 w-[35%] relative">
+                <Image
+                  src="/static1.png"
+                  width={200}
+                  height={200}
+                  alt="jobs"
+                  className="absolute -bottom-5 h-[90%] w-full object-cover "
+                />
+              </div>
+              {/* RIGHT SIDE */}
+              <div className="flex-1 flex flex-col h-full p-4">
+                <DialogHeader>
+                  <DialogTitle className="text-2xl font-semibold font-sora text-center mt-5">
+                    🎓 Welcome to College Preference Quiz
+                  </DialogTitle>
+                </DialogHeader>
+                <p className="text-gray-800 font-inter text-center mt-20 text-base">
+                  Answer a few quick questions to help us match you with the
+                  best colleges for your preferences.
+                </p>
+                <Button
+                  className="font-inter text-base mt-20 mx-auto flex items-center justify-center"
+                  onClick={() => setStarted(true)}
+                >
+                  Start Quiz <LuActivity className="ml-2" />
+                </Button>
+
+                <div className="bg-blue-50 border border-blue-400 px-3 py-6 rounded-md mt-auto">
+                  <p className="text-gray-800 font-inter text-center text-base">
+                   Make sure you answer the right questions so to get the most accurate results.
+                  </p>
+                </div>
+              </div>
+            </div>
+          ) : (
+            <div className="space-y-4">
+              <DialogHeader>
+                <DialogTitle>
+                  Question {currentIndex + 1} of {quizDataCollege.length}
+                </DialogTitle>
+              </DialogHeader>
+
+              <p className="text-lg font-medium">{currentQuestion.question}</p>
+
+              <div className="space-y-2">
+                {currentQuestion.options.map((opt) => {
+                  const selected = answers[currentQuestion.key];
+                  const isSelected =
+                    currentQuestion.type === "multiple"
+                      ? (selected as string[])?.includes(opt)
+                      : selected === opt;
+
+                  return (
+                    <Button
+                      key={opt}
+                      variant={isSelected ? "default" : "outline"}
+                      className="w-full justify-start"
+                      onClick={() => handleOptionSelect(opt)}
+                    >
+                      {opt}
+                    </Button>
+                  );
+                })}
+              </div>
+
+              <div className="flex justify-end">
+                <Button onClick={handleNext}>
+                  {currentIndex === quizDataCollege.length - 1
+                    ? "Finish"
+                    : "Next"}
+                </Button>
+              </div>
+            </div>
+          )}
+        </DialogContent>
+      </Dialog>
+    </div>
+  );
+}
