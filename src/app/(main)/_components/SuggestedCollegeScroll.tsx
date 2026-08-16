@@ -73,9 +73,30 @@ const SuggestedCollegeScroll = () => {
         return;
       }
 
-      // 3️⃣ Fetch colleges by state + degree
-      const colleges = await getSuggestedCollegeData(degrees, state);
-      setSuggestedCollegeData(colleges);
+      // 3️⃣ Fetch real-time colleges by state + degree
+      try {
+        const career = quizData?.selectedCareer || "";
+        const primaryDegree = degrees.length > 0 ? degrees[0] : "";
+        const params = new URLSearchParams();
+        if (career) params.set("q", career);
+        if (primaryDegree) params.set("degree", primaryDegree);
+        if (state) params.set("location", state);
+
+        const res = await fetch(`/api/colleges?${params.toString()}`);
+        const realTimeColleges = await res.json();
+
+        if (Array.isArray(realTimeColleges) && realTimeColleges.length > 0) {
+          setSuggestedCollegeData(realTimeColleges);
+        } else {
+          // Fallback to static DB query
+          const colleges = await getSuggestedCollegeData(degrees, state);
+          setSuggestedCollegeData(colleges);
+        }
+      } catch (err) {
+        console.error("Error fetching real-time suggested colleges:", err);
+        const colleges = await getSuggestedCollegeData(degrees, state);
+        setSuggestedCollegeData(colleges);
+      }
 
       setLoadingCollege(false);
     };
@@ -166,14 +187,23 @@ const SuggestedCollegeScroll = () => {
               />
 
               {/* Content */}
-              <div className="relative py-3 px-3 z-10">
-                {/* TYPE OF COLLEGE */}
+              <div className="relative py-2.5 px-3 z-10">
+                <div className="flex items-center justify-between mb-1">
+                  <span className="px-2 py-0.5 rounded-full text-[11px] font-semibold font-inter bg-amber-100 text-amber-800 border border-amber-300">
+                    🏆 {(college as any).rank_position || `#${idx + 1} Ranked`}
+                  </span>
+                  {(college as any).rank_display && (
+                    <span className="text-[10px] font-medium font-inter text-blue-600 bg-blue-50 px-1.5 py-0.5 rounded border border-blue-200 truncate max-w-[150px]">
+                      {(college as any).rank_display}
+                    </span>
+                  )}
+                </div>
 
-                <h3 className="font-semibold text-base font-inter tracking-tight uppercase text-left line-clamp-2">
+                <h3 className="font-semibold text-base font-inter tracking-tight uppercase text-left line-clamp-1">
                   {college.college_name}
                 </h3>
-                <p className="text-sm font-inter text-gray-600 capitalize mt-1">
-                  <GrLocation className="inline-block mr-1" />
+                <p className="text-xs font-inter text-gray-600 capitalize mt-0.5">
+                  <GrLocation className="inline-block mr-1 text-blue-500" />
                   {college.location}
                 </p>
               </div>
