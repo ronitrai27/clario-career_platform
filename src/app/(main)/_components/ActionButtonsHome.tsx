@@ -1,5 +1,6 @@
 "use client";
 
+import { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { useUserData } from "@/context/UserDataProvider";
 import { Activity, ActivityIcon } from "lucide-react";
@@ -29,12 +30,28 @@ export default function ActionsButtons() {
   const { user } = useUserData();
   const { quizData, loadingQuiz } = useQuizData();
   const router = useRouter();
+  const [open, setOpen] = useState(false);
+  const [mounted, setMounted] = useState(false);
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
+
+  useEffect(() => {
+    if (mounted && user && user.isQuizDone === false) {
+      setOpen(true);
+    }
+  }, [mounted, user]);
+
+  if (!mounted) {
+    return <div className="flex items-center gap-10 min-h-[40px]" />;
+  }
 
   return (
     <div className="flex items-center gap-10">
       {/* QUIZ BUTTON */}
       {user?.isQuizDone === false && (
-        <Dialog>
+        <Dialog open={open} onOpenChange={setOpen}>
           <DialogTrigger asChild>
             <Button className="rounded-md shadow-md cursor-pointer font-inter text-base bg-gradient-to-b from-blue-300 to-blue-500 text-white hover:-translate-y-1 duration-200">
               Start Quiz <Activity className="ml-2" />
