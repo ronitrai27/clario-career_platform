@@ -95,25 +95,23 @@ export default function AuthPage() {
         {/* LEFT SIDE */}
         <div className="flex-1">
           <div className="w-full h-full flex flex-col items-center justify-center">
-            <div className="flex items-center mb-10 cursor-pointer">
-              <Link href="/web">
-                <Image
-                  src="/clarioBlack.png"
-                  alt="logo"
-                  width={80}
-                  height={80}
-                  className=""
-                />
-              </Link>
+            <Link href="/web" className="flex items-center mb-8 hover:opacity-90 transition-opacity">
+              <Image
+                src="/clarioBlack.png"
+                alt="logo"
+                width={56}
+                height={56}
+                className="object-contain"
+              />
+              <h1 className="font-raleway text-3xl font-bold -ml-1 text-black">Clario</h1>
+            </Link>
 
-              <h1 className="font-raleway text-3xl font-bold">Clario</h1>
-            </div>
-            <div className="flex items-center">
-              <hr className="w-[40px]" />
-              <p className="text-center mb-6 text-sm font-inter whitespace-nowrap">
-                Continue using Clario with your favorite provider{" "}
+            <div className="flex items-center gap-3 mb-6">
+              <hr className="w-12 border-gray-300" />
+              <p className="text-center text-sm font-inter text-gray-600 whitespace-nowrap">
+                Continue using Clario with your favorite provider
               </p>
-              <hr className="w-[40px]" />
+              <hr className="w-12 border-gray-300" />
             </div>
             <div className="flex flex-col gap-3">
               <Button
@@ -129,7 +127,7 @@ export default function AuthPage() {
                 />{" "}
                 continue with Google
               </Button>
-              <Button
+              {/* <Button
                 className="font-inter text-sm tracking-wide bg-blue-50 text-black rounded border shadow-sm  hover:bg-blue-100 hover:scale-105 hover:border-blue-400 cursor-pointer  w-[280px] py-5"
                 onClick={() => handleLogin("discord")}
               >
@@ -154,7 +152,7 @@ export default function AuthPage() {
                   className="mr-5"
                 />{" "}
                 continue with Slack
-              </Button>
+              </Button> */}
             </div>
             {/* ---- */}
             {/* <p className="font-inter text-base font-light my-7">
