@@ -1,36 +1,102 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# 🚀 Clario Career Platform !
 
-## Getting Started
+<div align="center">
+  <h3>Your AI-Powered Career Compass 🧭</h3>
+  <p>Revolutionizing career guidance with 3D roadmaps, personalized AI agents, and real-time mentorship.</p>
 
-First, run the development server:
+  [**Live Demo**](https://www.clarioo.live/auth) | [**Report Bug**](https://github.com/ritesh-sinha29/clario/issues) | [**Request Feature**](https://github.com/ritesh-sinha29/clario/issues)
+</div>
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
-```
+---
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+## 🌟 Introduction
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+**Clario** is a comprehensive career development platform designed to guide students and professionals through their career journey. By leveraging cutting-edge **AI**, **3D visualization**, and **real-time communication**, Clario bridges the gap between ambition and reality. Whether you're deciding on a major, preparing for interviews, or seeking 1:1 mentorship, Clario's intelligent agents and immersive tools are here to help.
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+## ✨ Key Features
 
-## Learn More
+### 🗺️ Immersive 3D Career Roadmaps
+Visualize your career path potential like never before. Our interactive **3D Roadmaps** (powered by Three.js & Spline) create an engaging way to explore different execution strategies and milestones for your chosen field.
 
-To learn more about Next.js, take a look at the following resources:
+### 🛣️ AI-Personalized Learning Tracks
+Forget generic advice. Clario's AI analyzes your profile, skills, and goals to generate **customized learning tracks**. Step-by-step guidance ensures you learn exactly what you need to succeed.
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+### 🤖 Voice AI Mock Interviews
+Practice makes perfect. Our realistic **Voice Agents** (powered by Vapi AI) conduct mock interviews, providing real-time feedback on your responses, tone, and confidence to get you job-ready.
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+### 🧠 Intelligent Career Agents
+Unsure which path to take? Our **AI Career Agents** (powered by Google Gemini & LangChain) act as your personal counselors. Chat with them to decode your interests, discover suitable colleges, and identify high-growth career opportunities.
 
-## Deploy on Vercel
+### 🎓 Smart College Suggestions
+Data-driven recommendations to help you find the best educational institutions that align with your career aspirations and academic profile.
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+### 📹 1:1 Mentor Connect
+Connect directly with industry experts. Our integrated **Video Call** feature (powered by ZegoCloud) facilitates seamless mock interviews, guidance sessions, and networking with mentors worldwide.
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+## 🛠️ Tech Stack
+
+**Frontend & UI**
+- **Framework:** Next.js 16 (on Turbopack)
+- **Styling:** Tailwind CSS v4, Framer Motion, Styled Components
+- **UI Components:** Radix UI, Lucide React, Hetero UI
+- **3D Graphics:** react flow
+
+**AI & Intelligence**
+- **LLMs:** Google Gemini (via Google GenAI & LangChain)
+- **Voice AI:** Vapi AI
+- **Frameworks:** LangChain (Google, Groq)
+- **Vector DB:** Pinecone
+- **Search Agents:** Tavily, SerpApi, NewsAPI
+
+**Backend & Services**
+- **Database & Auth:** Supabase
+- **Storage:** Google Cloud Storage, ImageKit, Upstash Redis
+- **Real-time Video:** ZegoCloud
+- **Payments:** Razorpay
+
+## 🚀 Getting Started
+
+Follow these instructions to set up the project locally.
+
+### Prerequisites
+- Node.js (v18+ recommended)
+- pnpm (or npm/yarn)
+
+### Installation
+
+1. **Clone the repository**
+   ```bash
+   git clone https://github.com/ritesh-sinha29/clario.git
+   cd clario
+   ```
+
+2. **Install dependencies**
+   ```bash
+   pnpm install
+   ```
+
+3. **Set up Environment Variables**
+   Create a `.env.local` file in the root directory and add the necessary API keys.
+   *(Refer to `.env.example` if available)*
+
+
+4. **Run the Development Server**
+   ```bash
+   pnpm dev
+   ```
+
+   Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+
+## 🤝 Contributing
+
+Contributions are welcome! Please feel free to submit a Pull Request.
+
+## 📄 License
+
+This project is licensed under the MIT License.
+
+---
+
+<div align="center">
+  <p>Made with ❤️ for Hackathon.</p>
+</div>
