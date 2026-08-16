@@ -2,9 +2,7 @@
 
 <div align="center">
   <h3>Your AI-Powered Career Compass 🧭</h3>
-  <p>Revolutionizing career guidance with 3D roadmaps, personalized AI agents, and real-time mentorship.</p>
-
-  [**Live Demo**](https://www.clarioo.live/auth) | [**Report Bug**](https://github.com/ritesh-sinha29/clario/issues) | [**Request Feature**](https://github.com/ritesh-sinha29/clario/issues)
+  <p>Revolutionizing career guidance with end to end 3D roadmaps, personalized AI agents, and real-time mentorship , from clearance to making to market fit .</p>
 </div>
 
 ---
