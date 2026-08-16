@@ -1,4 +1,7 @@
 "use client";
+
+export const dynamic = "force-dynamic";
+
 import { useEffect, useRef, useState } from "react";
 import { Separator } from "@/components/ui/separator";
 import { useUserData } from "@/context/UserDataProvider";
@@ -36,15 +39,17 @@ import {
 import axios from "axios";
 import { useRouter } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
-import { FaceDetectionCanvas } from "../_components/FaceDetectionCanvas";
+import dynamicImport from "next/dynamic";
+
+const FaceDetectionCanvas = dynamicImport(
+  () =>
+    import("../_components/FaceDetectionCanvas").then(
+      (mod) => mod.FaceDetectionCanvas
+    ),
+  { ssr: false }
+);
 
 const VAPI_PUBLIC_KEY = process.env.NEXT_PUBLIC_VAPI_PUBLIC_KEY;
-
-if (!VAPI_PUBLIC_KEY) {
-  throw new Error(
-    "NEXT_PUBLIC_VAPI_PUBLIC_KEY is required. Please set it in your .env.local file."
-  );
-}
 
 interface Message {
   type: "user" | "assistant";
@@ -69,8 +74,13 @@ const InterviewStart = () => {
   const supabase = createClient();
 
   const [isDialogOpen, setIsDialogOpen] = useState(false);
+  const [vapi, setVapi] = useState<Vapi | null>(null);
 
-  const [vapi] = useState(() => new Vapi(VAPI_PUBLIC_KEY));
+  useEffect(() => {
+    if (typeof window !== "undefined" && VAPI_PUBLIC_KEY) {
+      setVapi(new Vapi(VAPI_PUBLIC_KEY));
+    }
+  }, []);
 
   const scrollRef = useRef<HTMLDivElement>(null);
 
@@ -115,7 +125,7 @@ const InterviewStart = () => {
   const toggleMic = async () => {
     if (isMicOn) {
       try {
-        if (isCallActive) {
+        if (isCallActive && vapi) {
           vapi.setMuted(true);
         }
       } catch (e) {
@@ -125,7 +135,7 @@ const InterviewStart = () => {
       toast.success("Mic turned off");
     } else {
       try {
-        if (isCallActive) {
+        if (isCallActive && vapi) {
           vapi.setMuted(false);
         }
       } catch (e) {
@@ -136,8 +146,9 @@ const InterviewStart = () => {
     }
   };
 
-  // Register Vapi error handler to prevent unhandled EventEmitter errors
+  // Register Vapi error handler
   useEffect(() => {
+    if (!vapi) return;
     const handleVapiError = (err: any) => {
       console.error("Vapi background error:", err);
     };
@@ -149,7 +160,7 @@ const InterviewStart = () => {
 
   // ----------------------------VAPI & CAMERA SETUP--------------------------------
   useEffect(() => {
-    if (!interviewData) return;
+    if (!interviewData || !vapi) return;
 
     if (!interviewData.jobTitle) {
       toast.error("Job title is missing for this interview.");
@@ -157,14 +168,14 @@ const InterviewStart = () => {
     }
     startCamera();
     startCall();
-  }, [interviewData]);
+  }, [interviewData, vapi]);
 
   const startCall = async () => {
+    if (!vapi) return;
     const questionList = interviewData?.questions
       ?.map((q: any) => q.question)
       .join(", ");
 
-      // gpt-4.1-mini
     const jobTitle = interviewData?.jobTitle;
     try {
       await vapi.start({
@@ -222,46 +233,57 @@ Key Guidelines:
         endCallMessage:
           "Thanks for chatting! That was a solid interview — see you crushing it soon!",
         endCallPhrases: ["goodbye", "bye", "end call", "hang up"],
-
-        // silenceTimeoutSeconds: 20,
         maxDurationSeconds: 300,
       });
 
       console.log("🎤 Vapi Interview started successfully!");
     } catch (error) {
       console.error("❌ Error starting call:", error);
-      // setVapiError(error);
       setLoading(false);
     }
   };
 
-  vapi.on("speech-start", () => {
-    setActiveUser(true);
-  });
+  useEffect(() => {
+    if (!vapi) return;
+    const handleSpeechStart = () => setActiveUser(true);
+    const handleSpeechEnd = () => setActiveUser(false);
 
-  vapi.on("speech-end", () => {
-    setActiveUser(false);
-  });
+    vapi.on("speech-start", handleSpeechStart);
+    vapi.on("speech-end", handleSpeechEnd);
 
-  vapi.on("call-start", () => {
-    console.log("Call has started");
-    setIsCallActive(true);
-    setIsMicOn(true);
-    try {
-      vapi.setMuted(false);
-    } catch (e) {
-      console.error("Default unmute error:", e);
-    }
-    setLoading(false);
-    toast.info("Interview Has been started", {
-      description: (
-        <span className="text-sm text-black font-semibold" style={{ color: "#000000" }}>
-          Your Interview Has Been started!{" "}
-          <span className="text-blue-600 font-bold">All the best</span>
-        </span>
-      ),
-    });
-  });
+    return () => {
+      vapi.off("speech-start", handleSpeechStart);
+      vapi.off("speech-end", handleSpeechEnd);
+    };
+  }, [vapi]);
+
+  useEffect(() => {
+    if (!vapi) return;
+    const handleCallStart = () => {
+      console.log("Call has started");
+      setIsCallActive(true);
+      setIsMicOn(true);
+      try {
+        vapi.setMuted(false);
+      } catch (e) {
+        console.error("Default unmute error:", e);
+      }
+      setLoading(false);
+      toast.info("Interview Has been started", {
+        description: (
+          <span className="text-sm text-black font-semibold" style={{ color: "#000000" }}>
+            Your Interview Has Been started!{" "}
+            <span className="text-blue-600 font-bold">All the best</span>
+          </span>
+        ),
+      });
+    };
+
+    vapi.on("call-start", handleCallStart);
+    return () => {
+      vapi.off("call-start", handleCallStart);
+    };
+  }, [vapi]);
 
   const hasEndedRef = useRef<boolean>(false);
   const isGeneratingRef = useRef<boolean>(false);
@@ -273,7 +295,7 @@ Key Guidelines:
 
     // 1. Stop Vapi session
     try {
-      vapi.stop();
+      if (vapi) vapi.stop();
     } catch (e) {
       console.error("Vapi stop error:", e);
     }
@@ -309,6 +331,7 @@ Key Guidelines:
   };
 
   useEffect(() => {
+    if (!vapi) return;
     const handleCallEnd = () => {
       endInterviewSession();
     };
@@ -362,12 +385,12 @@ Key Guidelines:
 
   // ---------------------------VAPI MESSAGE SETUP--------------------------
   useEffect(() => {
-    vapi.on("message", (message: any) => {
+    if (!vapi) return;
+    const handleMessage = (message: any) => {
       if (message.type === "transcript" && message.transcriptType === "final") {
         const role = message.role === "user" ? "user" : "assistant";
         const content = message.transcript;
 
-        //  Prevent duplicates
         setMessages((prev) => {
           if (prev.length > 0) {
             const lastMsg = prev[prev.length - 1];
@@ -378,15 +401,17 @@ Key Guidelines:
           return [...prev, { type: role, content }];
         });
       }
-    });
+    };
+
+    vapi.on("message", handleMessage);
+    return () => {
+      vapi.off("message", handleMessage);
+    };
   }, [vapi]);
 
   const handleEnd = () => {
     endInterviewSession();
   };
-
-  console.log("🎯 Current Job: start-----------", interviewData.jobTitle);
-  console.log("🧠 Questions: start-------------", interviewData.questions);
 
   // optional: cleanup on unmount
   useEffect(() => {
@@ -403,7 +428,6 @@ Key Guidelines:
         setSeconds((prev) => prev + 1);
       }, 1000);
     } else {
-      // Reset timer when call ends
       setSeconds(0);
       if (interval) clearInterval(interval);
     }
@@ -422,102 +446,6 @@ Key Guidelines:
       .padStart(2, "0");
     const secs = (totalSeconds % 60).toString().padStart(2, "0");
     return `${hrs}:${mins}:${secs}`;
-  };
-  // ------------------------TESTING--------------------------
-
-  const demoConversation: Message[] = [
-    { type: "assistant", content: "Hi, Renit. How are you?" },
-    {
-      type: "assistant",
-      content: "Ready for your interview on React and Next.js vs Vue?",
-    },
-    { type: "assistant", content: "Able to work with MongoDB, PostgreSQL..." },
-    {
-      type: "user",
-      content: "Uh, yes. I'm ready for that. I'm pretty excited.",
-    },
-    {
-      type: "assistant",
-      content:
-        "Awesome. Let's kick things off, tell me among React, Next.js, Vue.js",
-    },
-    { type: "assistant", content: "Which one will you use and why?" },
-    {
-      type: "user",
-      content: "Well, I will use Next.js for sure, because of its SSR and SSG",
-    },
-    { type: "assistant", content: "Thats great renit" },
-    {
-      type: "assistant",
-      content: "Now tell me about your experience with react",
-    },
-    {
-      type: "user",
-      content:
-        "I have worked with React for 2 years, where i learned lazy loading, hooks, context api",
-    },
-    {
-      type: "assistant",
-      content: "okay so tell me with your backend experience",
-    },
-    {
-      type: "user",
-      content: "Yes i worked with node , express , flask and even supabase.",
-    },
-    {
-      type: "assistant",
-      content: "Great, tell me something bout your projects?",
-    },
-    {
-      type: "assistant",
-      content:
-        "Tell me any third party packages you have worked with in your project",
-    },
-    {
-      type: "user",
-      content:
-        "yes, i created a neuratwin web app,  that uses openai api to generate text, langchain , mongodb , vapi ai for voice assistants, and sync with googpe calenders.",
-    },
-  ];
-
-  const testing = async () => {
-    setIsDialogOpen(true);
-    setFeedbackLoading(true);
-    toast.success("Interview Has been Ended", {
-      description: (
-        <span className="text-sm text-gray-500 font-medium">
-          Your Interview Has Been Ended!{" "}
-        </span>
-      ),
-    });
-    try {
-      const response = await axios.post("/api/feedback", {
-        conversation: demoConversation,
-      });
-      const feedbackData = response.data?.data;
-      console.log("🧠 Feedback Response:", feedbackData);
-
-      const { data, error } = await supabase.from("others").insert([
-        {
-          userId: user?.id,
-          jobTitle: interviewData?.jobTitle,
-          interviewInsights: feedbackData,
-        },
-      ]);
-
-      toast.success("Feedback generated successfully!");
-
-      if (error) {
-        console.error("❌ Supabase Insert Error:", error);
-        toast.error("Failed to save feedback to database!");
-        toast.success("Feedback generated successfully!");
-      }
-    } catch (error: any) {
-      console.error("❌ Feedback Error:", error);
-      toast.error("Failed to generate feedback. Try again!");
-    } finally {
-      setFeedbackLoading(false);
-    }
   };
 
   return (
@@ -767,8 +695,6 @@ Key Guidelines:
               View Insights
             </Button>
           )}
-
-          {/* <Image src="/element1.png" alt="success" width={100} height={100} className="mx-auto h-full w-full object-cover -mt-20" /> */}
         </DialogContent>
       </Dialog>
     </div>

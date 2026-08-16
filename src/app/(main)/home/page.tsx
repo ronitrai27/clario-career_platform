@@ -483,6 +483,12 @@ export default function HomePage() {
       {/* Dialog to show after quiz ends*/}
       <Dialog open={open} onOpenChange={setOpen}>
         <DialogContent className="sm:max-w-[780px] h-[520px] p-0 border-0 shadow-2xl rounded-lg overflow-hidden">
+          <DialogHeader className="sr-only">
+            <DialogTitle>Quiz Complete</DialogTitle>
+            <DialogDescription>
+              Personalized career assessment recommendations and next steps.
+            </DialogDescription>
+          </DialogHeader>
           <div className="flex h-full w-full">
             {/* LEFT SIDE */}
             <div className="bg-gradient-to-br from-red-100 via-red-200 to-rose-400 h-full w-[460px] relative">

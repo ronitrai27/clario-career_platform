@@ -38,18 +38,6 @@ const steps = [
     description: "Choose your main goals",
     icon: LuGraduationCap,
   },
-  {
-    id: 4,
-    title: "Google workspace",
-    description: "Connect your Google Workspace",
-    icon: FaGoogle,
-  },
-  {
-    id: 5,
-    title: "Invite Friends",
-    description: "Invite your friends on this platform",
-    icon: Users,
-  },
 ];
 
 export default function CallbackPage() {
