@@ -98,5 +98,5 @@ This project is licensed under the MIT License.
 ---
 
 <div align="center">
-  <p>Made with ❤️ for Hackathon.</p>
+  <p>Made with ❤️ for Intellify Hackathon.</p>
 </div>
