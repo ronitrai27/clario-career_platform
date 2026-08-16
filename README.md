@@ -2,9 +2,7 @@
 
 <div align="center">
   <h3>Your AI-Powered Career Compass 🧭</h3>
-  <p>Revolutionizing career guidance with 3D roadmaps, personalized AI agents, and real-time mentorship.</p>
-
-  [**Live Demo**](https://www.clarioo.live/auth) | [**Report Bug**](https://github.com/ritesh-sinha29/clario/issues) | [**Request Feature**](https://github.com/ritesh-sinha29/clario/issues)
+  <p>Revolutionizing career guidance with end to end 3D roadmaps, personalized AI agents, and real-time mentorship , from clearance to making to market fit .</p>
 </div>
 
 ---
@@ -93,10 +91,10 @@ Contributions are welcome! Please feel free to submit a Pull Request.
 
 ## 📄 License
 
-This project is licensed under the MIT License.
+This project is licensed under the MIT License
 
 ---
 
 <div align="center">
-  <p>Made with ❤️ for Hackathon.</p>
+  <p>Made with ❤️ for Intellify Hackathon.</p>
 </div>
