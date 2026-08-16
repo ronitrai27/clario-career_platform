@@ -136,17 +136,13 @@ export function OnboardingCard() {
         return !!data.profession;
       case 3:
         return !!data.focus;
-      case 4:
-        return true;
-      case 5:
-        return true;
       default:
         return false;
     }
   }, [busy, step, data]);
 
   function nextStep() {
-    if (step < 5 && canProceed) setStep((s) => s + 1);
+    if (step < 3 && canProceed) setStep((s) => s + 1);
   }
   function prevStep() {
     if (step > 1) setStep((s) => s - 1);
@@ -431,119 +427,10 @@ export function OnboardingCard() {
             </div>
           </section>
         )}
-
-        {step === 4 && (
-          <section className="space-y-4" aria-label="Connect Google Calendar">
-            <div className="rounded-md border p-4">
-              <div className="flex gap-3 w-full">
-                <div className="space-y-1 w-full">
-                  <div className="font-medium font-inter text-center">
-                    Where did you find Clario?
-                  </div>
-                  <p className="text-sm text-muted-foreground text-center font-inter">
-                    Tell us how you found out about Clario
-                  </p>
-                </div>
-              </div>
-              <div className="mt-8 flex items-center gap-3">
-                <Input
-                  type="text"
-                  placeholder="Eg: blogs..."
-                  className="w-[70%] mx-auto font-inter"
-                />
-              </div>
-            </div>
-            <p className="text-xs text-muted-foreground">
-              Note: This step is optional and can be skipped.
-            </p>
-          </section>
-        )}
-
-        {step === 5 && (
-          <section className="space-y-6" aria-label="Invite friends">
-            <div className="space-y-2">
-              <Label
-                htmlFor="inviteEmail"
-                className="font-raleway font-semibold text-base"
-              >
-                Invite by email
-              </Label>
-              <div className="flex items-center gap-2">
-                <Input
-                  id="inviteEmail"
-                  type="email"
-                  placeholder="friend@example.com"
-                  value={emailInput}
-                  onChange={(e) => setEmailInput(e.target.value)}
-                  className="bg-blue-50 border-blue-200 font-inter"
-                  onKeyDown={(e) => {
-                    if (e.key === "Enter") {
-                      e.preventDefault();
-                      addInviteFromInput();
-                    }
-                  }}
-                />
-                <Button
-                  onClick={addInviteFromInput}
-                  className="bg-blue-600 hover:bg-blue-700"
-                >
-                  <UserPlus className="h-4 w-4 mr-2" />
-                  Add
-                </Button>
-              </div>
-              {/* {!!data.invites.length && (
-                <div className="flex flex-wrap gap-2 pt-2">
-                  {data.invites.map((e) => (
-                    <span
-                      key={e}
-                      className="inline-flex items-center gap-2 rounded-full border border-border bg-background px-3 py-1 text-sm"
-                    >
-                      {e}
-                      <button
-                        type="button"
-                        onClick={() => removeInvite(e)}
-                        aria-label={`Remove ${e}`}
-                        className="text-muted-foreground hover:text-foreground"
-                      >
-                        ×
-                      </button>
-                    </span>
-                  ))}
-                </div>
-              )} */}
-            </div>
-
-            <div className="space-y-2">
-              <Label className="font-raleway font-semibold text-base">
-                Or share a referral link
-              </Label>
-              <div className="flex flex-wrap items-center gap-2 mt-3">
-                <Button
-                  variant="outline"
-                  onClick={copyReferral}
-                  className="font-inter"
-                >
-                  Copy referral link <Copy className="h-4 w-4 ml-2" />
-                </Button>
-                <Button
-                  onClick={shareReferral}
-                  className="bg-blue-600 hover:bg-blue-700 font-inter"
-                >
-                  <Share2 className="h-4 w-4 mr-2" />
-                  Share
-                </Button>
-              </div>
-              <p className="text-sm text-muted-foreground font-inter mt-4">
-                Friends who join with your link may unlock bonus resources for
-                you.
-              </p>
-            </div>
-          </section>
-        )}
       </CardContent>
 
       <CardFooter className="flex items-center justify-between gap-2 mt-4">
-        <div className="text-sm text-muted-foreground">Step {step} of 5</div>
+        <div className="text-sm text-muted-foreground">Step {step} of 3</div>
         <div className="flex items-center gap-2">
           <Button
             variant="outline"
@@ -552,7 +439,7 @@ export function OnboardingCard() {
           >
             <LuChevronLeft className="mr-2" /> Back
           </Button>
-          {step < 5 ? (
+          {step < 3 ? (
             <Button
               onClick={nextStep}
               disabled={!canProceed}
@@ -563,7 +450,7 @@ export function OnboardingCard() {
           ) : (
             <Button
               onClick={finish}
-              disabled={loading}
+              disabled={loading || !canProceed}
               className="bg-blue-600 hover:bg-blue-700 cursor-pointer"
             >
               {loading ? (

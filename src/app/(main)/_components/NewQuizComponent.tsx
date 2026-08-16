@@ -121,6 +121,68 @@ export default function Quiz() {
     }));
   };
 
+  const handleOptionClick = (opt: string) => {
+    saveAnswer(opt);
+    setTimeout(() => {
+      if (step < allQuestions.length - 1) {
+        setStep((s) => s + 1);
+      } else {
+        setFinished(true);
+        handleSubmit();
+      }
+    }, 160);
+  };
+
+  // Global Keyboard Shortcuts (1-5, Enter, Arrow Left/Right)
+  useEffect(() => {
+    if (!started || finished || readyToSave || !currentQ) return;
+
+    const handleKeyDown = (e: KeyboardEvent) => {
+      // Ignore if user is typing in a textarea or input
+      if (["TEXTAREA", "INPUT"].includes((e.target as HTMLElement)?.tagName)) {
+        if (e.key === "Enter" && (e.ctrlKey || e.metaKey)) {
+          e.preventDefault();
+          if (step < allQuestions.length - 1) {
+            setStep((s) => s + 1);
+          } else {
+            setFinished(true);
+            handleSubmit();
+          }
+        }
+        return;
+      }
+
+      const options = currentQ.question.options;
+      if (options && options.length > 0) {
+        const num = parseInt(e.key, 10);
+        if (!isNaN(num) && num >= 1 && num <= options.length) {
+          e.preventDefault();
+          handleOptionClick(options[num - 1]);
+          return;
+        }
+      }
+
+      if (e.key === "ArrowLeft" && step > 0) {
+        e.preventDefault();
+        setStep((s) => s - 1);
+      } else if (
+        (e.key === "ArrowRight" || e.key === "Enter") &&
+        answers[currentQ.section]?.[currentQ.index]
+      ) {
+        e.preventDefault();
+        if (step < allQuestions.length - 1) {
+          setStep((s) => s + 1);
+        } else {
+          setFinished(true);
+          handleSubmit();
+        }
+      }
+    };
+
+    window.addEventListener("keydown", handleKeyDown);
+    return () => window.removeEventListener("keydown", handleKeyDown);
+  }, [started, finished, readyToSave, step, currentQ, answers]);
+
   const progressPercent = Math.round(((step + 1) / allQuestions.length) * 100);
 
   const progress = ((step + 1) / allQuestions.length) * 100;
@@ -132,8 +194,6 @@ export default function Quiz() {
       question: q.question.question,
       answer: answers[q.section]?.[q.index] || "",
     }));
-
-    // console.log("Final Quiz Data:", JSON.stringify(result, null, 2));
 
     setLoading(true);
     try {
@@ -578,51 +638,74 @@ export default function Quiz() {
           <Progress value={progress} className="h-2 bg-blue-100 mt-2" />
         </div>
 
-        <div className="max-w-[720px] mx-auto mt-14 w-full">
-          <p className="mt-4 font-sora text-3xl text-left ">
+        <motion.div
+          key={step}
+          initial={{ opacity: 0, x: 15 }}
+          animate={{ opacity: 1, x: 0 }}
+          transition={{ duration: 0.15, ease: "easeOut" }}
+          className="max-w-[720px] mx-auto mt-10 w-full"
+        >
+          <p className="mt-4 font-sora text-3xl text-left font-semibold text-gray-900">
             {currentQ.question.question}
           </p>
-          <p className="text-base font-inter tracking-tight text-muted-foreground mt-4">
-            Note: Your selection will help to improve platform experience and
-            will not be shared with anyone.
-          </p>
+          <div className="flex items-center gap-2 mt-3 text-xs text-muted-foreground font-inter">
+            <span className="bg-blue-50 text-blue-600 px-2 py-0.5 rounded font-medium">
+              Section: {currentQ.section.replace("_", " ")}
+            </span>
+            <span>•</span>
+            <span>⚡ Tip: Press keys <kbd className="px-1 py-0.5 bg-gray-200 text-gray-700 rounded text-[10px]">1</kbd>–<kbd className="px-1 py-0.5 bg-gray-200 text-gray-700 rounded text-[10px]">4</kbd> or <kbd className="px-1 py-0.5 bg-gray-200 text-gray-700 rounded text-[10px]">Enter</kbd> to answer fast</span>
+          </div>
 
-          <p className="text-base font-inter  text-blue-500 italic mt-4 mb-16">
-            Section: {currentQ.section.replace("_", " ")}
-          </p>
+          <div className="mt-8">
+            {currentQ.question.options ? (
+              <div className="flex flex-col gap-3">
+                {currentQ.question.options.map((opt, i) => {
+                  const isSelected = answers[currentQ.section]?.[currentQ.index] === opt;
+                  return (
+                    <button
+                      key={i}
+                      onClick={() => handleOptionClick(opt)}
+                      className={`flex items-center justify-between px-5 py-3.5 rounded-xl text-left text-base font-medium transition-all duration-150 cursor-pointer ${
+                        isSelected
+                          ? "bg-blue-600 text-white shadow-md shadow-blue-500/20 scale-[1.01]"
+                          : "bg-gray-50 border border-gray-200 text-gray-800 hover:bg-blue-50/70 hover:border-blue-300"
+                      }`}
+                    >
+                      <div className="flex items-center gap-3">
+                        <span
+                          className={`flex items-center justify-center w-6 h-6 rounded-md text-xs font-bold font-mono transition-colors ${
+                            isSelected
+                              ? "bg-white text-blue-600"
+                              : "bg-gray-200 text-gray-600"
+                          }`}
+                        >
+                          {i + 1}
+                        </span>
+                        <span>{opt}</span>
+                      </div>
+                      {isSelected && <LuCheck className="w-5 h-5 text-white" />}
+                    </button>
+                  );
+                })}
+              </div>
+            ) : (
+              <textarea
+                className="border border-gray-300 p-3 rounded-xl w-full h-36 bg-gray-50 text-base focus:ring-2 focus:ring-blue-500 focus:outline-none transition-all"
+                placeholder="Type your answer..."
+                value={answers[currentQ.section]?.[currentQ.index] || ""}
+                onChange={(e) => saveAnswer(e.target.value)}
+              />
+            )}
+          </div>
+        </motion.div>
 
-          {currentQ.question.options ? (
-            <div className="flex flex-col gap-3">
-              {currentQ.question.options.map((opt, i) => (
-                <button
-                  key={i}
-                  onClick={() => saveAnswer(opt)}
-                  className={`px-4 py-2 rounded-md cursor-pointer ${
-                    answers[currentQ.section]?.[currentQ.index] === opt
-                      ? "bg-blue-500 border border-white text-white"
-                      : "bg-gray-50 border border-gray-300 hover:bg-blue-100 hover:border-blue-500"
-                  }`}
-                >
-                  {opt}
-                </button>
-              ))}
-            </div>
-          ) : (
-            <textarea
-              className="border p-2 rounded-lg w-full h-40 bg-gray-50"
-              placeholder="Type your answer..."
-              value={answers[currentQ.section]?.[currentQ.index] || ""}
-              onChange={(e) => saveAnswer(e.target.value)}
-            />
-          )}
-        </div>
-
-        <div className="mt-auto border-t-2">
-          <div className="flex justify-between mt-6 max-w-[800px] mx-auto w-full">
+        <div className="mt-auto border-t border-gray-200 pt-4">
+          <div className="flex justify-between max-w-[800px] mx-auto w-full">
             <Button
               variant="outline"
               disabled={step === 0}
               onClick={() => setStep((s) => Math.max(s - 1, 0))}
+              className="rounded-xl px-5"
             >
               <LuArrowLeft className="inline mr-2" /> Back
             </Button>
@@ -633,15 +716,19 @@ export default function Quiz() {
                   setStep((s) => Math.min(s + 1, allQuestions.length - 1))
                 }
                 disabled={!answers[currentQ.section]?.[currentQ.index]}
+                className="bg-blue-600 hover:bg-blue-700 text-white rounded-xl px-6"
               >
                 Next <LuArrowRight className="inline ml-2" />
               </Button>
             ) : (
               <Button
-                className="bg-blue-500 cursor-pointer text-white"
-                onClick={() => setFinished(true)}
+                className="bg-emerald-600 hover:bg-emerald-700 cursor-pointer text-white rounded-xl px-6 font-semibold shadow-md shadow-emerald-500/20"
+                onClick={() => {
+                  setFinished(true);
+                  handleSubmit();
+                }}
               >
-                Finish <LuArrowRight className="inline ml-2" />
+                Finish Quiz <LuArrowRight className="inline ml-2" />
               </Button>
             )}
           </div>

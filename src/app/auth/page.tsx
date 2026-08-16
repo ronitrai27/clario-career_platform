@@ -1,282 +1,134 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 "use client";
 
-import Image from "next/image";
-import { MarqueeDemo } from "./_components/MarqueeLogin";
-import { Button } from "@/components/ui/button";
-import { Label } from "@/components/ui/label";
-import { Input } from "@/components/ui/input";
-import { useRef, useState } from "react";
-import { LuChevronRight, LuInfo, LuLoader } from "react-icons/lu";
-import { AnimatedGradientTextDemo } from "./_components/GerdaientText";
-// import Silk from "@/components/Silk/Silk";
-import { toast } from "sonner";
+import { useUserData } from "@/context/UserDataProvider";
+import { useEffect, useState } from "react";
+import { LuLoader } from "react-icons/lu";
 import { createClient } from "@/lib/supabase/client";
+import { Button } from "@/components/ui/button";
 import { useRouter } from "next/navigation";
-import HCaptcha from "@hcaptcha/react-hcaptcha";
-import Link from "next/link";
+import { SpinningText } from "@/components/magicui/spinning-text";
 
-export default function AuthPage() {
-  const captchaRef = useRef<HCaptcha>(null);
-  const router = useRouter();
-  const [token, setToken] = useState<string | null>(null);
-  const [loading, setLoading] = useState<boolean>(false);
-  const [error, setError] = useState<string>("");
+import { Briefcase, Users } from "lucide-react";
+import { LuFlagTriangleRight, LuGraduationCap } from "react-icons/lu";
+import { FaGoogle } from "react-icons/fa6";
+import { toast } from "sonner";
+import Image from "next/image";
+import { OnboardingCard } from "../_components/OnBoardingCard";
 
-  const [email, setEmail] = useState<string>("");
-  const [password, setPassword] = useState<string>("");
-  // signup - create account, signin - login
-  const [isSignup, setIsSignup] = useState<boolean>(false);
+const steps = [
+  {
+    // Let's get to know you better. Share a few details to personalize your experience.
+    id: 1,
+    title: "Welcome",
+    description: "Let's get to know you better",
+    icon: LuFlagTriangleRight,
+  },
+  {
+    // tell us what best describes you right now.
+    id: 2,
+    title: "Current Status",
+    description: " what best describes you right now.",
+    icon: Briefcase,
+  },
+  {
+    // dynamiclly show on basis of step 1 , what they want to acheieve
+    id: 3,
+    title: "Your Focus",
+    description: "Choose your main goals",
+    icon: LuGraduationCap,
+  },
+];
+
+export default function CallbackPage() {
   const supabase = createClient();
+  const router = useRouter();
+  const { user, loading, ensureUserInDB, isNewUser } = useUserData();
 
-  const handleLogin = async (provider: "google" | "discord" | "slack_oidc") => {
-    const { error } = await supabase.auth.signInWithOAuth({
-      provider,
-      options: {
-        redirectTo: `${window.location.origin}/auth/callback`,
-        queryParams: {
-          role: "user",
-        },
-      },
-    });
+  // useEffect(() => {
+  //   ensureUserInDB();
+  // }, []);
 
-    if (error) {
-      console.error("Login error:", error.message);
-      toast.error(error.message);
-    }
-  };
+  useEffect(() => {
+    if (!loading && user) {
+      const isOnboardingIncomplete =
+        typeof window !== "undefined" &&
+        localStorage.getItem("isOnboardingDone") === "false";
 
-  async function HandleAuth() {
-    setLoading(true);
-    setError("");
-    try {
-      if (isSignup) {
-        // signup functionality
-        const { data, error } = await supabase.auth.signUp({
-          email,
-          password,
-          options: {
-            emailRedirectTo: `${window.location.origin}/email-verified`,
-            // captchaToken: token || undefined,
-            data: { role: "user" },
-          },
-        });
-
-        if (error) throw error;
-        // for email verification
-        if (data.user && !data.session) {
-          setError("Please check your email for verification link");
-          return;
-        }
+      if (isNewUser) {
+        toast(`Welcome aboard, ${user?.userEmail}!`);
+      } else if (isOnboardingIncomplete || user?.is_verified === false) {
+        toast("Resuming your onboarding Process");
       } else {
-        // login functionality
-        const { data, error } = await supabase.auth.signInWithPassword({
-          email,
-          password,
-          options: {
-            // captchaToken: token || undefined,
-          },
-        });
-
-        if (error) throw error;
-        if (data.session) {
-          router.push("/auth/callback");
-        }
+        toast(`Welcome back, ${user?.userName}!`);
+        router.push("/home");
       }
-    } catch (err: any) {
-      setError(err.error_description || err.message);
-    } finally {
-      setLoading(false);
+    }
+  }, [isNewUser, loading, user]);
+
+  // localStorage.setItem("isOnboardingDone", "true");
+
+  async function signOut() {
+    try {
+      await supabase.auth.signOut();
+      router.push("/auth");
+    } catch (error) {
+      console.error("Error signing out:", error);
     }
   }
-  return (
-    <section>
-      <main className="flex lg:flex-row gap-10">
-        {/* LEFT SIDE */}
-        <div className="flex-1">
-          <div className="w-full h-full flex flex-col items-center justify-center">
-            <div className="flex items-center mb-10 cursor-pointer">
-              <Link href="/web">
-                <Image
-                  src="/clarioBlack.png"
-                  alt="logo"
-                  width={80}
-                  height={80}
-                  className=""
-                />
-              </Link>
 
-              <h1 className="font-raleway text-3xl font-bold">Clario</h1>
-            </div>
-            <div className="flex items-center">
-              <hr className="w-[40px]" />
-              <p className="text-center mb-6 text-sm font-inter whitespace-nowrap">
-                Continue using Clario with your favorite provider{" "}
-              </p>
-              <hr className="w-[40px]" />
-            </div>
-            <div className="flex flex-col gap-3">
-              <Button
-                className="font-inter text-sm tracking-wide bg-blue-50 text-black rounded border shadow-sm hover:bg-blue-100 hover:scale-105 hover:border-blue-400 cursor-pointer w-[280px] py-5"
-                onClick={() => handleLogin("google")}
-              >
-                <Image
-                  src="/search.png"
-                  alt="Google"
-                  width={25}
-                  height={25}
-                  className="mr-5"
-                />{" "}
-                continue with Google
-              </Button>
-              <Button
-                className="font-inter text-sm tracking-wide bg-blue-50 text-black rounded border shadow-sm  hover:bg-blue-100 hover:scale-105 hover:border-blue-400 cursor-pointer  w-[280px] py-5"
-                onClick={() => handleLogin("discord")}
-              >
-                <Image
-                  src="/discord.png"
-                  alt="Google"
-                  width={25}
-                  height={25}
-                  className="mr-5"
-                />{" "}
-                continue with Discord
-              </Button>
-              <Button
-                className="font-inter text-sm tracking-wide bg-blue-50 text-black rounded border shadow-sm  hover:bg-blue-100 hover:scale-105 hover:border-blue-400 cursor-pointer  w-[280px] py-5"
-                onClick={() => handleLogin("slack_oidc")}
-              >
-                <Image
-                  src="/slack.png"
-                  alt="Google"
-                  width={25}
-                  height={25}
-                  className="mr-5"
-                />{" "}
-                continue with Slack
-              </Button>
-            </div>
-            {/* ---- */}
-            {/* <p className="font-inter text-base font-light my-7">
-              {" "}
-              or continue with{" "}
-              <span className="font-medium font-raleway  text-blue-500  ml-4">
-                {isSignup ? "Creating Account" : "Logging In"}
-              </span>
-            </p> */}
-
-            <div className="flex flex-col gap-5 w-full max-w-[320px] mx-auto">
-              {/* <div className="flex items-center justify-center gap-2 ">
-                <Label className="font-inter">Email</Label>
-                <Input
-                  placeholder="Enter your email"
-                  type="email"
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                  className="w-full rounded border "
-                />
-              </div>
-              <div className="flex items-center justify-center gap-2 ">
-                <Label className="font-inter">Pass</Label>
-                <Input
-                  placeholder="Enter your password"
-                  type="password"
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
-                  className="w-full rounded border "
-                />
-              </div>
-               */}
-
-              {/* <Button
-                className="rounded border font-sora cursor-pointer bg-black"
-                disabled={loading}
-                onClick={HandleAuth}
-              >
-                {loading ? (
-                  <>
-                    <LuLoader className="animate-spin" />
-                    {isSignup ? "Signing up..." : "Signing in..."}
-                  </>
-                ) : (
-                  <>
-                    {isSignup ? "Sign Up" : "Sign In"}
-                    <LuChevronRight />
-                  </>
-                )}
-              </Button> */}
-
-              {/* <p className="font-inter text-sm font-light py-10">
-                {isSignup
-                  ? "Already have an account?"
-                  : "Don't have an account?"}{" "}
-                <span
-                  className="font-medium text-blue-500 text-sm font-raleway cursor-pointer"
-                  onClick={() => setIsSignup(!isSignup)}
-                >
-                  {isSignup ? "Sign In" : "Sign Up"}
-                </span>
-              </p> */}
-
-              <p
-                onClick={() => router.push("/auth-mentor")}
-                className="text-base font-medium py-10 text-center"
-              >
-                {" "}
-                Are you a Mentor ?{" "}
-                <span className="text-blue-500 cursor-pointer">
-                  Click here!
-                </span>
-              </p>
-            </div>
-
-            {error && (
-              <p className="font-raleway text-sm text-muted-foreground text-center mt-10">
-                <LuInfo className="mr-2 inline" /> {error}
-              </p>
-            )}
-          </div>
+  if (loading || !user) {
+    return (
+      <div className="flex flex-col items-center justify-center h-screen">
+        <div className="flex items-center text-2xl font-raleway font-medium tracking-wide">
+          <LuLoader className="animate-spin inlinr mr-4" />
+          <p>Validating user...</p>
         </div>
-        {/* RIGHT SIDE */}
-        <div className="h-screen w-[55%] bg-blue-700 relative">
-          <div
-            className="absolute inset-0 z-0"
-            style={{
-              background: `
-        radial-gradient(ellipse 80% 60% at 70% 20%, rgba(90, 70, 200, 0.85), transparent 70%),
-        radial-gradient(ellipse 70% 60% at 20% 80%, rgba(40, 120, 220, 0.75), transparent 70%),
-        radial-gradient(ellipse 65% 55% at 60% 65%, rgba(0, 180, 255, 0.55), transparent 70%),
-        radial-gradient(ellipse 65% 40% at 50% 60%, rgba(180, 60, 200, 0.45), transparent 70%),
-        linear-gradient(180deg, #0f172a 0%, #1e293b 100%)
-      `,
-            }}
-          />
+        <p className="mt-8 font-inter text-xl tracking-wide">
+          Please wait and tighten your seatbelt
+        </p>
+      </div>
+    );
+  }
 
-          <div className="absolute top-[16%] left-1/2 -translate-x-1/2 -translate-y-1/2">
-            <AnimatedGradientTextDemo />
-          </div>
-          <div className="absolute inset-0 ">
+  const onboardingStatus =
+    typeof window !== "undefined"
+      ? localStorage.getItem("isOnboardingDone")
+      : null;
+
+  if (onboardingStatus === "false" || isNewUser) {
+    return (
+      <div className="w-full h-screen relative bg-white overflow-hidden">
+        <div
+          className="absolute inset-0 z-0"
+          style={{
+            background:
+              "radial-gradient(125% 125% at 50% 90%, #fff 40%, #6366f1 100%)",
+          }}
+        />
+        <div className="absolute top-2 left-5">
+          <div className="flex items-center ">
             <Image
               src="/clarioWhite.png"
-              alt="Clario"
-              width={100}
-              height={100}
-              className="absolute top-[32%] left-1/2 -translate-x-1/2 -translate-y-1/2"
+              alt="logo"
+              width={60}
+              height={60}
+              className=""
             />
-          </div>
-
-          <div className="absolute top-[48%] left-1/2 -translate-x-1/2 -translate-y-1/2 w-full ">
-            <h1 className="text-[58px] font-bold text-white/70 font-sora tracking-wide text-center leading-tight">
-              “Clarity Today, <br /> <span className="">Success Tomorrow.</span>
-              ”
+            <h1 className="font-raleway text-3xl font-bold text-white">
+              Clario
             </h1>
           </div>
-
-          <div className="w-[99%] mx-auto absolute bottom-2">
-            <MarqueeDemo />
-          </div>
         </div>
-      </main>
-    </section>
-  );
+        <div className="absolute top-14 right-16">
+          <SpinningText className="text-white tracking-wide">
+            learn more • earn more • grow more •
+          </SpinningText>
+        </div>
+        <main className="relative z-50 h-full w-full flex items-center justify-center">
+          <OnboardingCard />
+        </main>
+      </div>
+    );
+  }
 }

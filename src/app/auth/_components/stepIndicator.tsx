@@ -14,8 +14,6 @@ const steps: StepMeta[] = [
   { key: 1, label: "Basics", icon: <UserRound className="h-4 w-4" /> },
   { key: 2, label: "Profile", icon: <GraduationCap className="h-4 w-4" /> },
   { key: 3, label: "Focus", icon: <Target className="h-4 w-4" /> },
-  { key: 4, label: "Info", icon: <EarIcon className="h-4 w-4" /> },
-  { key: 5, label: "Invite", icon: <Users className="h-4 w-4" /> },
 ]
 
 export function StepIndicator({
