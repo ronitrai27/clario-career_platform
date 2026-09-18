@@ -44,9 +44,9 @@ import dynamicImport from "next/dynamic";
 const FaceDetectionCanvas = dynamicImport(
   () =>
     import("../_components/FaceDetectionCanvas").then(
-      (mod) => mod.FaceDetectionCanvas
+      (mod) => mod.FaceDetectionCanvas,
     ),
-  { ssr: false }
+  { ssr: false },
 );
 
 const VAPI_PUBLIC_KEY = process.env.NEXT_PUBLIC_VAPI_PUBLIC_KEY;
@@ -237,8 +237,9 @@ Key Guidelines:
       });
 
       console.log("🎤 Vapi Interview started successfully!");
-    } catch (error) {
+    } catch (error: any) {
       console.error("❌ Error starting call:", error);
+      toast.error(error?.message || "Failed to start AI voice connection");
       setLoading(false);
     }
   };
@@ -271,7 +272,10 @@ Key Guidelines:
       setLoading(false);
       toast.info("Interview Has been started", {
         description: (
-          <span className="text-sm text-black font-semibold" style={{ color: "#000000" }}>
+          <span
+            className="text-sm text-black font-semibold"
+            style={{ color: "#000000" }}
+          >
             Your Interview Has Been started!{" "}
             <span className="text-blue-600 font-bold">All the best</span>
           </span>
@@ -320,7 +324,10 @@ Key Guidelines:
     // 4. Single toast notification
     toast.success("Interview Has been Ended", {
       description: (
-        <span className="text-sm text-black font-semibold" style={{ color: "#000000" }}>
+        <span
+          className="text-sm text-black font-semibold"
+          style={{ color: "#000000" }}
+        >
           Your Interview Has Been Ended!
         </span>
       ),
@@ -354,7 +361,7 @@ Key Guidelines:
           conversation: messages,
           jobTitle: interviewData?.jobTitle || "Professional Candidate",
         },
-        { timeout: 15000 }
+        { timeout: 15000 },
       );
 
       const feedbackData = response.data?.data;

@@ -150,12 +150,21 @@ const CareerCoach = () => {
       const aiReply = await runAgent(ctx);
       console.log("AI Reply:---------->", aiReply);
 
+      const replyText =
+        typeof aiReply === "string" ? aiReply : aiReply?.content || "";
+
       const aiMessage: Message = {
         role: "ai",
-        text: typeof aiReply === "string" ? aiReply : String(aiReply),
+        text: replyText,
       };
 
       setMessages((prev) => [...prev, aiMessage]);
+
+      if (aiReply && typeof aiReply === "object" && aiReply.updatedCareer) {
+        toast.success(`Career choice updated to "${aiReply.updatedCareer}" in database!`, {
+          description: "Your personalized dashboard and roadmaps are now aligned with your new path.",
+        });
+      }
       // FOLLOW UP QUESTIONS=====================================
       (async () => {
         try {

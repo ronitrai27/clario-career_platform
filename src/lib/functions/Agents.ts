@@ -186,6 +186,8 @@ For accurate and personalized guidance, you can use two knowledge tools freely:
 
   const openai = getOpenAI();
 
+  let updatedCareer: string | null = null;
+
   try {
     while (true) {
       const response = await openai.chat.completions.create({
@@ -214,6 +216,9 @@ For accurate and personalized guidance, you can use two knowledge tools freely:
             if (tool) {
               const result = await tool(args as any);
               console.log(`Result from ${name}:`, result);
+              if (name === "updateCareerTool" && result) {
+                updatedCareer = (args as any)?.selectedCareer || result;
+              }
               resultStr =
                 typeof result === "string"
                   ? result
@@ -228,7 +233,10 @@ For accurate and personalized guidance, you can use two knowledge tools freely:
           }
         }
       } else {
-        return responseMessage.content ?? "";
+        return {
+          content: responseMessage.content ?? "",
+          updatedCareer,
+        };
       }
     }
   } catch (error: any) {
@@ -238,9 +246,13 @@ For accurate and personalized guidance, you can use two knowledge tools freely:
       String(error?.message).includes("429") ||
       String(error?.message).includes("quota")
     ) {
-      return "⚠️ OpenAI API rate limit or quota exceeded. Please check your plan/billing details or try again later.";
+      return {
+        content: "⚠️ OpenAI API rate limit or quota exceeded. Please check your plan/billing details or try again later.",
+      };
     }
-    return `⚠️ An error occurred: ${error?.message || "Please try again."}`;
+    return {
+      content: `⚠️ An error occurred: ${error?.message || "Please try again."}`,
+    };
   }
 }
 

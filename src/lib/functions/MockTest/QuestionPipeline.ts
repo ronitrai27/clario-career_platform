@@ -21,9 +21,11 @@ class QuestionGenerationPipeline {
         throw new Error('GROQ_API_KEY environment variable is not set');
       }
       
+      const modelName = process.env.GROQ_MODEL || 'openai/gpt-oss-120b';
+
       this.llm = new ChatGroq({
         apiKey: apiKey,
-        model: 'llama-3.3-70b-versatile', // Current active Groq model, reliable JSON output
+        model: modelName,
         temperature: 0.5,
         maxTokens: 2500,
       });

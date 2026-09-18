@@ -67,9 +67,11 @@ export async function POST(request: Request) {
       );
     }
 
+    const modelName = process.env.GROQ_MODEL || "openai/gpt-oss-120b";
+
     const llm = new ChatGroq({
       apiKey,
-      model: "llama-3.3-70b-versatile",
+      model: modelName,
       temperature: 0.6,
       maxTokens: 1200,
       maxRetries: 3,

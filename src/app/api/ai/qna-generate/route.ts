@@ -11,15 +11,24 @@ interface InterviewRequest {
   jobDescription: string;
 }
 
-const questionSchema = z.array(
+const questionSchema = z.union([
   z.object({
     interviewQuestions: z.array(
       z.object({
         question: z.string().describe("The interview question"),
       })
     ),
-  })
-);
+  }),
+  z.array(
+    z.object({
+      interviewQuestions: z.array(
+        z.object({
+          question: z.string().describe("The interview question"),
+        })
+      ),
+    })
+  ),
+]);
 
 const parser = StructuredOutputParser.fromZodSchema(questionSchema as any);
 
@@ -36,7 +45,7 @@ Your task:
   - 1-2 advanced-level questions (to test deep expertise or problem-solving ability).
   - Each question should be short to medium length, clear, and suitable for an oral conversation enough to understand the candidate's skills.
 - Make sure the questions are realistic, relevant, and diverse in focus (e.g., theory, application, reasoning).
-- Return a JSON array containing a single object with the key 'interviewQuestions' containing an array of objects with 'question' field.
+- Return a JSON object with the key 'interviewQuestions' containing an array of objects with 'question' field.
 - Do not include markdown, explanations, or extra text.
 
 {format_instructions}
@@ -53,11 +62,13 @@ export async function POST(request: Request) {
       );
     }
 
+    const modelName = process.env.GROQ_MODEL || "openai/gpt-oss-120b";
+
     const llm = new ChatGroq({
       apiKey,
-      model: "llama-3.3-70b-versatile",
-      temperature: 0.7,
-      maxTokens: 600,
+      model: modelName,
+      temperature: 0.6,
+      maxTokens: 2500,
       maxRetries: 3,
     });
 
@@ -79,18 +90,40 @@ export async function POST(request: Request) {
       format_instructions: parser.getFormatInstructions(),
     };
 
-    // Run the chain
-    const result = await chain.invoke(input);
+    let result: any;
+    try {
+      result = await chain.invoke(input);
+    } catch (parseErr) {
+      console.warn("Chain parsing failed in qna-generate, trying fallback extraction...", parseErr);
+      const rawRes = await promptTemplate.pipe(llm).invoke(input);
+      const text = typeof rawRes.content === "string" ? rawRes.content : JSON.stringify(rawRes.content);
+      const jsonMatch = text.match(/\{[\s\S]*\}|\[[\s\S]*\]/);
+      if (jsonMatch) {
+        result = JSON.parse(jsonMatch[0]);
+      } else {
+        throw parseErr;
+      }
+    }
 
-    // Fallback to extract inner object for UI
-    const finalResult =
-      Array.isArray(result) && result[0]?.interviewQuestions
-        ? { interviewQuestions: result[0].interviewQuestions }
-        : result;
+    // Extract inner interviewQuestions array for UI
+    let questions: any[] = [];
+    if (Array.isArray(result)) {
+      questions = result[0]?.interviewQuestions || result;
+    } else if (result?.interviewQuestions) {
+      questions = result.interviewQuestions;
+    }
+
+    const finalResult = {
+      interviewQuestions: questions.map((q: any) => ({
+        question: typeof q === "string" ? q : q?.question || "",
+      })),
+    };
+
+    console.log("✅ All questions generated successfully:", JSON.stringify(finalResult, null, 2));
 
     return NextResponse.json({ data: finalResult });
   } catch (error: any) {
-    console.error("❌ ERROR:", error);
+    console.error("❌ ERROR in qna-generate:", error);
     return NextResponse.json(
       { isError: true, error: error.message || "Failed to generate questions" },
       { status: 500 }

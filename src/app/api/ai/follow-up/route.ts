@@ -31,11 +31,13 @@ export async function POST(req: Request) {
       return NextResponse.json({ followUps: [] }, { status: 500 });
     }
 
+    const modelName = process.env.GROQ_MODEL || "openai/gpt-oss-120b";
+
     const llm = new ChatGroq({
       apiKey,
-      model: "llama-3.3-70b-versatile",
+      model: modelName,
       temperature: 0.7,
-      maxTokens: 300,
+      maxTokens: 800,
     });
 
     const chain = promptTemplate.pipe(llm).pipe(parser);

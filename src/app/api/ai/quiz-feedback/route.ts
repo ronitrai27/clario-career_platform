@@ -95,11 +95,13 @@ export async function POST(request: Request) {
       );
     }
 
+    const modelName = process.env.GROQ_MODEL || "openai/gpt-oss-120b";
+
     const llm = new ChatGroq({
       apiKey,
-      model: "llama-3.3-70b-versatile",
-      temperature: 0.4,
-      maxTokens: 600,
+      model: modelName,
+      temperature: 0.3,
+      maxTokens: 1200,
     });
     const body: QuizRequest = await request.json();
     const { quizData, userStatus, mainFocus } = body;
@@ -126,7 +128,20 @@ export async function POST(request: Request) {
       format_instructions: parser.getFormatInstructions(),
     };
 
-    const result = (await chain.invoke(input)) as z.infer<typeof schema>;
+    let result: any;
+    try {
+      result = (await chain.invoke(input)) as z.infer<typeof schema>;
+    } catch (parseErr) {
+      console.warn("Chain parsing failed, attempting fallback JSON parse...", parseErr);
+      const rawRes = await prompt.pipe(llm).invoke(input);
+      const text = typeof rawRes.content === "string" ? rawRes.content : JSON.stringify(rawRes.content);
+      const jsonMatch = text.match(/\{[\s\S]*\}/);
+      if (jsonMatch) {
+        result = JSON.parse(jsonMatch[0]);
+      } else {
+        throw parseErr;
+      }
+    }
 
     // Normalize (safe defaults to avoid UI crash) ---
     const finalResult = {
